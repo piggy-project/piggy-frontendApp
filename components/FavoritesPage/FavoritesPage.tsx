@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, View } from 'react-native';
-import MainHeader from '../Parts/MainHeader';
+import MainHeader from '../Header/MainHeader';
 import { styles } from './Favorites.styles';
 
 export default function FavoritesPage() {

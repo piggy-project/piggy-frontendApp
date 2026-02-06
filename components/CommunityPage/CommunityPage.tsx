@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, View } from 'react-native';
-import MainHeader from '../Parts/MainHeader';
+import MainHeader from '../Header/MainHeader';
 import { styles } from './Community.styles';
 
 export default function CommunityPage() {
