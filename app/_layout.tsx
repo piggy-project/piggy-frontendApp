@@ -11,8 +11,14 @@ export default function RootLayout() {
       />
 
       <SafeAreaView style={{ flex: 1 }}>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack
+          // 이 스택에 포함된 모든 시스템 헤더 끄기
+          screenOptions={{
+            headerShown: false,
+          }}
+        >
+
+          <Stack.Screen name="(tabs)" />
         </Stack>
       </SafeAreaView>
     </>

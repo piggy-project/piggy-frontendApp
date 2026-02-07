@@ -1,0 +1,35 @@
+import { Dimensions, StyleSheet } from "react-native";
+const { height, width } = Dimensions.get('window');
+
+export const styles = StyleSheet.create({
+  container: {
+    marginBottom: 20,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#333',
+  },
+  graphWrapper: {
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5', // 회색 배경 (스크린샷 느낌)
+    borderRadius: 16,
+    paddingVertical: 10,
+  },
+  // 로딩용 스타일
+  graphContainer: {
+    height: 250,
+    backgroundColor: '#E0E0E0', // 로딩 중 회색 박스
+    borderRadius: 16,
+    marginBottom: 20,
+  },
+  center: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 10,
+    color: '#666',
+  },
+});

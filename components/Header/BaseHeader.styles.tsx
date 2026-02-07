@@ -6,12 +6,12 @@ export const styles = StyleSheet.create({
     height: 60,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
+    paddingHorizontal: 0,
     justifyContent: 'space-between',
   },
 
   leftArea: {
-    width: 60,
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'flex-start',
   },
@@ -23,7 +23,7 @@ export const styles = StyleSheet.create({
   },
 
   rightArea: {
-    width: 80,
+    flex: 1,
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignItems: 'center',
