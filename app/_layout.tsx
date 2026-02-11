@@ -10,7 +10,7 @@ export default function RootLayout() {
         barStyle="dark-content"
       />
 
-      <SafeAreaView style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1 }} edges={['top', 'left', 'right']}>
         <Stack
           // 이 스택에 포함된 모든 시스템 헤더 끄기
           screenOptions={{

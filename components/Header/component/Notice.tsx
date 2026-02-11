@@ -1,11 +1,13 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import React from 'react';
 import { TouchableOpacity } from 'react-native';
 
 export default function Notice() {
+  const router = useRouter();
 
   const openNotification = () => {
-    console.log("알림창 열기");
+    router.push('/notification'); 
   };
 
   return (

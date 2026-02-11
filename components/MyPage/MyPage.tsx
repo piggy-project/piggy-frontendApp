@@ -1,17 +1,16 @@
 import React from 'react';
-import { Text, View } from 'react-native';
-import MainHeader from '../Header/MainHeader';
+import { View } from 'react-native';
+import MyPageHeader from '../Header/MyPageHeader';
 import { styles } from './MyPage.styles';
+import ProfileInfo from './component/ProfileInfo';
 
 export default function MyPage() {
   return (
     <View style={styles.container}>
-      <MainHeader />
+      <MyPageHeader />
       <View style={[styles.sectionGap, { flex: 1 }]}>
         {/*<기능 컴포넌트 넣기/>*/}
-      <Text>
-        마이페이지
-      </Text>
+        <ProfileInfo/>
       </View>
     </View>
   );
