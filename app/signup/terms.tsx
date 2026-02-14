@@ -1,16 +1,16 @@
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useSignupData } from '../../components/utils/SignupContext';
 
-type Props = {
-  onNext: () => void;
-};
+export default function SignupTerms() {
+  const router = useRouter();
+  const { updateData } = useSignupData();
 
-export default function Step1_Terms({ onNext }: Props) {
   const [allAgreed, setAllAgreed] = useState(false);
   const [term1, setTerm1] = useState(false);
   const [term2, setTerm2] = useState(false);
 
-  // 전체 동의 토글
   const toggleAll = () => {
     const newValue = !allAgreed;
     setAllAgreed(newValue);
@@ -18,17 +18,23 @@ export default function Step1_Terms({ onNext }: Props) {
     setTerm2(newValue);
   };
 
-  // 개별 토글 시 전체 동의 상태 업데이트
   const toggleTerm1 = () => {
-    setTerm1(!term1);
-    if (!term1 && term2) setAllAgreed(true);
+    const nextVal = !term1;
+    setTerm1(nextVal);
+    if (nextVal && term2) setAllAgreed(true);
     else setAllAgreed(false);
   };
 
   const toggleTerm2 = () => {
-    setTerm2(!term2);
-    if (term1 && !term2) setAllAgreed(true);
+    const nextVal = !term2;
+    setTerm2(nextVal);
+    if (term1 && nextVal) setAllAgreed(true);
     else setAllAgreed(false);
+  };
+
+  const handleNext = () => {
+    updateData({ termsAgreed: true });
+    router.push('/signup/email');
   };
 
   return (
@@ -46,13 +52,12 @@ export default function Step1_Terms({ onNext }: Props) {
 
         <View style={styles.divider} />
 
-        {/* 개별 약관 1 */}
+        {/* 개별 약관 */}
         <TouchableOpacity style={styles.checkboxRow} onPress={toggleTerm1}>
           <Text style={[styles.checkIcon, term1 && styles.activeText]}>✓</Text>
           <Text style={styles.checkboxLabel}>[필수] 서비스 이용약관 동의</Text>
         </TouchableOpacity>
 
-        {/* 개별 약관 2 */}
         <TouchableOpacity style={styles.checkboxRow} onPress={toggleTerm2}>
           <Text style={[styles.checkIcon, term2 && styles.activeText]}>✓</Text>
           <Text style={styles.checkboxLabel}>[필수] 개인정보 처리방침 동의</Text>
@@ -61,7 +66,7 @@ export default function Step1_Terms({ onNext }: Props) {
 
       <TouchableOpacity 
         style={[styles.button, (!term1 || !term2) && styles.disabledButton]} 
-        onPress={onNext}
+        onPress={handleNext}
         disabled={!term1 || !term2}
       >
         <Text style={styles.buttonText}>동의하고 가입하기</Text>
@@ -71,8 +76,8 @@ export default function Step1_Terms({ onNext }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, justifyContent: 'space-between', backgroundColor: '#fff' },
-  content: { marginTop: 40 },
+  container: { flex: 1, padding: 20, justifyContent: 'space-between', backgroundColor: '#fff', paddingTop: 60 },
+  content: { marginTop: 50 },
   title: { fontSize: 24, fontWeight: 'bold', marginBottom: 40, lineHeight: 32 },
   checkboxRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 20 },
   checkbox: { width: 24, height: 24, borderWidth: 1, borderColor: '#ccc', borderRadius: 4, marginRight: 10, justifyContent: 'center', alignItems: 'center' },
@@ -83,7 +88,7 @@ const styles = StyleSheet.create({
   checkboxLabelBold: { fontSize: 16, fontWeight: 'bold' },
   checkboxLabel: { fontSize: 16, color: '#555' },
   divider: { height: 1, backgroundColor: '#eee', marginBottom: 20 },
-  button: { backgroundColor: '#ddd', padding: 16, borderRadius: 8, alignItems: 'center', marginBottom: 20 },
-  disabledButton: { backgroundColor: '#f0f0f0' },
-  buttonText: { fontSize: 16, fontWeight: '600', color: '#333' },
+  button: { backgroundColor: '#333', padding: 16, borderRadius: 8, alignItems: 'center', marginBottom: 20 },
+  disabledButton: { backgroundColor: '#ddd' },
+  buttonText: { fontSize: 16, fontWeight: '600', color: '#fff' },
 });

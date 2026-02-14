@@ -3,11 +3,12 @@ import { StyleSheet } from 'react-native';
 export const styles = StyleSheet.create({
 
   container: {
-    height: 60,
+    minHeight: 60,
+    paddingBottom: 10,
+    
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 0,
-    justifyContent: 'space-between',
+    paddingHorizontal: 0, 
   },
 
   leftArea: {

@@ -1,5 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { styles } from './BaseHeader.styles';
 
 interface Props {
@@ -9,9 +10,12 @@ interface Props {
 }
 
 export default function BaseHeader({ left, center, right }: Props) {
-
+  const insets = useSafeAreaInsets();
   return (
-    <View style={styles.container}>
+    <View style={[
+      styles.container, 
+      { paddingTop: insets.top }
+    ]}>
 
       {/* 왼쪽 */}
       <View style={styles.leftArea}>
