@@ -2,7 +2,11 @@ import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { styles } from './ProfileInfo.styles';
 
-export default function ProfileInfo() {
+type Props = {
+  onLogout: () => void;
+};
+
+export default function ProfileInfo({ onLogout }: Props) {
   return (
     <View style={styles.container}>
       {/* 프로필 이미지 (회색 박스) */}
@@ -14,6 +18,10 @@ export default function ProfileInfo() {
 
       <TouchableOpacity style={styles.editButton}>
         <Text style={styles.editButtonText}>내 정보 수정</Text>
+      </TouchableOpacity>
+      {/* 로그아웃 버튼 */}
+      <TouchableOpacity style={styles.logoutButton} onPress={onLogout}>
+        <Text style={styles.logoutButtonText}>로그아웃</Text>
       </TouchableOpacity>
     </View>
   );

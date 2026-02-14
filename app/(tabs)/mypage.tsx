@@ -1,25 +1,50 @@
-import React, { useState } from 'react';
-// 경로에 맞춰 import 해주세요
+import React, { useEffect, useState } from 'react';
+import LoginPage from '../../components/LoginPage/LoginPage';
 import MyPage from '../../components/MyPage/MyPage';
 import UserRegisterPage from '../../components/UserRegisterPage/UserRegisterPage';
-import LoginPage from '../../components/LoginPage/LoginPage';
+import { getToken, removeToken } from '../../components/utils/authStore';
 
 export default function My() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 여부
-  const [showLogin, setShowLogin] = useState(false);   // 로그인 화면 보여줄지 여부
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
+  const [loading, setLoading] = useState(true); // 로딩 상태 추가
+
+  // 앱 켜지면 토큰 검사
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      const token = await getToken();
+      if (token) {
+        // 토큰이 있으면 로그인 된 것으로 간주
+        setIsLoggedIn(true);
+      }
+      setLoading(false);
+    };
+    checkLoginStatus();
+  }, []);
+
+  // 로그아웃 함수 정의
+  const handleLogout = async () => {
+    await removeToken(); // 저장소에서 토큰 삭제
+    setIsLoggedIn(false);
+    setShowLogin(false);
+  };
+
+  if (loading) return null; // 혹은 로딩 스피너
+
+  if (isLoggedIn) {
+    return <MyPage onLogout={handleLogout} />;
+  }
 
   // 1. 로그인이 되어있다면 -> 마이페이지
   if (isLoggedIn) {
-    return <MyPage />;
+    return <MyPage onLogout={handleLogout} />;
   }
 
   // 2. 로그인 화면 보기 상태라면 -> 로그인 페이지
   if (showLogin) {
     return (
       <LoginPage 
-        // 뒤로가기 누르면 다시 회원가입(웰컴) 화면으로 돌아감
         onBack={() => setShowLogin(false)} 
-        // 로그인 성공 시 처리
         onLoginSuccess={() => setIsLoggedIn(true)}
       />
     );
@@ -28,9 +53,7 @@ export default function My() {
   // 3. 기본값 -> 회원가입 페이지
   return (
     <UserRegisterPage 
-      // 여기서 로그인 버튼을 누르면 showLogin을 true로 변경!
       onLoginPress={() => setShowLogin(true)} 
-      // onFinish={() => setIsLoggedIn(true)} 
     />
   );
 }

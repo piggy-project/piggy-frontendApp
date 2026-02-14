@@ -31,4 +31,13 @@ export const styles = StyleSheet.create({
     fontSize: 12,
     color: '#555',
   },
+  logoutButton: {
+    marginTop: 10,
+    padding: 5,
+  },
+  logoutButtonText: {
+    color: '#888',
+    fontSize: 13,
+    textDecorationLine: 'underline',
+  },
 });
