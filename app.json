@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "som",
-    "slug": "som",
+    "name": "Piggy",
+    "slug": "piggy",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "som",
+    "icon": "./assets/images/piggyicon.png",
+    "scheme": "piggy",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -30,7 +30,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/piggysplash.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff",

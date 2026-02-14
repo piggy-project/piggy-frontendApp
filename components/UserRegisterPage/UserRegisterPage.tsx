@@ -10,7 +10,12 @@ import Step3_Password from './steps/Step3_Password';
 import Step4_Nickname from './steps/Step4_Nickname';
 import Step5_Success from './steps/Step5_Success';
 
-export default function UserRegisterPage() {
+type Props = {
+  onLoginPress?: () => void; // 로그인 화면으로 전환하는 함수
+  onFinish?: () => void;     // 회원가입 완료 후 실행할 함수 (선택사항)
+};
+
+export default function UserRegisterPage({ onLoginPress, onFinish }: Props) {
   const [step, setStep] = useState(0); 
   
   const initialFormData = {
@@ -26,9 +31,8 @@ export default function UserRegisterPage() {
   useFocusEffect(
     useCallback(() => {
       return () => {
-        // 화면을 나갈 때(다른 탭 이동 시) 실행되는 정리 함수
-        setStep(0); // 단계를 0으로 초기화
-        setFormData(initialFormData); // (선택사항) 입력하던 데이터도 초기화하고 싶다면 추가
+        setStep(0); 
+        setFormData(initialFormData); 
       };
     }, [])
   );
@@ -42,7 +46,12 @@ export default function UserRegisterPage() {
   const renderStep = () => {
     switch (step) {
       case 0:
-        return <Step0_Welcome onNext={nextStep} />;
+        return (
+          <Step0_Welcome 
+            onNext={nextStep} 
+            onLoginPress={onLoginPress} 
+          />
+        );
       case 1:
         return <Step1_Terms onNext={nextStep} />;
       case 2:
@@ -70,7 +79,7 @@ export default function UserRegisterPage() {
           />
         );
       case 5:
-        return <Step5_Success formData={formData} />; 
+        return <Step5_Success formData={formData} onFinish={onFinish} />; 
       default:
         return null;
     }
