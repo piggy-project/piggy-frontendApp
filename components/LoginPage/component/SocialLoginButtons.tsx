@@ -1,22 +1,32 @@
 import React from 'react';
-import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 export default function SocialLoginButtons() {
   return (
     <View style={styles.container}>
-      {/* 네이버 */}
-      <TouchableOpacity style={[styles.circle, { backgroundColor: '#03C75A' }]}>
-        <Text style={styles.socialText}>N</Text>
+      {/* 1. 카카오톡 (노랑) */}
+      <TouchableOpacity style={styles.circle}>
+        <Image
+          source={require('@/assets/images/kakaologo.png')}
+          style={styles.logoIcon}
+        />
       </TouchableOpacity>
 
-      {/* 카카오 */}
-      <TouchableOpacity style={[styles.circle, { backgroundColor: '#FEE500' }]}>
-        <Text style={[styles.socialText, { color: '#000' }]}>K</Text>
+      {/* 2. 구글 (흰색) */}
+      <TouchableOpacity style={styles.circle}>
+        <Image
+          source={require('@/assets/images/googlelogo.png')}
+          style={styles.logoIcon}
+        />
       </TouchableOpacity>
 
-      {/* 구글 */}
-      <TouchableOpacity style={[styles.circle, { backgroundColor: '#fff', borderColor: '#ddd', borderWidth: 1 }]}>
-        <Text style={[styles.socialText, { color: '#EA4335' }]}>G</Text>
+      {/* 3. 네이버 (초록) */}
+      <TouchableOpacity style={styles.circle}>
+         {/* 네이버 로고는 초록 배경 위에서 흰색으로 보여야 합니다. */}
+        <Image
+          source={require('@/assets/images/naverlogo.png')}
+          style={styles.logoIcon}
+        />
       </TouchableOpacity>
     </View>
   );
@@ -35,15 +45,11 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 2, // 안드로이드 그림자
-    shadowColor: '#000', // iOS 그림자
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
+
   },
-  socialText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#fff',
+  logoIcon: {
+    width: 50, // 아이콘 크기 조절
+    height: 50,
+    resizeMode: 'contain',
   },
 });
