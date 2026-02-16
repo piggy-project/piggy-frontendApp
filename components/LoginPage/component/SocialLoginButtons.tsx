@@ -13,7 +13,7 @@ export default function SocialLoginButtons() {
       </TouchableOpacity>
 
       {/* 2. 구글 (흰색) */}
-      <TouchableOpacity style={styles.circle}>
+      <TouchableOpacity style={[styles.circle, styles.googleCircle]}>
         <Image
           source={require('@/assets/images/googlelogo.png')}
           style={styles.logoIcon}
@@ -22,7 +22,6 @@ export default function SocialLoginButtons() {
 
       {/* 3. 네이버 (초록) */}
       <TouchableOpacity style={styles.circle}>
-         {/* 네이버 로고는 초록 배경 위에서 흰색으로 보여야 합니다. */}
         <Image
           source={require('@/assets/images/naverlogo.png')}
           style={styles.logoIcon}
@@ -51,5 +50,17 @@ const styles = StyleSheet.create({
     width: 50, // 아이콘 크기 조절
     height: 50,
     resizeMode: 'contain',
+  },
+  googleCircle: {
+    backgroundColor: '#FFFFFF',
+
+    // iOS shadow
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4, // 그림자가 퍼지는 정도
+
+    // Android shadow
+    elevation: 2,
   },
 });

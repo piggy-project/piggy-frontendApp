@@ -38,7 +38,6 @@ export default function SignupPersonalInfo() {
   };
 
   return (
-    // ✅ ScrollView 복구
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.content}>
         <Text style={styles.title}>기본정보를 입력해주세요</Text>

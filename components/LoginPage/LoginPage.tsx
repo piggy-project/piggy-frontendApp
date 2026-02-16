@@ -7,6 +7,7 @@ import InputField from './component/InputField';
 import LoginButton from './component/LoginButton';
 import SocialLoginButtons from './component/SocialLoginButtons';
 
+import { authApi } from '../utils/api';
 import { saveToken } from '../utils/authStore';
 
 type Props = {
@@ -20,35 +21,29 @@ export default function LoginPage({ onBack, onLoginSuccess }: Props) {
 
   const handleLogin = async () => {
     try {
-      // 1. 백엔드로 로그인 요청
-      const response = await fetch('http://10.0.2.2:8080/users/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
+      // 1. authApi를 통해 로그인 요청
+      const data = await authApi.login({ email, password });
 
-      const data = await response.json();
+      // 2. 성공 시 로직
+      if (data.accessToken) {
+        console.log('받은 토큰:', data.accessToken);
 
-      if (response.ok) {
-        // 2. 백엔드에서 받은 accessToken 확인
-        // 백엔드 LoginResponse DTO에 accessToken 필드가 있으므로 data.accessToken으로 접근
-        const token = data.accessToken; 
-        
-        console.log('받은 토큰:', token);
+        // 3. 토큰 저장
+        await saveToken(data.accessToken);
 
-        // 3. 핸드폰에 토큰 저장 (비동기 처리)
-        await saveToken(token);
-
-        // 4. 로그인 성공 처리 (화면 전환)
+        // 4. 화면 전환
         Alert.alert('성공', '로그인 되었습니다!');
         onLoginSuccess();
-        
       } else {
-        Alert.alert('실패', '이메일이나 비밀번호를 확인해주세요.');
+        // 성공은 했는데 토큰이 없는 이상한 경우
+        Alert.alert('오류', '토큰을 받아오지 못했습니다.');
       }
-    } catch (error) {
-      console.error(error);
-      Alert.alert('오류', '서버 연결 실패');
+
+    } catch (error: any) {
+      console.error('로그인 에러:', error);
+      
+      // 5. 실패 처리
+      Alert.alert('로그인 실패', error.message || '이메일이나 비밀번호를 확인해주세요.');
     }
   };
 
