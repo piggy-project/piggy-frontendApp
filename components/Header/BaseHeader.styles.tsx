@@ -8,7 +8,7 @@ export const styles = StyleSheet.create({
     
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 0, 
+    paddingHorizontal: 10, 
   },
 
   leftArea: {
