@@ -19,9 +19,9 @@ export default function ChoiceCountry({ onSelect }: Props) {
   return (
     <ScrollView 
       horizontal={true}                // 가로 스크롤 허용
-      showsHorizontalScrollIndicator={false} // 스크롤바 숨기기 (깔끔하게)
+      showsHorizontalScrollIndicator={false} // 스크롤바 숨기기
       contentContainerStyle={styles.container} // 스타일 적용
-      bounces={false}                  // (선택) iOS에서 튕기는 효과 제거
+      bounces={false}                  // iOS에서 튕기는 효과 제거
       style={{ flexGrow: 0 }}
     >
       {COUNTRIES.map((country) => {

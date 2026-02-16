@@ -10,6 +10,6 @@ export const styles = StyleSheet.create({
 
   // 위젯 간 간격 설정
   sectionGap: {
-    gap: 10,
+    gap: 0,
   }
 });

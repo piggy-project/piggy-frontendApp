@@ -2,7 +2,6 @@ import React from 'react';
 import { View } from 'react-native';
 import BaseHeader from './BaseHeader';
 import Notion from './component/Notice';
-import Sidebar from './component/Sidebar';
 import WonSign from './component/WonSign';
 
 interface Props {
@@ -34,7 +33,6 @@ export default function MainHeader({
       right={
         <>
           <Notion />
-          <Sidebar />
         </>
       }
     />

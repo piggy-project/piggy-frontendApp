@@ -3,7 +3,7 @@ const { height, width } = Dimensions.get('window');
 
 export const styles = StyleSheet.create({
   container: {
-    marginBottom: 20,
+    marginBottom: 10,
   },
   title: {
     fontSize: 18,
@@ -15,7 +15,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#f5f5f5', // 회색 배경 (스크린샷 느낌)
     borderRadius: 16,
-    paddingVertical: 10,
+    paddingVertical: 3,
   },
   // 로딩용 스타일
   graphContainer: {

@@ -7,9 +7,16 @@ const screenWidth = Dimensions.get('window').width;
 
 interface ExchangeGraphProps {
   code: string; // 예: USD
+  hideTitle?: boolean;
+  height?: number;
+  width?: number;
 }
 
-export default function ExchangeGraph({ code }: ExchangeGraphProps) {
+export default function ExchangeGraph({ code, 
+  hideTitle = false, 
+  height = 220,
+  width = screenWidth - 40 }: ExchangeGraphProps) {
+
   const [loading, setLoading] = useState(true);
   const [graphData, setGraphData] = useState<number[]>([]);
   const [labels, setLabels] = useState<string[]>([]);
@@ -54,7 +61,7 @@ export default function ExchangeGraph({ code }: ExchangeGraphProps) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{code} 최근 동향</Text>
+      {!hideTitle && <Text style={styles.title}>{code} 최근 동향</Text>}
       
       <View style={styles.graphWrapper}>
         <LineChart
@@ -66,10 +73,10 @@ export default function ExchangeGraph({ code }: ExchangeGraphProps) {
               },
             ],
           }}
-          width={screenWidth - 40} // 화면 너비에서 패딩 뺌
-          height={220}
-          yAxisLabel="" // y축 접두사 (필요 없으면 비움)
-          yAxisSuffix="원" // y축 접미사
+          width={width} 
+          height={height} 
+          yAxisLabel="" 
+          yAxisSuffix="원" 
           yAxisInterval={1} 
           chartConfig={{
             backgroundColor: "#f5f5f5",
