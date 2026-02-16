@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import React from 'react';
 import { Dimensions, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import ExchangeGraph from '../../ExchangeDetailPage/component/ExchangeGraph';
@@ -7,14 +8,29 @@ const screenWidth = Dimensions.get('window').width;
 
 // 저장된 국가 리스트 (가짜 데이터)
 const SAVED_COUNTRIES = [
-  { name: '베트남', code: 'VND' },
-  { name: '일본', code: 'JPY' },
-  { name: '캐나다', code: 'CAD' },
-  { name: '한국', code: '' },
-  { name: '브라질', code: '' },
+  { name: '베트남', code: 'VND', flag: 'star' }, // 예시로 아이콘 이름이나 이미지 경로를 넣음
+  { name: '일본', code: 'JPY', flag: 'disc' },
+  { name: '캐나다', code: 'CAD', flag: 'leaf' },
+  { name: '한국', code: 'KRW', flag: 'flag' }, // 한국 코드 추가
+  { name: '브라질', code: 'BRL', flag: 'football' }, // 브라질 코드 추가
 ];
 
 export default function BottomInfoContainer() {
+  const handleGoToDetail = (country: { name: string; code: string; flag?: string }) => {
+    // router.push를 통해 경로와 파라미터를 전달합니다.
+    router.push({
+      // ⚠️ 주의: 실제 ExchangeDetailPage 파일이 있는 경로를 적어야 합니다.
+      // 예: app 폴더 바로 아래에 ExchangeDetailPage.tsx가 있다면 '/ExchangeDetailPage'
+      // 만약 app/exchange/detail.tsx 라면 '/exchange/detail' 입니다.
+      pathname: '/exchange_detail',
+      params: {
+        name: country.name,
+        code: country.code,
+        flag: country.flag || 'default', // flag가 없으면 기본값 전달
+      }
+    });
+  };
+
   return (
     <View style={styles.container}>
       
@@ -49,8 +65,13 @@ export default function BottomInfoContainer() {
           {SAVED_COUNTRIES.map((country, index) => (
             <View key={index} style={styles.countryItem}>
               {/* 회색 원 (국기 들어갈 자리) */}
-              <TouchableOpacity style={styles.circleIcon}>
-                 {/* 이미지 넣을거면 여기에 Image 컴포넌트 추가 */}
+              <TouchableOpacity 
+                style={styles.circleIcon}
+                onPress={() => handleGoToDetail(country)}
+                activeOpacity={0.7}
+              >
+                 {/* 예시: 그냥 텍스트로 국가 코드 앞글자 표시 */}
+                 <Text style={{fontSize: 10, color: '#888'}}>{country.code.substring(0,2)}</Text>
               </TouchableOpacity>
               <Text style={styles.countryLabel}>{country.name}</Text>
             </View>
