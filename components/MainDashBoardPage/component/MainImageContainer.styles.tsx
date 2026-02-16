@@ -8,7 +8,7 @@ export const styles = StyleSheet.create({
     width: '100%',
     height: 400,
     justifyContent: 'space-between', // 내부 요소 상-하 배치 분배
-    paddingVertical: 20,
+    paddingVertical: 15,
     backgroundColor: '#E0E0E0', // 이미지가 없을 때 보일 회색 배경색
   },
   textContainer: {
@@ -24,6 +24,7 @@ export const styles = StyleSheet.create({
     alignSelf: 'flex-start', // 왼쪽 정렬 (flex-start) 또는 글자 크기에 맞춤
     backgroundColor: '#fff',
     marginLeft: 10,
+    marginBottom: 10,
     paddingHorizontal: 10,
     paddingVertical: 8,
     borderRadius: 20, // 둥근 캡슐 모양
