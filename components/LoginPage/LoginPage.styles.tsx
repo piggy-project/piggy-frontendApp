@@ -1,9 +1,14 @@
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
+  // 전체 컨테이너 (KeyboardAvoidingView)
   container: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+  // 내부 콘텐츠 컨테이너 (패딩 담당)
+  contentContainer: {
+    flex: 1,
     paddingHorizontal: 24,
   },
   backButton: {
@@ -14,10 +19,10 @@ export const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#000',
     paddingTop: 50,
-    marginBottom: 100,
+    marginBottom: 80, // 간격 살짝 조정
   },
   inputContainer: {
-    marginBottom: 20,
+    marginBottom: 10,
   },
   linksContainer: {
     flexDirection: 'row',
@@ -33,13 +38,7 @@ export const styles = StyleSheet.create({
     color: '#ddd',
   },
   bottomContainer: {
-    marginTop: 'auto', // 하단으로 밀어내기
-    marginBottom: 40,
-  },
-  socialTitle: {
-    textAlign: 'center',
-    color: '#888',
-    marginBottom: 20,
-    fontSize: 12,
+    // marginTop: 'auto'
+    paddingBottom: 20,   // 하단 여백
   },
 });
