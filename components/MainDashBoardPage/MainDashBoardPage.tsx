@@ -29,12 +29,10 @@ export default function MainDashBoardPage() {
 
       onPanResponderMove: (event, gestureState) => {
         // 현재 위치가 초기 위치(INITIAL_TOP)보다 더 내려가려고 하면 무시
-        // lastOffset.current + gestureState.dy는 "예상되는 다음 위치"입니다.
         const nextPosition = lastOffset.current + gestureState.dy;
-
-        // INITIAL_TOP보다 커지면(더 아래로 내려가면) 움직이지 않게 막음
+        
         if (nextPosition > INITIAL_TOP) {
-          // 억지로 내리려고 할 때 약간의 저항감을 주고 싶다면 아래 줄 사용 (선택사항)
+          // 저항감 표현 시 아래 코드 적용
           //panY.setValue(gestureState.dy / 3); 
           
           // 아예 못 내리게 하려면 그냥 값을 업데이트 안 하거나, 한계값으로 고정
@@ -49,8 +47,6 @@ export default function MainDashBoardPage() {
         panY.flattenOffset(); 
 
         // 현재 위치 확인
-        // (flattenOffset 호출 후에는 panY._value를 직접 확인하기 어려우므로 lastOffset을 업데이트하며 판단)
-        
         // 올리는 동작 감지 (위로 100 이상 밀었거나, 위쪽 영역에 있을 때)
         if (gestureState.dy < -100 || (lastOffset.current < INITIAL_TOP && gestureState.dy < 50)) {
           // 끝까지 올리기
