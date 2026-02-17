@@ -1,40 +1,73 @@
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import { Stack, useRouter, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import React, { useEffect } from 'react';
-import { StatusBar, Text, TextInput } from 'react-native';
+import { ActivityIndicator, StatusBar, Text, TextInput, View } from 'react-native';
+import { AuthProvider, useAuth } from '../components/utils/AuthContext';
 
 // 앱이 로드될 때까지 스플래시 화면 유지
 SplashScreen.preventAutoHideAsync();
 
+// RootLayout: 폰트 로딩 & AuthProvider 제공
 export default function RootLayout() {
-  // 1. 폰트 파일 로드
   const [loaded, error] = useFonts({
     'Pretendard-Medium': require('../assets/fonts/Pretendard-Medium.ttf'),
     'Pretendard-Bold': require('../assets/fonts/Pretendard-Bold.ttf'),
     'Pretendard-ExtraBold': require('../assets/fonts/Pretendard-ExtraBold.ttf'),
   });
 
-  // 2. 에러 발생 시 처리
   useEffect(() => {
     if (error) throw error;
   }, [error]);
 
-  // 3. 폰트 로딩 완료 시 실행
   useEffect(() => {
     if (loaded) {
-      // 앱의 기본 폰트를 Medium으로 설정
-      setDefaultFont(); 
-      
+      setDefaultFont();
       SplashScreen.hideAsync();
     }
   }, [loaded]);
 
-  // 폰트가 아직 로딩 안 됐으면 아무것도 보여주지 않음 (스플래시 화면이 떠 있는 상태)
   if (!loaded) {
     return null;
   }
 
+  return (
+    // AuthProvider로 감싸고, 실제 로직은 AppLayout에서 처리
+    <AuthProvider>
+      <AppLayout />
+    </AuthProvider>
+  );
+}
+
+// AppLayout: 실제 네비게이션 & 로그인 체크
+function AppLayout() {
+  const { user, isLoading } = useAuth();
+  const segments = useSegments();
+  const router = useRouter();
+
+  useEffect(() => {
+    // 로딩 중(토큰 확인 중)이면 대기
+    if (isLoading) return;
+
+    // 현재 경로가 로그인/회원가입 그룹인지 확인
+    const inAuthGroup = segments[0] === 'login' || segments[0] === 'signup';
+
+    if (user && inAuthGroup) {
+      // 로그인 상태인데 로그인 화면에 있다면 -> 메인으로 보냄
+      router.replace('/(tabs)');
+    }
+  }, [user, isLoading, segments]);
+
+  // 로딩 중일 때는 화면 가운데 뺑뺑이(Spinner) 보여줌
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#fff' }}>
+        <ActivityIndicator size="large" color="#333" />
+      </View>
+    );
+  }
+
+  // 로딩 끝 & 권한 확인 끝 -> 화면 렌더링
   return (
     <>
       <StatusBar
@@ -44,7 +77,7 @@ export default function RootLayout() {
 
       <Stack
         screenOptions={{
-          headerShown: false, 
+          headerShown: false,
           gestureEnabled: true,
           gestureDirection: 'horizontal',
           animation: 'default',
@@ -57,11 +90,10 @@ export default function RootLayout() {
   );
 }
 
-// 전역 기본 폰트 설정 함수 (Text, TextInput 컴포넌트 해킹)
+// 전역 기본 폰트 설정 함수
 const setDefaultFont = () => {
   const customFont = { fontFamily: 'Pretendard-Medium' };
 
-  // 1. Text 컴포넌트 기본 스타일 변경
   const TextRender = Text as any;
   const oldTextRender = TextRender.render;
   TextRender.render = function (...args: any) {
@@ -71,7 +103,6 @@ const setDefaultFont = () => {
     });
   };
 
-  // 2. TextInput 컴포넌트 기본 스타일 변경
   const TextInputRender = TextInput as any;
   const oldTextInputRender = TextInputRender.render;
   TextInputRender.render = function (...args: any) {

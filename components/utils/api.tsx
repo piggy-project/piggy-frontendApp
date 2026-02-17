@@ -1,7 +1,7 @@
 import { getToken } from './authStore'; // 금고에서 토큰 가져오는 함수 임포트
 
 // 1. 기본 서버 주소 설정 (안드로이드 에뮬레이터 기준)
-const BASE_URL = 'http://10.0.2.2:8080';
+const BASE_URL = 'http://localhost:8080';
 
 // 2. Fetch를 더 편하게 쓰기 위한 래퍼 함수 (Interceptor 역할)
 const request = async (endpoint: string, options: RequestInit = {}) => {
@@ -45,8 +45,8 @@ const request = async (endpoint: string, options: RequestInit = {}) => {
 export const authApi = {
   // 이메일 중복 체크
   checkEmail: (email: string) => {
-    return request(`/users/check-email?email=${email}`, { method: 'GET' });
-  },
+    return request(`/users/check-email?email=${email}`, { method: 'POST' });
+},
 
   // 회원가입
   signUp: (userData: any) => {
@@ -64,12 +64,12 @@ export const authApi = {
     });
   },
   
-  // (예시) 마이페이지 정보 조회 - 토큰이 자동으로 들어감!
+  // (예시) 마이페이지 정보 조회
   getMyInfo: () => {
     return request('/users/me', { method: 'GET' });
   },
-  
+  // 닉네임 중복 체크
   checkNickname: (nickname: string) => {
-    return request(`/users/check-nickname?nickname=${nickname}`, { method: 'GET' });
+    return request(`/users/check-nickname?nickname=${nickname}`, { method: 'POST' });
   },
 };

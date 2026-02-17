@@ -1,13 +1,13 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { ActivityIndicator, Alert, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'; // Image 제거
 import { useSignupData } from '../../components/utils/SignupContext';
 import { authApi } from '../../components/utils/api';
 
 export default function SignupNickname() {
   const router = useRouter();
-  const { data } = useSignupData();
+  const { data, updateData } = useSignupData(); // updateData 추가 (필요시 사용)
   
   const [nickname, setNickname] = useState('');
   const [isChecking, setIsChecking] = useState(false); // 로딩 상태
@@ -16,7 +16,7 @@ export default function SignupNickname() {
   const [showCheckError, setShowCheckError] = useState(false); // 중복 표시 여부
   const [loading, setLoading] = useState(false); // 가입 요청 로딩
 
-  // 닉네임 유효성 검사 (예: 2자 이상 10자 이하, 특수문자 제외 등)
+  // 닉네임 유효성 검사 (2자 이상 10자 이하)
   const isFormatValid = nickname.length >= 2 && nickname.length <= 10;
 
   // 입력값 변경 시 상태 초기화
@@ -27,7 +27,7 @@ export default function SignupNickname() {
     setShowCheckError(false);
   };
 
-  // 1. 닉네임 중복 체크
+  // 1. 닉네임 중복 체크 API 연결
   const checkNicknameDuplicate = async () => {
     if (!isFormatValid) {
       Alert.alert('알림', '닉네임은 2자 이상 10자 이하로 설정해주세요.');
@@ -39,17 +39,23 @@ export default function SignupNickname() {
     setShowCheckError(false);
 
     try {
-      const data = await authApi.checkNickname(nickname);
+      // API 호출
+      const resData = await authApi.checkNickname(nickname);
 
-      if (data.isAvailable) {
+      // 응답 처리
+      if (resData.isAvailable) {
         setIsAvailable(true);
       } else {
         setIsAvailable(false);
         setDuplicateError('이미 존재하는 닉네임입니다.');
       }
     } catch (error: any) {
-      // 400 에러 등이 발생했을 때 처리
-      if (error.status === 400 || (error.data && !error.data.isAvailable)) {
+      console.log('Check Nickname Error:', error);
+      
+      const status = error.response?.status;
+      
+      // 409(Conflict), 400(Bad Request), 500(서버 에러) 처리
+      if (status === 409 || status === 400 || status === 500) {
         setIsAvailable(false);
         setDuplicateError('이미 존재하는 닉네임입니다.');
       } else {
@@ -65,6 +71,7 @@ export default function SignupNickname() {
     // 닉네임 확인 절차
     if (!isFormatValid) return;
     
+    // 중복 체크를 통과하지 못했으면 에러 표시
     if (!isAvailable) {
       if (!duplicateError) {
         setShowCheckError(true);
@@ -74,28 +81,33 @@ export default function SignupNickname() {
 
     setLoading(true);
     try {
-      // 생년월일 포맷 변경
-      const formattedBirth = data.birth.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3');
+      // 생년월일 포맷 변경 (YYYYMMDD -> YYYY-MM-DD)
+      // data.birth가 존재한다고 가정
+      const formattedBirth = data.birth 
+        ? data.birth.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3')
+        : ''; 
 
       const requestBody = {
         email: data.email,
         password: data.password,
         checkedPassword: data.password,
         name: data.name,
-        nickname: nickname, // 확정된 닉네임
+        nickname: nickname,
         birth: formattedBirth,
         phoneNum: data.phoneNum,
       };
 
       console.log('가입 요청:', requestBody);
 
-      const responseData = await authApi.signUp(requestBody);
+      // 회원가입 API 호출
+      await authApi.signUp(requestBody);
 
+      // 성공 시 페이지 이동
       router.push('/signup/success');
 
     } catch (error: any) {
       console.error(error);
-      Alert.alert('가입 실패', error.message || '정보를 확인해주세요.');
+      Alert.alert('가입 실패', error.message || '가입 처리 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
     }
@@ -122,6 +134,7 @@ export default function SignupNickname() {
             value={nickname}
             onChangeText={handleNicknameChange}
             maxLength={10}
+            autoCapitalize="none"
           />
 
            {/* 우측 체크 아이콘 영역 */}
@@ -130,10 +143,10 @@ export default function SignupNickname() {
               <ActivityIndicator size="small" color="#333" />
             ) : isAvailable ? (
               // 중복확인 완료
-              <Image 
-                source={require('../../assets/images/circlecheckicon.png')} 
-                style={styles.checkIcon}
-                resizeMode="contain"
+              <Ionicons 
+                name="checkmark-circle" 
+                size={28} 
+                color="#333" 
               />
             ) : (
               // 중복확인 전
@@ -202,10 +215,7 @@ const styles = StyleSheet.create({
     width: 30,
     alignItems: 'center',
   },
-  checkIcon: {
-    width: 28,
-    height: 28,
-  },
+  // checkIcon 스타일은 더 이상 필요 없어서 제거함
   errorText: { color: 'red', marginTop: 10, fontSize: 14 },
   successText: { color: '#03C75A', marginTop: 10, fontSize: 14 },
   button: { backgroundColor: '#333', padding: 16, borderRadius: 8, alignItems: 'center', marginBottom: 20 },

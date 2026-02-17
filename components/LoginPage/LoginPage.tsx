@@ -1,47 +1,57 @@
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { 
-  Alert, 
-  Text, 
-  View, 
-  KeyboardAvoidingView, // ✅ 추가
-  Platform,             // ✅ 추가
-  TouchableWithoutFeedback, // ✅ 추가
-  Keyboard              // ✅ 추가
+import {
+  Alert,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  Text,
+  TouchableWithoutFeedback,
+  View
 } from 'react-native';
 import LoginHeader from '../Header/LoginHeader';
+import { useAuth } from '../utils/AuthContext';
 import { styles } from './LoginPage.styles';
 import ActionLinks from './component/ActionLinks';
 import InputField from './component/InputField';
 import LoginButton from './component/LoginButton';
 
-import { authApi } from '../utils/api';
-import { saveToken } from '../utils/authStore';
-
 type Props = {
   onBack: () => void;
-  onLoginSuccess: () => void;
+  onLoginSuccess?: () => void; 
 };
 
 export default function LoginPage({ onBack, onLoginSuccess }: Props) {
+  const router = useRouter();
+  const { login } = useAuth();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
-    try {
-      const data = await authApi.login({ email, password });
+    if (!email || !password) {
+      Alert.alert('알림', '이메일과 비밀번호를 입력해주세요.');
+      return;
+    }
 
-      if (data.accessToken) {
-        console.log('받은 토큰:', data.accessToken);
-        await saveToken(data.accessToken);
-        Alert.alert('성공', '로그인 되었습니다!');
-        onLoginSuccess();
-      } else {
-        Alert.alert('오류', '토큰을 받아오지 못했습니다.');
-      }
+    setLoading(true);
+    try {
+      // 5. Context의 login 함수 호출
+      await login({ email, password });
+
+      // 6. 성공 시 메인 화면으로 이동
+      if (onLoginSuccess) onLoginSuccess(); // 부모 콜백이 있다면 실행
+      
+      // 'replace'를 써야 뒤로가기 했을 때 로그인 화면으로 다시 안 돌아옴
+      // RootLayout에서 설정한 메인 탭 경로 (보통 '(tabs)' 또는 'index')
+      router.replace('/(tabs)'); 
 
     } catch (error: any) {
       console.error('로그인 에러:', error);
       Alert.alert('로그인 실패', error.message || '이메일이나 비밀번호를 확인해주세요.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -49,18 +59,13 @@ export default function LoginPage({ onBack, onLoginSuccess }: Props) {
     <KeyboardAvoidingView 
       style={styles.container} 
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      // 필요하다면 높이 미세조정
-      // keyboardVerticalOffset={Platform.OS === 'ios' ? 50 : 0} 
     >
+      <LoginHeader onBack={onBack} />
       
-      {/* 전체 컨테이너 (패딩 적용) */}
       <View style={styles.contentContainer}>
-        
-        {/* 빈 곳을 누르면 키보드가 내려가는 영역 (상단 ~ 입력창) */}
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={{ flex: 1 }}>
             <View>
-              <LoginHeader onBack={onBack} />
               <Text style={styles.title}>환영합니다</Text>
 
               <View style={styles.inputContainer}>
@@ -82,15 +87,13 @@ export default function LoginPage({ onBack, onLoginSuccess }: Props) {
                 onFindPw={() => console.log('비번 찾기')} 
               />
             </View>
-
           </View>
         </TouchableWithoutFeedback>
 
-        {/* 터치 간섭 없이 즉시 클릭되어야 하는 영역 (로그인 버튼) */}
         <View style={styles.bottomContainer}>
           <LoginButton 
             onPress={handleLogin} 
-            disabled={!email || !password} 
+            disabled={!email || !password || loading} // 로딩 중 클릭 방지
           />
         </View>
       </View>

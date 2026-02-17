@@ -1,5 +1,6 @@
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
+import { useAuth } from '../../utils/AuthContext';
 import { styles } from './ProfileInfo.styles';
 
 type Props = {
@@ -7,6 +8,8 @@ type Props = {
 };
 
 export default function ProfileInfo({ onLogout }: Props) {
+  const { user } = useAuth();
+
   return (
     <View style={styles.container}>
       {/* 프로필 이미지 (회색 박스) */}
@@ -14,7 +17,9 @@ export default function ProfileInfo({ onLogout }: Props) {
         <Text style={styles.imageText}>프로필</Text>
       </View>
 
-      <Text style={styles.nickname}>닉네임 1234</Text>
+      <Text style={styles.nickname}>
+        {user?.nickname || '알 수 없음'}
+      </Text>
 
       <TouchableOpacity style={styles.editButton}>
         <Text style={styles.editButtonText}>내 정보 수정</Text>

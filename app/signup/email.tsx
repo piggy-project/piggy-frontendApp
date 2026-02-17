@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { ActivityIndicator, Alert, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSignupData } from '../../components/utils/SignupContext';
 
 import { authApi } from '../../components/utils/api';
@@ -41,25 +41,32 @@ export default function SignupEmail() {
     setDuplicateError('');
 
     try {
-      // (내부에서 에러가 나면 catch로 넘어감)
+      // 1. API 호출
       const data = await authApi.checkEmail(email);
 
-      // 성공적으로 데이터를 받으면(200 OK) 여기로 옴
+      // 2. 응답 처리
       if (data.isAvailable) {
         setIsAvailable(true);
       } else {
-        // 200이지만 사용 불가능한 경우 (백엔드 로직에 따라 다름)
+        // 200 OK지만 사용 불가능한 경우 (백엔드 로직에 따라)
         setIsAvailable(false);
-        setDuplicateError('이미 존재하는 이메일입니다.');
+        setDuplicateError('이미 사용 중인 이메일입니다.');
       }
 
     } catch (error: any) {
-      // api.ts에서 던진 에러를 여기서 잡음
-      if (error.status === 400 || (error.data && !error.data.isAvailable)) {
+      // 3. 에러 처리
+      console.log('Check Email Error:', error);
+
+      // 백엔드가 중복일 때 409 Conflict 처리
+      const status = error.response?.status; 
+
+      if (status === 409 || status === 400 || status === 500) { 
+        // 500은 아까 보셨던 "GET method not supported" 같은 서버 에러일 때도
+        // 일단 '사용 불가'로 처리하거나, 별도 처리를 위해 추가하면 좋습니다.
         setIsAvailable(false);
-        setDuplicateError('이미 존재하는 이메일입니다.');
-      } else {
-        Alert.alert('오류', error.message || '서버 연결 실패');
+        setDuplicateError('이미 사용 중인 이메일입니다.');
+    } else {
+        Alert.alert('오류', error.message || '서버 연결에 실패했습니다.');
       }
     } finally {
       setIsChecking(false);
@@ -73,7 +80,6 @@ export default function SignupEmail() {
 
     // 2. 중복 체크를 통과하지 못했을 때
     if (!isAvailable) {
-      // 만약 이미 중복 에러가 떠있다면 "체크해주세요"는 안 띄워도 됨 (선택사항)
       // 여기서는 중복 에러가 없는데 available하지 않은 경우(즉, 체크 안한 경우)만 처리
       if (!duplicateError) {
         setShowCheckError(true); // 에러 표시
@@ -107,13 +113,13 @@ export default function SignupEmail() {
               <ActivityIndicator size="small" color="#333" />
             ) : isAvailable ? (
               // 중복확인 완료 (채워진 초록 체크)
-              <Image 
-                source={require('../../assets/images/circlecheckicon.png')} 
-                style={styles.checkIcon}
-                resizeMode="contain"
+              <Ionicons 
+                name="checkmark-circle" 
+                size={28}
+                color="#333" 
               />
             ) : (
-              // 중복확인 전 (빈 회색 체크) - 누르면 확인 실행
+              // 중복확인 전 (빈 회색 체크)
               <TouchableOpacity onPress={checkEmailDuplicate}>
                 <Ionicons 
                   name="checkmark-circle-outline" 
