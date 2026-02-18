@@ -64,7 +64,7 @@ export const authApi = {
     });
   },
   
-  // (예시) 마이페이지 정보 조회
+  // 마이페이지 정보 조회
   getMyInfo: () => {
     return request('/users/me', { method: 'GET' });
   },

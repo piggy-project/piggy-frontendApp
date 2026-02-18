@@ -15,6 +15,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (credentials: any) => Promise<void>;
   logout: () => Promise<void>;
+  loginWithToken: (accessToken: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -76,8 +77,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
   };
 
+  // 4. 소셜 로그인 토큰만 받아서 바로 로그인 처리
+  const loginWithToken = async (accessToken: string) => {
+    try {
+      // 1. 토큰 저장
+      await saveToken(accessToken);
+
+      // 2. 내 정보 가져오기 (/users/me)
+      const userData = await authApi.getMyInfo();
+      
+      // 3. 상태 업데이트
+      setUser(userData);
+      
+    } catch (error) {
+      console.error("소셜 로그인 처리 실패:", error);
+      await removeToken();
+      throw error;
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ user, isLoading, login, logout, loginWithToken }}>
       {children}
     </AuthContext.Provider>
   );

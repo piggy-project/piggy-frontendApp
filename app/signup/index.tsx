@@ -1,7 +1,7 @@
+import SocialLoginButtons from '@/components/LoginPage/component/SocialLoginButtons';
 import { useRouter } from 'expo-router';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import SocialLoginButtons from '../../components/LoginPage/component/SocialLoginButtons';
 
 export default function SignupWelcome() {
   const router = useRouter();
