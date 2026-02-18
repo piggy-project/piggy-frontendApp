@@ -12,13 +12,14 @@ export default function SocialLoginButtons() {
   const router = useRouter();
 
   // 2. 백엔드 주소 설정
-  const BACKEND_URL = 'http://localhost.nip.io:8080'; 
+  const BACKEND_URL = 'https://piggys.mooo.com';
 
   // 3. 소셜 로그인 처리 함수
   const handleSocialLogin = async (provider: 'kakao' | 'google' | 'naver') => {
     try {
       const authUrl = `${BACKEND_URL}/oauth2/authorization/${provider}`;
-      const returnUrl = 'http://localhost:3000/oauth/success';
+      //엑스포용 리다이렉트 주소. 나중에 변경 필요
+      const returnUrl = 'exp://localhost:8081/--/oauth/success';
 
       const result = await WebBrowser.openAuthSessionAsync(authUrl, returnUrl);
 
@@ -28,7 +29,6 @@ export default function SocialLoginButtons() {
         const token = params.get('token');
 
         if (token) {
-          console.log(`${provider} 로그인 성공! 토큰:`, token);
           await loginWithToken(token);
           router.replace('/(tabs)');
         } else {

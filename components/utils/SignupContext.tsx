@@ -4,15 +4,27 @@ type SignupData = {
   email?: string;
   password?: string;
   name?: string;
-  // ... 나머지 필드들
+  
+  birth?: string;
+  phoneNum?: string;
+  nickname?: string;
+  
+  provider?: string;
+  providerId?: string | null; 
 };
+interface SignupContextType {
+  data: SignupData;
+  updateData: (newData: Partial<SignupData>) => void;
+}
 
-const SignupContext = createContext<any>(null);
+const SignupContext = createContext<SignupContextType | null>(null);
 
 export function SignupProvider({ children }: { children: React.ReactNode }) {
-  const [data, setData] = useState<SignupData>({});
+  const [data, setData] = useState<SignupData>({
+  });
 
   const updateData = (newData: Partial<SignupData>) => {
+    console.log('데이터 업데이트:', newData);
     setData((prev) => ({ ...prev, ...newData }));
   };
 
@@ -23,4 +35,10 @@ export function SignupProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-export const useSignupData = () => useContext(SignupContext);
+export const useSignupData = () => {
+  const context = useContext(SignupContext);
+  if (!context) {
+    throw new Error('useSignupData must be used within a SignupProvider');
+  }
+  return context;
+};

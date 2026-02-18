@@ -24,6 +24,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true); // 앱 시작 시 토큰 체크 로딩
 
+  
   // 1. 앱 켜질 때 자동 로그인 (토큰 있으면 유저정보 가져오기)
   useEffect(() => {
     const loadUser = async () => {
