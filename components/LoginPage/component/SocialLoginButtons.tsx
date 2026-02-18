@@ -17,7 +17,7 @@ export default function SocialLoginButtons() {
   // 3. 소셜 로그인 처리 함수
   const handleSocialLogin = async (provider: 'kakao' | 'google' | 'naver') => {
     try {
-      const authUrl = `${BACKEND_URL}/oauth2/authorization/${provider}`;
+      const authUrl = `${BACKEND_URL}/oauth2/authorization/${provider}?target=app`;
       //엑스포용 리다이렉트 주소. 나중에 변경 필요
       const returnUrl = 'exp://localhost:8081/--/oauth/success';
 
