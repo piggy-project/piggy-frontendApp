@@ -95,6 +95,8 @@ export default function SignupNickname() {
         nickname: nickname,
         birth: formattedBirth,
         phoneNum: data.phoneNum,
+        provider: 'LOCAL',
+        providerId: null,
       };
 
       console.log('가입 요청:', requestBody);
