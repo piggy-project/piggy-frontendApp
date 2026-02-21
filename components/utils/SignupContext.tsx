@@ -11,6 +11,7 @@ type SignupData = {
   
   provider?: string;
   providerId?: string | null; 
+  termsAgreed?: boolean;
 };
 interface SignupContextType {
   data: SignupData;
@@ -24,7 +25,6 @@ export function SignupProvider({ children }: { children: React.ReactNode }) {
   });
 
   const updateData = (newData: Partial<SignupData>) => {
-    console.log('데이터 업데이트:', newData);
     setData((prev) => ({ ...prev, ...newData }));
   };
 

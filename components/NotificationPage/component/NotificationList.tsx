@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, Text, TouchableOpacity, View } from 'react-native';
 import { styles } from './NotificationList.styles';
+import { Typography } from '@/constants/Typography';
 
 // 1. 알림 데이터 타입 정의
 interface NotificationItem {
@@ -60,7 +61,7 @@ export default function NotificationList() {
   if (notifications.length === 0) {
     return (
       <View style={styles.centerContainer}>
-        <Text style={styles.emptyText}>새로운 알림이 없습니다.</Text>
+        <Text style={[styles.emptyText, Typography.Pretendard_M_16]}>새로운 알림이 없습니다.</Text>
       </View>
     );
   }
@@ -77,10 +78,10 @@ export default function NotificationList() {
 
           {/* 중간: 제목과 시간 */}
           <View style={styles.textContainer}>
-            <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
+            <Text style={[styles.title, Typography.Pretendard_M_14]} numberOfLines={1} ellipsizeMode="tail">
               {item.title}
             </Text>
-            <Text style={styles.time}>{item.time}</Text>
+            <Text style={[styles.time, Typography.Pretendard_M_12]}>{item.time}</Text>
           </View>
 
           {/* 오른쪽: 삭제 버튼 (X) */}

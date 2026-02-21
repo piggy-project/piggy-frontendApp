@@ -61,8 +61,6 @@ export default function ExchangeGraph({ code,
 
   return (
     <View style={styles.container}>
-      {!hideTitle && <Text style={styles.title}>{code} 최근 동향</Text>}
-      
       <View style={styles.graphWrapper}>
         <LineChart
           data={{

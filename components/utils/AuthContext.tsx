@@ -24,14 +24,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true); // 앱 시작 시 토큰 체크 로딩
 
-  
   // 1. 앱 켜질 때 자동 로그인 (토큰 있으면 유저정보 가져오기)
   useEffect(() => {
     const loadUser = async () => {
       try {
         const token = await getToken();
         if (token) {
-          const userData = await authApi.getMyInfo(); // /users/me 호출
+          const userData = await authApi.getMyInfo();
           setUser(userData);
         }
       } catch (e) {
@@ -73,10 +72,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   // 3. 로그아웃 함수
-  const logout = async () => {
+  // AuthContext.tsx 내부
+const logout = async () => {
+  try {
     await removeToken();
+  } catch (error) {
+    console.error('--- [AuthContext] 토큰 삭제 중 에러 ---', error);
+  } finally {
     setUser(null);
-  };
+  }
+};
 
   // 4. 소셜 로그인 토큰만 받아서 바로 로그인 처리
   const loginWithToken = async (accessToken: string) => {

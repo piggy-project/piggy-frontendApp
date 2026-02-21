@@ -1,3 +1,4 @@
+import { Typography } from '@/constants/Typography';
 import React from 'react';
 import { TextInput, StyleSheet, View } from 'react-native';
 
@@ -12,7 +13,7 @@ export default function InputField({ placeholder, value, onChangeText, secureTex
   return (
     <View style={styles.container}>
       <TextInput
-        style={styles.input}
+        style={[styles.input, Typography.Pretendard_M_16]}
         placeholder={placeholder}
         placeholderTextColor="#aaa"
         value={value}
@@ -32,7 +33,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
     paddingVertical: 12,
-    fontSize: 16,
     color: '#000',
   },
 });

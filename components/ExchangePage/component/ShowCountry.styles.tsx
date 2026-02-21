@@ -3,7 +3,7 @@ const { height, width } = Dimensions.get('window');
 
 export const styles = StyleSheet.create({
   listContainer: {
-    paddingHorizontal: 10,
+    paddingHorizontal: 20,
     paddingBottom: 20,
   },
   itemContainer: {
@@ -31,23 +31,16 @@ export const styles = StyleSheet.create({
     fontSize: 24,
   },
   nameText: {
-    fontSize: 16,
-    fontWeight: '600',
     color: '#333',
   },
   codeText: {
-    fontSize: 14,
     color: '#666',
-    fontWeight: 'normal',
   },
   subText: {
-    fontSize: 12,
     color: '#999',
     marginTop: 2,
   },
   rateText: {
-    fontSize: 16,
-    fontWeight: 'bold',
     color: '#333',
   },
 });

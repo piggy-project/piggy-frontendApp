@@ -1,6 +1,7 @@
 import React from 'react';
 import { Text, View } from 'react-native';
 import { styles } from './ExchangeInfo.styles';
+import { Typography } from '@/constants/Typography';
 
 interface ExchangeInfoProps {
   currentRate: string;      // 현재 환율 (예: 0.85)
@@ -33,15 +34,15 @@ export default function ExchangeInfo({
   
   return (
     <View style={styles.container}>
-      <Text style={styles.headerTitle}>현재 환율</Text>
+      <Text style={[styles.headerTitle, Typography.Pretendard_M_16]}>현재 환율</Text>
 
       {/* 1. 환율 카드 */}
       <View style={styles.card}>
-        <Text style={styles.label}>환율</Text>
+        <Text style={[styles.label, Typography.Pretendard_M_14]}>환율</Text>
         <View style={styles.valueContainer}>
-          <Text style={styles.value}>{currentRate}</Text>
+          <Text style={[styles.value, Typography.Pretendard_M_20]}>{currentRate}</Text>
           {rateChange && (
-            <Text style={[styles.changeText, getChangeColorStyle(rateChange)]}>
+            <Text style={[styles.changeText, Typography.Pretendard_M_14, getChangeColorStyle(rateChange)]}>
               {rateChange}
             </Text>
           )}
@@ -50,27 +51,27 @@ export default function ExchangeInfo({
 
       {/* 2. 오늘의 최고치 카드 */}
       <View style={styles.card}>
-        <Text style={styles.label}>오늘의 최고치</Text>
+        <Text style={[styles.label, Typography.Pretendard_M_14]}>오늘의 최고치</Text>
         <View style={styles.valueContainer}>
-          <Text style={styles.value}>{high}</Text>
+          <Text style={[styles.value, Typography.Pretendard_M_20]}>{high}</Text>
         </View>
       </View>
 
       {/* 3. 오늘의 최저치 카드 */}
       <View style={styles.card}>
-        <Text style={styles.label}>오늘의 최저치</Text>
+        <Text style={[styles.label, Typography.Pretendard_M_14]}>오늘의 최저치</Text>
         <View style={styles.valueContainer}>
-          <Text style={styles.value}>{low}</Text>
+          <Text style={[styles.value, Typography.Pretendard_M_20]}>{low}</Text>
         </View>
       </View>
 
       {/* 4. 인플레이션율 카드 */}
       <View style={styles.card}>
-        <Text style={styles.label}>인플레이션율</Text>
+        <Text style={[styles.label, Typography.Pretendard_M_16]}>인플레이션율</Text>
         <View style={styles.valueContainer}>
-          <Text style={styles.value}>{inflation}</Text>
+          <Text style={[styles.value, Typography.Pretendard_M_20]}>{inflation}</Text>
           {inflationChange && (
-            <Text style={[styles.changeText, getChangeColorStyle(inflationChange)]}>
+            <Text style={[styles.changeText, Typography.Pretendard_M_14, getChangeColorStyle(inflationChange)]}>
               {inflationChange}
             </Text>
           )}

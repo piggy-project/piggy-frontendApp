@@ -1,3 +1,4 @@
+import { Typography } from '@/constants/Typography';
 import React, { useState } from 'react';
 import {
     FlatList,
@@ -77,7 +78,7 @@ export default function WonSign({ onSelect }: Props) {
                     style={styles.item} 
                     onPress={() => handleSelect(item)}
                   >
-                    <Text style={styles.itemText}>{item.label}</Text>
+                    <Text style={[styles.itemText, Typography.Pretendard_M_14]}>{item.label}</Text>
                   </TouchableOpacity>
                 )}
                 // 아이템 사이 구분선

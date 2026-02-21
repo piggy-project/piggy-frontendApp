@@ -4,10 +4,9 @@ const { height, width } = Dimensions.get('window');
 export const styles = StyleSheet.create({
   container: {
     marginBottom: 10,
+    paddingHorizontal: 20,
   },
   title: {
-    fontSize: 18,
-    fontWeight: 'bold',
     marginBottom: 10,
     color: '#333',
   },

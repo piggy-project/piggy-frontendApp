@@ -1,3 +1,4 @@
+import { Typography } from '@/constants/Typography';
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 
@@ -9,29 +10,39 @@ type Props = {
 export default function LoginButton({ onPress, disabled }: Props) {
   return (
     <TouchableOpacity 
-      style={[styles.button, disabled && styles.disabled]} 
+      // 활성화 상태(!disabled)일 때 active 스타일이 적용되도록 합니다.
+      style={[styles.button, !disabled ? styles.activeButton : styles.disabledButton]} 
       onPress={onPress}
       disabled={disabled}
     >
-      <Text style={styles.text}>로그인</Text>
+      <Text style={[
+        styles.text, 
+        Typography.Pretendard_M_16,
+        // 비활성화 시 글자 색상도 연하게 변경
+        { color: !disabled ? '#fff' : '#999' } 
+      ]}>
+        로그인
+      </Text>
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: '#ddd', // 활성화 시 색상 변경 가능
     paddingVertical: 16,
     borderRadius: 8,
     alignItems: 'center',
     width: '100%',
   },
-  disabled: {
-    backgroundColor: '#f0f0f0',
+  // 활성화 상태: 진한 배경
+  activeButton: {
+    backgroundColor: '#333',
+  },
+  // 비활성화 상태: 연한 배경
+  disabledButton: {
+    backgroundColor: '#ddd',
   },
   text: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
+    // 기본 스타일 (Typography가 덮어씌움)
   },
 });

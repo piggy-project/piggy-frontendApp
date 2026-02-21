@@ -15,6 +15,7 @@ import { styles } from './LoginPage.styles';
 import ActionLinks from './component/ActionLinks';
 import InputField from './component/InputField';
 import LoginButton from './component/LoginButton';
+import { Typography } from '@/constants/Typography';
 
 type Props = {
   onBack: () => void;
@@ -66,12 +67,11 @@ export default function LoginPage({ onBack, onLoginSuccess }: Props) {
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={{ flex: 1 }}>
             <View>
-              <Text style={styles.title}>환영합니다</Text>
-
+              <Text style={[styles.title, Typography.Pretendard_B_24]}>기존 계정으로{'\n'}로그인 해주세요</Text>
               <View style={styles.inputContainer}>
-                <InputField 
+                <InputField
                   placeholder="이메일을 입력해주세요" 
-                  value={email} 
+                  value={email}
                   onChangeText={setEmail} 
                 />
                 <InputField 

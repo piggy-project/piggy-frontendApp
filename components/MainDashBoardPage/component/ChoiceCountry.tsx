@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ScrollView, Text, TouchableOpacity } from 'react-native';
 import { styles } from './ChoiceCountry.style';
+import { Typography } from '@/constants/Typography';
 
 const COUNTRIES = ['베트남', '일본', '캐나다', '--', '미국', '중국', '태국'];
 
@@ -36,7 +37,7 @@ export default function ChoiceCountry({ onSelect }: Props) {
             onPress={() => handlePress(country)}
             activeOpacity={0.7}
           >
-            <Text style={[styles.text, isSelected && styles.selectedText]}>
+            <Text style={[styles.text, isSelected && styles.selectedText, Typography.Pretendard_M_14]}>
               {country}
             </Text>
           </TouchableOpacity>

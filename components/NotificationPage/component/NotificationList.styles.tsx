@@ -28,17 +28,13 @@ export const styles = StyleSheet.create({
     marginRight: 10,
   },
   title: {
-    fontSize: 16,
-    fontWeight: '600', // 약간 굵게
     color: '#333',
     marginBottom: 4,
   },
   time: {
-    fontSize: 13,
     color: '#888', // 연한 회색
   },
   emptyText: {
-    fontSize: 16,
     color: '#999',
   },
   separator: {

@@ -1,5 +1,7 @@
+import { Typography } from '@/constants/Typography';
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
+import { TextStyle } from 'react-native';
 
 export default function TabLayout() {
     return (
@@ -8,6 +10,10 @@ export default function TabLayout() {
                 tabBarActiveTintColor: 'black',
                 tabBarInactiveTintColor: 'gray',
                 headerShown: false,
+                tabBarLabelStyle: {
+                    ...(Typography.Pretendard_M_11 as TextStyle),
+                    marginTop: -3, // 아이콘와의 간격
+                },
             }}
         >
             <Tabs.Screen

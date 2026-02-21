@@ -2,6 +2,7 @@ import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSignupData } from '../../components/utils/SignupContext';
+import { Typography } from '@/constants/Typography';
 
 export default function SignupTerms() {
   const router = useRouter();
@@ -40,27 +41,27 @@ export default function SignupTerms() {
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.title}>서비스 이용약관에{'\n'}동의해주세요</Text>
+        <Text style={[styles.title, Typography.Pretendard_B_24]}>서비스 이용약관에{'\n'}동의해주세요</Text>
         
         {/* 전체 동의 */}
         <TouchableOpacity style={styles.checkboxRow} onPress={toggleAll}>
           <View style={[styles.checkbox, allAgreed && styles.checked]}>
-            {allAgreed && <Text style={styles.checkMark}>✓</Text>}
+            {allAgreed && <Text style={[styles.checkMark, Typography.Pretendard_M_14]}>✓</Text>}
           </View>
-          <Text style={styles.checkboxLabelBold}>모두 동의</Text>
+          <Text style={Typography.Pretendard_M_14}>모두 동의</Text>
         </TouchableOpacity>
 
         <View style={styles.divider} />
 
         {/* 개별 약관 */}
         <TouchableOpacity style={styles.checkboxRow} onPress={toggleTerm1}>
-          <Text style={[styles.checkIcon, term1 && styles.activeText]}>✓</Text>
-          <Text style={styles.checkboxLabel}>[필수] 서비스 이용약관 동의</Text>
+          <Text style={[styles.checkIcon, term1 && styles.activeText, Typography.Pretendard_M_14]}>✓</Text>
+          <Text style={[styles.checkboxLabel, Typography.Pretendard_M_14]}>[필수] 서비스 이용약관 동의</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.checkboxRow} onPress={toggleTerm2}>
-          <Text style={[styles.checkIcon, term2 && styles.activeText]}>✓</Text>
-          <Text style={styles.checkboxLabel}>[필수] 개인정보 처리방침 동의</Text>
+          <Text style={[styles.checkIcon, term2 && styles.activeText, Typography.Pretendard_M_14]}>✓</Text>
+          <Text style={[styles.checkboxLabel, Typography.Pretendard_M_14]}>[필수] 개인정보 처리방침 동의</Text>
         </TouchableOpacity>
       </View>
 
@@ -69,7 +70,7 @@ export default function SignupTerms() {
         onPress={handleNext}
         disabled={!term1 || !term2}
       >
-        <Text style={styles.buttonText}>동의하고 가입하기</Text>
+        <Text style={[styles.buttonText, Typography.Pretendard_M_16]}>다음</Text>
       </TouchableOpacity>
     </View>
   );
@@ -78,17 +79,16 @@ export default function SignupTerms() {
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, justifyContent: 'space-between', backgroundColor: '#fff', paddingTop: 60 },
   content: { marginTop: 50 },
-  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 40, lineHeight: 32 },
+  title: { marginBottom: 40 },
   checkboxRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 20 },
   checkbox: { width: 24, height: 24, borderWidth: 1, borderColor: '#ccc', borderRadius: 4, marginRight: 10, justifyContent: 'center', alignItems: 'center' },
   checked: { backgroundColor: '#333', borderColor: '#333' },
-  checkMark: { color: '#fff', fontSize: 16 },
-  checkIcon: { fontSize: 18, color: '#ccc', marginRight: 10 },
+  checkMark: { color: '#fff' },
+  checkIcon: { color: '#ccc', marginRight: 10 },
   activeText: { color: '#333' },
-  checkboxLabelBold: { fontSize: 16, fontWeight: 'bold' },
-  checkboxLabel: { fontSize: 16, color: '#555' },
+  checkboxLabel: { color: '#555' },
   divider: { height: 1, backgroundColor: '#eee', marginBottom: 20 },
   button: { backgroundColor: '#333', padding: 16, borderRadius: 8, alignItems: 'center', marginBottom: 20 },
   disabledButton: { backgroundColor: '#ddd' },
-  buttonText: { fontSize: 16, fontWeight: '600', color: '#fff' },
+  buttonText: { color: '#fff' },
 });

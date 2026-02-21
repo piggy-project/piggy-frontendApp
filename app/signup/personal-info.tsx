@@ -1,8 +1,9 @@
-import { Ionicons } from '@expo/vector-icons'; // 아이콘 추가
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSignupData } from '../../components/utils/SignupContext';
+import { Typography } from '@/constants/Typography';
 
 export default function SignupPersonalInfo() {
   const router = useRouter();
@@ -40,14 +41,14 @@ export default function SignupPersonalInfo() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.title}>기본정보를 입력해주세요</Text>
+        <Text style={[styles.title, Typography.Pretendard_B_24]}>기본정보를 입력해주세요</Text>
         
         {/* 이름 */}
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>이름</Text>
+          <Text style={[styles.label, Typography.Pretendard_M_14]}>이름</Text>
           <TextInput 
-            style={styles.input} 
-            placeholder="성명" 
+            style={[styles.input, Typography.Pretendard_M_16]} 
+            placeholder="성함" 
             value={name} 
             onChangeText={setName} 
           />
@@ -55,9 +56,9 @@ export default function SignupPersonalInfo() {
 
         {/* 전화번호 */}
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>전화번호</Text>
+          <Text style={[styles.label, Typography.Pretendard_M_14]}>전화번호</Text>
           <TextInput 
-            style={styles.input} 
+            style={[styles.input, Typography.Pretendard_M_16]} 
             placeholder="010 0000 0000" 
             value={formatPhoneNumberView(phoneNum)} 
             onChangeText={(text) => setPhoneNum(text.replace(/\s/g, ''))} // 저장할 땐 공백 제거
@@ -68,12 +69,12 @@ export default function SignupPersonalInfo() {
 
         {/* 생년월일 */}
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>생년월일</Text>
+          <Text style={[styles.label, Typography.Pretendard_M_14]}>생년월일</Text>
           <View style={styles.dateInputContainer}>
             <TextInput 
-              style={styles.dateInput} 
-              placeholder="1999 / 01 / 01" 
-              value={formatBirthDateView(birth)} 
+              style={[styles.dateInput, Typography.Pretendard_M_16]} 
+              placeholder="2000 / 00 / 00" 
+              value={formatBirthDateView(birth)}
               onChangeText={(text) => setBirth(text.replace(/\D/g, '').slice(0, 8))}
               keyboardType="number-pad" 
               maxLength={14} 
@@ -88,7 +89,7 @@ export default function SignupPersonalInfo() {
         onPress={handleNext}
         disabled={!isValid}
       >
-        <Text style={styles.buttonText}>다음</Text>
+        <Text style={[styles.buttonText, Typography.Pretendard_M_16]}>다음</Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -97,14 +98,14 @@ export default function SignupPersonalInfo() {
 const styles = StyleSheet.create({
   container: { flexGrow: 1, padding: 20, justifyContent: 'space-between', backgroundColor: '#fff', paddingTop: 60 },
   content: { marginTop: 50 },
-  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 40 },
+  title: { marginBottom: 40 },
   inputGroup: { marginBottom: 30 },
-  label: { fontSize: 14, fontWeight: '600', marginBottom: 10 },
-  input: { borderBottomWidth: 1, borderBottomColor: '#ccc', fontSize: 16, paddingVertical: 10 },
+  label: { marginBottom: 10 },
+  input: { borderBottomWidth: 1, borderBottomColor: '#ccc', paddingVertical: 10 },
   dateInputContainer: { flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: '#ccc' },
-  dateInput: { flex: 1, fontSize: 16, paddingVertical: 10 },
+  dateInput: { flex: 1, paddingVertical: 10 },
   icon: { marginLeft: 10 },
   button: { backgroundColor: '#333', padding: 16, borderRadius: 8, alignItems: 'center', marginBottom: 20 },
   disabledButton: { backgroundColor: '#ddd' },
-  buttonText: { fontSize: 16, fontWeight: '600', color: '#fff' },
+  buttonText: { color: '#fff' },
 });

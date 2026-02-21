@@ -1,6 +1,7 @@
 import React from 'react';
 import { FlatList, Text, TouchableOpacity, View } from 'react-native';
 import { styles } from './ShowCountry.styles';
+import { Typography } from '@/constants/Typography';
 
 // 국가 데이터 타입 정의
 export interface CountryData {
@@ -32,14 +33,14 @@ export default function ShowCountry({ data, onPressItem }: ShowCountryProps) {
               <Text style={styles.flag}>{item.flag}</Text>
             </View>
             <View>
-              <Text style={styles.nameText}>
+              <Text style={[styles.nameText, Typography.Pretendard_M_14]}>
                 {item.name} <Text style={styles.codeText}>({item.code})</Text>
               </Text>
-              <Text style={styles.subText}>1 {item.code}</Text>
+              <Text style={[styles.subText, Typography.Pretendard_M_12]}>1 {item.code}</Text>
             </View>
           </View>
           <View>
-            <Text style={styles.rateText}>{item.rate}</Text>
+            <Text style={[styles.rateText, Typography.Pretendard_M_14]}>{item.rate}</Text>
           </View>
         </TouchableOpacity>
       )}

@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { ActivityIndicator, Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'; // Image 제거
 import { useSignupData } from '../../components/utils/SignupContext';
 import { authApi } from '../../components/utils/api';
+import { Typography } from '@/constants/Typography';
 
 export default function SignupNickname() {
   const router = useRouter();
@@ -127,11 +128,11 @@ export default function SignupNickname() {
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.title}>마지막이에요!{'\n'}닉네임을 정해주세요</Text>
+        <Text style={[styles.title, Typography.Pretendard_B_24]}>마지막이에요!{'\n'}닉네임을 정해주세요</Text>
         
         <View style={styles.inputContainer}>
           <TextInput 
-            style={styles.input}
+            style={[styles.input, Typography.Pretendard_M_14]}
             placeholder="닉네임 (2~10자)"
             value={nickname}
             onChangeText={handleNicknameChange}
@@ -162,25 +163,27 @@ export default function SignupNickname() {
             )}
           </View>
         </View>
+        <Text style={[styles.helperText, Typography.Pretendard_M_11]}>- 공백없이 12자 이하 입력</Text>
+          
 
         {/* 1. 형식 에러 */}
         {nickname.length > 0 && !isFormatValid && (
-            <Text style={styles.errorText}>2자 이상 10자 이하로 입력해주세요.</Text>
+            <Text style={[styles.errorText, Typography.Pretendard_M_14]}>2자 이상 10자 이하로 입력해주세요.</Text>
         )}
 
         {/* 2. 중복 에러 */}
         {duplicateError ? (
-          <Text style={styles.errorText}>{duplicateError}</Text>
+          <Text style={[styles.errorText, Typography.Pretendard_M_14]}>{duplicateError}</Text>
         ) : null}
 
         {/* 3. 체크 요청 에러 */}
         {showCheckError && !isAvailable && isFormatValid && !duplicateError && (
-          <Text style={styles.errorText}>닉네임 중복체크를 해주세요.</Text>
+          <Text style={[styles.errorText, Typography.Pretendard_M_14]}>닉네임 중복체크를 해주세요.</Text>
         )}
 
         {/* 4. 사용 가능 메시지 */}
         {isAvailable && (
-          <Text style={styles.successText}>사용 가능한 닉네임입니다.</Text>
+          <Text style={[styles.successText, Typography.Pretendard_M_14]}>사용 가능한 닉네임입니다.</Text>
         )}
 
       </View>
@@ -190,7 +193,7 @@ export default function SignupNickname() {
         onPress={handleSignUp}
         disabled={!isFormatValid}
       >
-        <Text style={styles.buttonText}>완료</Text>
+        <Text style={[styles.buttonText, Typography.Pretendard_M_16]}>완료</Text>
       </TouchableOpacity>
     </View>
   );
@@ -199,7 +202,7 @@ export default function SignupNickname() {
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, justifyContent: 'space-between', backgroundColor: '#fff', paddingTop: 60 },
   content: { marginTop: 50 },
-  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 30 },
+  title: { marginBottom: 30 },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -208,7 +211,6 @@ const styles = StyleSheet.create({
   },
   input: { 
     flex: 1,
-    fontSize: 18, 
     paddingVertical: 10 
   },
   iconArea: {
@@ -217,10 +219,10 @@ const styles = StyleSheet.create({
     width: 30,
     alignItems: 'center',
   },
-  // checkIcon 스타일은 더 이상 필요 없어서 제거함
-  errorText: { color: 'red', marginTop: 10, fontSize: 14 },
+  helperText: { marginTop: 5, color: '#888' },
+  errorText: { color: 'red', marginTop: 10 },
   successText: { color: '#03C75A', marginTop: 10, fontSize: 14 },
   button: { backgroundColor: '#333', padding: 16, borderRadius: 8, alignItems: 'center', marginBottom: 20 },
   disabledButton: { backgroundColor: '#ddd' },
-  buttonText: { fontSize: 16, fontWeight: '600', color: '#fff' },
+  buttonText: { color: '#fff' },
 });

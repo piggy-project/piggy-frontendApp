@@ -1,18 +1,27 @@
+// ProfileInfo.tsx 수정
 import React from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View, Alert } from 'react-native';
 import { useAuth } from '../../utils/AuthContext';
 import { styles } from './ProfileInfo.styles';
+import { useRouter } from 'expo-router';
 
-type Props = {
-  onLogout: () => void;
-};
+export default function ProfileInfo() {
+  const { user, logout } = useAuth();
+  const router = useRouter();
 
-export default function ProfileInfo({ onLogout }: Props) {
-  const { user } = useAuth();
+  const handleLogout = async () => {
+    try {
+      await logout();
+      // 로그아웃 후 환영 페이지로 강제 이동
+      router.replace('/signup'); 
+    } catch (e) {
+      console.error('로그아웃 실패:', e);
+      Alert.alert('오류', '로그아웃에 실패했습니다.');
+    }
+  };
 
   return (
     <View style={styles.container}>
-      {/* 프로필 이미지 (회색 박스) */}
       <View style={styles.profileImage}>
         <Text style={styles.imageText}>프로필</Text>
       </View>
@@ -24,8 +33,8 @@ export default function ProfileInfo({ onLogout }: Props) {
       <TouchableOpacity style={styles.editButton}>
         <Text style={styles.editButtonText}>내 정보 수정</Text>
       </TouchableOpacity>
-      {/* 로그아웃 버튼 */}
-      <TouchableOpacity style={styles.logoutButton} onPress={onLogout}>
+
+      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Text style={styles.logoutButtonText}>로그아웃</Text>
       </TouchableOpacity>
     </View>

@@ -5,6 +5,7 @@ import { ActivityIndicator, Alert, StyleSheet, Text, TextInput, TouchableOpacity
 import { useSignupData } from '../../components/utils/SignupContext';
 
 import { authApi } from '../../components/utils/api';
+import { Typography } from '@/constants/Typography';
 
 export default function SignupEmail() {
   const router = useRouter();
@@ -95,12 +96,12 @@ export default function SignupEmail() {
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.title}>로그인에 사용할{'\n'}이메일을 입력해주세요</Text>
+        <Text style={[styles.title, Typography.Pretendard_B_24]}>이메일을 입력해주세요</Text>
         
         <View style={styles.inputContainer}>
           <TextInput 
-            style={styles.input}
-            placeholder="이메일 입력"
+            style={[styles.input, Typography.Pretendard_M_14]}
+            placeholder="이메일을 입력해주세요"
             value={email}
             onChangeText={handleEmailChange}
             keyboardType="email-address"
@@ -133,22 +134,22 @@ export default function SignupEmail() {
 
         {/* 1. 형식 에러 */}
         {email.length > 0 && !isFormatValid && (
-          <Text style={styles.errorText}>올바른 이메일 형식이 아닙니다.</Text>
+          <Text style={[styles.errorText, Typography.Pretendard_M_14]}>올바른 이메일 형식이 아닙니다.</Text>
         )}
         
         {/* 2. 중복 에러 (서버 400 응답 시) */}
         {duplicateError ? (
-          <Text style={styles.errorText}>{duplicateError}</Text>
+          <Text style={[styles.errorText, Typography.Pretendard_M_14]}>{duplicateError}</Text>
         ) : null}
 
         {/* 3. "중복체크를 해주세요" 에러 (다음 버튼 눌렀을 때, 중복 에러 없을 시) */}
         {showCheckError && !isAvailable && isFormatValid && !duplicateError && (
-          <Text style={styles.errorText}>이메일 중복체크를 해주세요.</Text>
+          <Text style={[styles.errorText, Typography.Pretendard_M_14]}>이메일 중복체크를 해주세요.</Text>
         )}
 
         {/* 4. 사용 가능 메시지 */}
         {isAvailable && (
-          <Text style={styles.successText}>사용 가능한 이메일입니다.</Text>
+          <Text style={[styles.successText, Typography.Pretendard_M_14]}>사용 가능한 이메일입니다.</Text>
         )}
       </View>
 
@@ -157,7 +158,7 @@ export default function SignupEmail() {
         onPress={handleNext}
         disabled={!isFormatValid}
       >
-        <Text style={styles.buttonText}>다음</Text>
+        <Text style={[styles.buttonText, Typography.Pretendard_M_16]}>다음</Text>
       </TouchableOpacity>
     </View>
   );
@@ -166,7 +167,7 @@ export default function SignupEmail() {
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, justifyContent: 'space-between', backgroundColor: '#fff', paddingTop: 60 },
   content: { marginTop: 50 },
-  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 30 },
+  title: { marginBottom: 30 },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -175,7 +176,6 @@ const styles = StyleSheet.create({
   },
   input: { 
     flex: 1,
-    fontSize: 18, 
     paddingVertical: 10 
   },
   iconArea: {
@@ -188,9 +188,9 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
   },
-  errorText: { color: 'red', marginTop: 10, fontSize: 14 },
-  successText: { color: '#03C75A', marginTop: 10, fontSize: 14 },
+  errorText: { color: 'red', marginTop: 10 },
+  successText: { color: '#03C75A', marginTop: 10 },
   button: { backgroundColor: '#333', padding: 16, borderRadius: 8, alignItems: 'center', marginBottom: 20 },
   disabledButton: { backgroundColor: '#ddd' },
-  buttonText: { fontSize: 16, fontWeight: '600', color: '#fff' },
+  buttonText: { color: '#fff' },
 });

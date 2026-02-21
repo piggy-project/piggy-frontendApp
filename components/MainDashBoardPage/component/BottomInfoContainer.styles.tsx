@@ -30,8 +30,6 @@ export const styles = StyleSheet.create({
     marginBottom: 15,
   },
   rateText: {
-    fontSize: 20,
-    fontWeight: 'bold',
     color: '#333',
   },
   countryInfo: {
@@ -40,8 +38,6 @@ export const styles = StyleSheet.create({
     gap: 8,
   },
   countryName: {
-    fontSize: 14,
-    fontWeight: '600',
     color: '#333',
   },
   flagIcon: {
@@ -64,8 +60,6 @@ export const styles = StyleSheet.create({
     marginTop: 10,
   },
   savedListTitle: {
-    fontSize: 14,
-    fontWeight: 'bold',
     marginBottom: 10,
     color: '#333',
   },
@@ -86,7 +80,6 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
   },
   countryLabel: {
-    fontSize: 12,
     color: '#555',
   },
 });

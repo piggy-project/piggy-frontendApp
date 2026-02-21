@@ -3,10 +3,9 @@ import { StyleSheet } from 'react-native';
 export const styles = StyleSheet.create({
   container: {
     width: '100%',
+    paddingHorizontal: 20,
   },
   headerTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
     color: '#000',
     marginBottom: 10,
   },
@@ -18,7 +17,6 @@ export const styles = StyleSheet.create({
     marginBottom: 10,           // 카드 간 간격
   },
   label: {
-    fontSize: 14,
     color: '#666',              // 라벨은 약간 흐리게
     marginBottom: 5,
   },
@@ -27,12 +25,9 @@ export const styles = StyleSheet.create({
     alignItems: 'baseline',     // 텍스트 밑줄 기준 정렬
   },
   value: {
-    fontSize: 22,
-    fontWeight: 'bold',
     color: '#000',
   },
   changeText: {
-    fontSize: 16,
     marginLeft: 8,              // 숫자 옆에 약간 띄우기
   },
   textUp: {

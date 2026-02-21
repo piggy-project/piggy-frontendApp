@@ -1,3 +1,4 @@
+import { Typography } from '@/constants/Typography';
 import { useRouter } from 'expo-router';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -16,12 +17,12 @@ export default function SignupSuccess() {
     <View style={styles.container}>
       <View style={styles.content}>
         <Text style={styles.emoji}>🎉</Text>
-        <Text style={styles.title}>회원가입 완료!</Text>
-        <Text style={styles.subTitle}>이제 PIGGY와 함께{'\n'}똑똑한 여행을 시작해보세요.</Text>
+        <Text style={[styles.title, Typography.Pretendard_B_32]}>가입을 축하합니다!</Text>
+        <Text style={[styles.subTitle, Typography.Pretendard_M_14]}>이제 PIGGY와 함께 똑똑한 여행을 시작해보세요.</Text>
       </View>
 
       <TouchableOpacity style={styles.button} onPress={handleFinish}>
-        <Text style={styles.buttonText}>로그인하러 가기</Text>
+        <Text style={[styles.buttonText, Typography.Pretendard_M_16]}>로그인하러 가기</Text>
       </TouchableOpacity>
     </View>
   );
@@ -31,8 +32,8 @@ const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, justifyContent: 'center', alignItems: 'center', backgroundColor: '#fff' },
   content: { alignItems: 'center', marginBottom: 50 },
   emoji: { fontSize: 60, marginBottom: 20 },
-  title: { fontSize: 28, fontWeight: 'bold', marginBottom: 10 },
-  subTitle: { fontSize: 16, color: '#666', textAlign: 'center', lineHeight: 24 },
+  title: { marginBottom: 10 },
+  subTitle: { color: '#666', textAlign: 'center', },
   button: { backgroundColor: '#333', paddingHorizontal: 40, paddingVertical: 16, borderRadius: 8, position: 'absolute', bottom: 40, width: '100%', alignItems: 'center' },
-  buttonText: { fontSize: 16, fontWeight: '600', color: '#fff' },
+  buttonText: { color: '#fff' },
 });

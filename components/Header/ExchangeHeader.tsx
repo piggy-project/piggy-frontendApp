@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import BaseHeader from './BaseHeader';
 import BackButton from './component/BackButton';
+import { Typography } from '@/constants/Typography';
 
 interface Props {
     title?: string;
@@ -17,10 +18,10 @@ export default function ExchangeHeader({ title, country, code, flag }: Props) {
                 <View style={styles.leftContainer}>
                     <BackButton />
                     {title ? (
-                        <Text style={styles.title}>{title}</Text>
+                        <Text style={[styles.title, Typography.Pretendard_M_16]}>{title}</Text>
                     ) : (
                         // 국가명과 코드가 있는 경우
-                        <Text style={styles.title}>
+                        <Text style={[styles.title, Typography.Pretendard_M_16]}>
                             {country} <Text style={styles.codeText}>({code})</Text>
                         </Text>
                     )}
@@ -46,12 +47,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     title: {
-        fontSize: 15,
         color: '#000',
         marginLeft: 8,
     },
     codeText: {
-        fontSize: 15,
         color: '#000',
     },
     flagText: {

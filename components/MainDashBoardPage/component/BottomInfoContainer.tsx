@@ -4,6 +4,7 @@ import React from 'react';
 import { Dimensions, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import ExchangeGraph from '../../ExchangeDetailPage/component/ExchangeGraph';
 import { styles } from './BottomInfoContainer.styles';
+import { Typography } from '@/constants/Typography';
 const screenWidth = Dimensions.get('window').width;
 
 // 저장된 국가 리스트 (가짜 데이터)
@@ -19,9 +20,6 @@ export default function BottomInfoContainer() {
   const handleGoToDetail = (country: { name: string; code: string; flag?: string }) => {
     // router.push를 통해 경로와 파라미터를 전달합니다.
     router.push({
-      // ⚠️ 주의: 실제 ExchangeDetailPage 파일이 있는 경로를 적어야 합니다.
-      // 예: app 폴더 바로 아래에 ExchangeDetailPage.tsx가 있다면 '/ExchangeDetailPage'
-      // 만약 app/exchange/detail.tsx 라면 '/exchange/detail' 입니다.
       pathname: '/exchange_detail',
       params: {
         name: country.name,
@@ -36,9 +34,9 @@ export default function BottomInfoContainer() {
       
       {/* 1. 현재 환율 정보 바 */}
       <View style={styles.rateInfoBar}>
-        <Text style={styles.rateText}>5.5243₩</Text>
+        <Text style={[styles.rateText, Typography.Pretendard_M_16]}>5.5243₩</Text>
         <View style={styles.countryInfo}>
-          <Text style={styles.countryName}>베트남 동</Text>
+          <Text style={[styles.countryName, Typography.Pretendard_M_14]}>베트남 동</Text>
           {/* 베트남 국기 (임시로 빨간 원 아이콘 사용, 실제 이미지로 교체 가능) */}
           <View style={styles.flagIcon}>
             <Ionicons name="star" size={12} color="#FFFF00" />
@@ -59,7 +57,7 @@ export default function BottomInfoContainer() {
 
       {/* 3. 내 저장 국가 리스트 */}
       <View style={styles.savedListContainer}>
-        <Text style={styles.savedListTitle}>내 저장 국가 리스트</Text>
+        <Text style={[styles.savedListTitle, Typography.Pretendard_M_14]}>내 저장 국가 리스트</Text>
         
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollArea}>
           {SAVED_COUNTRIES.map((country, index) => (
@@ -73,7 +71,7 @@ export default function BottomInfoContainer() {
                  {/* 예시: 그냥 텍스트로 국가 코드 앞글자 표시 */}
                  <Text style={{fontSize: 10, color: '#888'}}>{country.code.substring(0,2)}</Text>
               </TouchableOpacity>
-              <Text style={styles.countryLabel}>{country.name}</Text>
+              <Text style={[styles.countryLabel, Typography.Pretendard_M_12]}>{country.name}</Text>
             </View>
           ))}
           

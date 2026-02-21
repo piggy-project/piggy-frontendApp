@@ -46,19 +46,15 @@ function AppLayout() {
   const router = useRouter();
 
   useEffect(() => {
-    // 로딩 중(토큰 확인 중)이면 대기
     if (isLoading) return;
 
-    // 현재 경로가 로그인/회원가입 그룹인지 확인
     const inAuthGroup = segments[0] === 'login' || segments[0] === 'signup';
 
     if (user && inAuthGroup) {
-      // 로그인 상태인데 로그인 화면에 있다면 -> 메인으로 보냄
       router.replace('/(tabs)');
     }
   }, [user, isLoading, segments]);
 
-  // 로딩 중일 때는 화면 가운데 뺑뺑이(Spinner) 보여줌
   if (isLoading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#fff' }}>
@@ -85,6 +81,8 @@ function AppLayout() {
         }}
       >
         <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="signup" />
+        <Stack.Screen name="login" />
       </Stack>
     </>
   );

@@ -15,8 +15,6 @@ export const styles = StyleSheet.create({
     marginBottom: 40,
   },
   title: {
-    fontSize: 28,
-    fontWeight: 'bold',
     color: '#000',
     paddingTop: 50,
     marginBottom: 80, // 간격 살짝 조정
