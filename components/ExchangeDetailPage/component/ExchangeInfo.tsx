@@ -1,44 +1,45 @@
+import { Typography } from '@/constants/Typography';
 import React from 'react';
 import { Text, View } from 'react-native';
 import { styles } from './ExchangeInfo.styles';
-import { Typography } from '@/constants/Typography';
 
 interface ExchangeInfoProps {
-  currentRate: string;      // 현재 환율 (예: 0.85)
-  rateChange?: string;      // 환율 변동 (예: +0.02)
-  high: string;             // 오늘의 최고치
-  low: string;              // 오늘의 최저치
-  inflation: string;        // 인플레이션율
+  currentRate?: string;      // 현재 환율 (예: 1,445.63)
+  rateChange?: string;      // 환율 변동 (예: +5.21 (0.35%))
+  high?: string;            // 오늘의 최고치
+  low?: string;             // 오늘의 최저치
+  inflation?: string;       // 인플레이션율 (데이터 없을 시 대비)
   inflationChange?: string; // 인플레 변동
 }
 
 export default function ExchangeInfo({ 
-  currentRate, 
+  currentRate = '0.00', 
   rateChange, 
-  high, 
-  low, 
-  inflation, 
+  high = '0.00', 
+  low = '0.00', 
+  inflation = '-', 
   inflationChange 
 }: ExchangeInfoProps) {
-    const getChangeColorStyle = (value: string | undefined) => {
-    if (!value) return styles.textNeutral; // 값이 없으면 기본색
+  
+  // 상승/하락에 따른 텍스트 색상 결정 함수
+  const getChangeColorStyle = (value: string | undefined) => {
+    if (!value) return styles.textNeutral;
 
     if (value.startsWith('+')) {
-      return styles.textUp;   // '+'로 시작하면 빨간색
+      return styles.textUp;   // 빨간색
     } else if (value.startsWith('-')) {
-      return styles.textDown; // '-'로 시작하면 파란색
-    } else {
-      return styles.textNeutral; // 그 외(0 등)는 기본색
+      return styles.textDown; // 파란색
     }
+    return styles.textNeutral;
   };
   
   return (
     <View style={styles.container}>
-      <Text style={[styles.headerTitle, Typography.Pretendard_M_16]}>현재 환율</Text>
+      <Text style={[styles.headerTitle, Typography.Pretendard_M_16]}>실시간 시장 지표</Text>
 
       {/* 1. 환율 카드 */}
       <View style={styles.card}>
-        <Text style={[styles.label, Typography.Pretendard_M_14]}>환율</Text>
+        <Text style={[styles.label, Typography.Pretendard_M_14]}>현재 환율 (KRW)</Text>
         <View style={styles.valueContainer}>
           <Text style={[styles.value, Typography.Pretendard_M_20]}>{currentRate}</Text>
           {rateChange && (
@@ -49,27 +50,26 @@ export default function ExchangeInfo({
         </View>
       </View>
 
-      {/* 2. 오늘의 최고치 카드 */}
-      <View style={styles.card}>
-        <Text style={[styles.label, Typography.Pretendard_M_14]}>오늘의 최고치</Text>
-        <View style={styles.valueContainer}>
-          <Text style={[styles.value, Typography.Pretendard_M_20]}>{high}</Text>
+      {/* 오늘의 최고/최저치는 한 줄에 배치하거나 디자인에 맞춰 유지 */}
+      <View style={{ flexDirection: 'row', gap: 10 }}>
+        {/* 2. 최고치 */}
+        <View style={[styles.card, { flex: 1 }]}>
+          <Text style={[styles.label, Typography.Pretendard_M_14]}>오늘 최고</Text>
+          <Text style={[styles.value, Typography.Pretendard_M_16]}>{high}</Text>
+        </View>
+
+        {/* 3. 최저치 */}
+        <View style={[styles.card, { flex: 1 }]}>
+          <Text style={[styles.label, Typography.Pretendard_M_14]}>오늘 최저</Text>
+          <Text style={[styles.value, Typography.Pretendard_M_16]}>{low}</Text>
         </View>
       </View>
 
-      {/* 3. 오늘의 최저치 카드 */}
+      {/* 4. 인플레이션율 (API 미제공 시를 대비한 처리) */}
       <View style={styles.card}>
-        <Text style={[styles.label, Typography.Pretendard_M_14]}>오늘의 최저치</Text>
+        <Text style={[styles.label, Typography.Pretendard_M_14]}>소비자 물가 지수 (예정)</Text>
         <View style={styles.valueContainer}>
-          <Text style={[styles.value, Typography.Pretendard_M_20]}>{low}</Text>
-        </View>
-      </View>
-
-      {/* 4. 인플레이션율 카드 */}
-      <View style={styles.card}>
-        <Text style={[styles.label, Typography.Pretendard_M_16]}>인플레이션율</Text>
-        <View style={styles.valueContainer}>
-          <Text style={[styles.value, Typography.Pretendard_M_20]}>{inflation}</Text>
+          <Text style={[styles.value, Typography.Pretendard_M_20]}>{inflation}%</Text>
           {inflationChange && (
             <Text style={[styles.changeText, Typography.Pretendard_M_14, getChangeColorStyle(inflationChange)]}>
               {inflationChange}
@@ -77,7 +77,6 @@ export default function ExchangeInfo({
           )}
         </View>
       </View>
-
     </View>
   );
 }

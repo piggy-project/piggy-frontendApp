@@ -6,97 +6,128 @@ import { styles } from './ExchangeGraph.styles';
 const screenWidth = Dimensions.get('window').width;
 
 interface ExchangeGraphProps {
-  code: string; // 예: USD
+  code: string; // 예: USD, JPY
   hideTitle?: boolean;
   height?: number;
   width?: number;
 }
 
-export default function ExchangeGraph({ code, 
-  hideTitle = false, 
+// 백엔드에서 받아올 데이터 타입 정의 (예시)
+interface HistoryData {
+  date: string;  // "05-01"
+  rate: number;  // 1350.5
+}
+
+export default function ExchangeGraph({ 
+  code, 
   height = 220,
-  width = screenWidth - 40 }: ExchangeGraphProps) {
+  width = screenWidth - 40 
+}: ExchangeGraphProps) {
 
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [graphData, setGraphData] = useState<number[]>([]);
   const [labels, setLabels] = useState<string[]>([]);
-
+  const [errorMessage, setErrorMessage] = useState('');
+  
   useEffect(() => {
     fetchGraphData();
-  }, [code]); // 국가 코드가 바뀌면 다시 불러옴
+  }, [code]);
 
   const fetchGraphData = async () => {
-    try {
-      setLoading(true);
-      // 👇 [중요] 여기에 실제 백엔드 API 주소를 넣으세요!
-      // const response = await fetch(`http://your-backend/api/rates/history/${code}`);
-      // const json = await response.json();
-      
-      // 지금은 테스트를 위해 1초 뒤에 가짜 데이터를 만듭니다.
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // [가짜 데이터 생성 로직] - 백엔드 연결 시 지우세요
-      const mockData = [1310, 1315, 1312, 1320, 1318, 1325]; // 환율 추이
-      const mockLabels = ["1월", "2월", "3월", "4월", "5월", "6월"]; // 날짜
+  try {
+    setLoading(true);
+    setError(false);
+    setErrorMessage('');
 
-      setGraphData(mockData);
-      setLabels(mockLabels);
-
-    } catch (error) {
-      console.error("그래프 불러오기 실패:", error);
-    } finally {
-      setLoading(false);
+    const response = await fetch(`https://piggys.mooo.com/api/exchange/history?code=${code}`);
+    
+    // 2. 응답이 정상이 아닐 때 처리
+    if (!response.ok) {
+      const errorJson = await response.json();
+      throw new Error(errorJson.message || '데이터를 불러오는데 실패했습니다.');
     }
-  };
 
-  // 로딩 중일 때 보여줄 화면
+    const result: HistoryData[] = await response.json();
+    
+    const newLabels = result.map(item => item.date);
+    const newRates = result.map(item => item.rate);
+
+    setLabels(newLabels);
+    setGraphData(newRates);
+
+  } catch (e: any) {
+    console.error("그래프 데이터 로딩 에러:", e);
+    setError(true);
+    // 3. catch 문에서 에러 메시지를 상태에 저장
+    setErrorMessage(e.message); 
+  } finally {
+    setLoading(false);
+  }
+};
+
+  // 1. 로딩 상태
   if (loading) {
     return (
       <View style={[styles.graphContainer, styles.center]}>
-        <ActivityIndicator size="large" color="#000" />
-        <Text style={styles.loadingText}>환율 정보를 불러오는 중...</Text>
+        <ActivityIndicator size="large" color="#4A90E2" />
+        <Text style={styles.loadingText}>최신 환율 정보를 불러오는 중...</Text>
       </View>
     );
   }
+
+  // 2. 에러 또는 데이터가 없을 때
+  if (error || graphData.length === 0) {
+  return (
+    <View style={[styles.graphContainer, styles.center]}>
+      <Text style={styles.loadingText}>
+        {errorMessage || "그래프를 표시할 수 없습니다."}
+      </Text>
+    </View>
+  );
+}
 
   return (
     <View style={styles.container}>
       <View style={styles.graphWrapper}>
         <LineChart
           data={{
-            labels: labels,
+            labels: labels, // X축: 날짜 배열
             datasets: [
               {
-                data: graphData,
+                data: graphData, // Y축: 환율 값 배열
               },
             ],
           }}
-          width={width} 
-          height={height} 
-          yAxisLabel="" 
-          yAxisSuffix="원" 
-          yAxisInterval={1} 
+          width={width}
+          height={height}
+          yAxisLabel=""
+          yAxisSuffix="원"
           chartConfig={{
-            backgroundColor: "#f5f5f5",
-            backgroundGradientFrom: "#f5f5f5",
-            backgroundGradientTo: "#f5f5f5",
-            decimalPlaces: 0, // 소수점 없애기
-            color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`, // 선 색상 (검정)
-            labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`, // 글자 색상
-            style: {
-              borderRadius: 16,
-            },
+            backgroundColor: "#ffffff",
+            backgroundGradientFrom: "#ffffff",
+            backgroundGradientTo: "#ffffff",
+            decimalPlaces: 1, // 소수점 첫째자리까지 표시
+            color: (opacity = 1) => `rgba(74, 144, 226, ${opacity})`, // 메인 선 색상 (파란색 계열)
+            labelColor: (opacity = 1) => `rgba(100, 100, 100, ${opacity})`, // 축 글자 색상
             propsForDots: {
               r: "4",
               strokeWidth: "2",
-              stroke: "#ffa726",
+              stroke: "#4A90E2",
             },
+            // 그리드 라인 투명도 조절
+            propsForBackgroundLines: {
+                strokeDasharray: "", // 실선으로 변경 (원하면 유지)
+                strokeOpacity: 0.1
+            }
           }}
-          bezier // 곡선 그래프로 만들기 (직선 원하면 제거)
+          bezier // 곡선 적용
           style={{
             marginVertical: 8,
             borderRadius: 16,
           }}
+          // 데이터 포인트 클릭 시 가이드라인 등을 위한 설정
+          fromZero={false} // 데이터의 최소값에 맞춰서 그래프 시작 (변동폭 강조)
         />
       </View>
     </View>

@@ -73,3 +73,15 @@ export const authApi = {
     return request(`/users/check-nickname?nickname=${nickname}`, { method: 'POST' });
   },
 };
+
+export const exchangeApi = {
+  // 최신 환율 리스트 가져오기
+  getLatestRates: () => {
+    return request('/api/exchange/rates', { method: 'GET' });
+  },
+  // 2. 특정 통화 상세 정보 가져오기 (추가)
+  getExchangeDetail: (code: string) => {
+    // URL 파라미터로 통화 코드(USD, JPY 등)를 전달합니다.
+    return request(`/api/exchange/detail/${code}`, { method: 'GET' });
+  },
+};
