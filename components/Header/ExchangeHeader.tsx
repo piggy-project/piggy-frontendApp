@@ -1,17 +1,18 @@
+import { Typography } from '@/constants/Typography';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import BaseHeader from './BaseHeader';
 import BackButton from './component/BackButton';
-import { Typography } from '@/constants/Typography';
 
 interface Props {
     title?: string;
     country?: string;
     code?: string;
     flag?: string;
+    time?: string;
 }
 
-export default function ExchangeHeader({ title, country, code, flag }: Props) {
+export default function ExchangeHeader({ title, country, code, flag, time }: Props) {
     return (
         <BaseHeader
             left={
@@ -31,11 +32,21 @@ export default function ExchangeHeader({ title, country, code, flag }: Props) {
             center={null}
 
             right={
-                flag ? (
-                    <Text style={styles.flagText}>{flag}</Text>
-                ) : (
-                    <View style={{ width: 26 }} />
-                )
+                <View style={styles.rightContainer}>
+                    {/* ✅ 시간이 있으면 시간 표시 */}
+                    {time && (
+                        <Text style={[styles.timeText, Typography.Pretendard_M_12]}>
+                            {time} 기준
+                        </Text>
+                    )}
+                    {/* ✅ 국기가 있으면 국기 표시 */}
+                    {flag ? (
+                        <Text style={styles.flagText}>{flag}</Text>
+                    ) : (
+                        // 시간도 국기도 없으면 간격 유지용 빈 뷰
+                        !time && <View style={{ width: 26 }} />
+                    )}
+                </View>
             }
         />
     );
@@ -46,12 +57,20 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
     },
+    rightContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
     title: {
         color: '#000',
         marginLeft: 8,
     },
     codeText: {
         color: '#000',
+    },
+    timeText: {
+        color: '#888',
+        marginRight: 8, // 국기와의 간격
     },
     flagText: {
         fontSize: 20,

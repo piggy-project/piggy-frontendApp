@@ -40,7 +40,7 @@ export default function ExchangeGraph({
     setError(false);
     setErrorMessage('');
 
-    const response = await fetch(`https://piggys.mooo.com/api/exchange/history?code=${code}`);
+    const response = await fetch(`http://localhost:8080/api/exchange/history?code=${code}`);
     
     // 2. 응답이 정상이 아닐 때 처리
     if (!response.ok) {

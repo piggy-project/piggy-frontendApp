@@ -38,7 +38,8 @@ export default function ShowCountry({ data, onPressItem }: ShowCountryProps) {
               </Text>
               <Text style={[styles.subText, Typography.Pretendard_M_12]}>
                 {item.code === 'JPY' ? '100' : '1'} {item.code}
-              </Text>            </View>
+              </Text>
+            </View>
           </View>
           <View>
             <Text style={[styles.rateText, Typography.Pretendard_M_14]}>{item.rate}</Text>

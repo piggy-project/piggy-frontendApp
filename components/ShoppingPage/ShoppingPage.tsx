@@ -1,9 +1,9 @@
 import React from 'react';
 import { Text, View } from 'react-native';
 import MainHeader from '../Header/MainHeader';
-import { styles } from './Favorites.styles';
+import { styles } from './Shopping.styles';
 
-export default function FavoritesPage() {
+export default function ShoppingPage() {
   return (
     <View style={styles.container}>
       <MainHeader />
