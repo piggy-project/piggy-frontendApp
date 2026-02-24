@@ -3,6 +3,7 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import BaseHeader from './BaseHeader';
 import BackButton from './component/BackButton';
+import WonSign from './component/WonSign';
 
 interface Props {
     title?: string;
@@ -17,7 +18,7 @@ export default function ExchangeHeader({ title, country, code, flag, time }: Pro
         <BaseHeader
             left={
                 <View style={styles.leftContainer}>
-                    <BackButton />
+                    <WonSign/>
                     {title ? (
                         <Text style={[styles.title, Typography.Pretendard_M_16]}>{title}</Text>
                     ) : (
@@ -33,13 +34,13 @@ export default function ExchangeHeader({ title, country, code, flag, time }: Pro
 
             right={
                 <View style={styles.rightContainer}>
-                    {/* ✅ 시간이 있으면 시간 표시 */}
+                    {/* 시간이 있으면 시간 표시 */}
                     {time && (
                         <Text style={[styles.timeText, Typography.Pretendard_M_12]}>
                             {time} 기준
                         </Text>
                     )}
-                    {/* ✅ 국기가 있으면 국기 표시 */}
+                    {/* 국기가 있으면 국기 표시 */}
                     {flag ? (
                         <Text style={styles.flagText}>{flag}</Text>
                     ) : (

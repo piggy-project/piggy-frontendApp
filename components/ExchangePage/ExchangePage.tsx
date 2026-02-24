@@ -132,7 +132,7 @@ export default function ExchangePage() {
   return (
     <View style={styles.container}>
       <ExchangeHeader
-        title="실시간 환율 목록"
+        title="환율 목록"
         time={updateTime}
       />
       <View style={[styles.sectionGap, { flex: 1 }]}>

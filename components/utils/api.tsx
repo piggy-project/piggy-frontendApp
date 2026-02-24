@@ -1,6 +1,6 @@
 import { getToken } from './authStore'; // 금고에서 토큰 가져오는 함수 임포트
 
-// 1. 기본 서버 주소 설정 (안드로이드 에뮬레이터 기준)
+// 1. 기본 서버 주소 설정 (안드로이드 에뮬레이터 기준) - 현재 내 ip
 const BASE_URL = 'http://localhost:8080';
 
 // 2. Fetch를 더 편하게 쓰기 위한 래퍼 함수 (Interceptor 역할)
@@ -79,9 +79,13 @@ export const exchangeApi = {
   getLatestRates: () => {
     return request('/api/exchange/rates', { method: 'GET' });
   },
-  // 2. 특정 통화 상세 정보 가져오기 (추가)
+  // 2. 특정 통화 상세 정보 가져오기
   getExchangeDetail: (code: string) => {
     // URL 파라미터로 통화 코드(USD, JPY 등)를 전달합니다.
     return request(`/api/exchange/detail/${code}`, { method: 'GET' });
+  },
+  // 3. 특정 통화의 과거 기록 가져오기
+  getExchangeHistory: (code: string) => {
+    return request(`/api/exchange/history?code=${code}`, { method: 'GET' });
   },
 };
