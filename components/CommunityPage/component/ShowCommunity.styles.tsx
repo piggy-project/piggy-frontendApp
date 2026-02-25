@@ -9,7 +9,7 @@ export const styles = StyleSheet.create({
   },
   tab: {
     flex: 1,
-    paddingVertical: 15,
+    paddingVertical: 10,
     alignItems: 'center',
   },
   activeTab: {
@@ -17,12 +17,10 @@ export const styles = StyleSheet.create({
     borderBottomColor: '#333',
   },
   tabText: {
-    fontSize: 15,
     color: '#888',
-    fontWeight: '500',
+
   },
   activeTabText: {
     color: '#000',
-    fontWeight: 'bold',
   },
 });

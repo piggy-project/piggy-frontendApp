@@ -60,5 +60,12 @@ export const Typography = StyleSheet.create({
     fontSize: 24,
     lineHeight: 36,
     letterSpacing: -0.72,
+  },
+  // 9번: 16px / 25px / -4%
+  Pretendard_B_16: {
+    fontFamily: 'Pretendard-Bold',
+    fontSize: 16,
+    lineHeight: 25,
+    letterSpacing: -0.64, // 계산된 자간 값
   }
 });

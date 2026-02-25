@@ -1,3 +1,4 @@
+import { Typography } from '@/constants/Typography';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
@@ -13,7 +14,7 @@ export default function MyPageHeader() {
       left={
         <View style={styles.leftContainer}>
           <BackButton />
-          <Text style={styles.title}>
+          <Text style={[styles.title, Typography.Pretendard_M_16]}>
             마이페이지
           </Text>
         </View>
@@ -32,7 +33,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     title: {
-        fontSize: 15,
         color: '#000',
         marginLeft: 8,
     },

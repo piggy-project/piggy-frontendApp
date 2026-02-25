@@ -17,8 +17,6 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
   },
   buttonText: {
-    fontSize: 14,
-    fontWeight: '600',
     color: '#000',
   },
 });

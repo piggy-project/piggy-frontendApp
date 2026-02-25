@@ -17,8 +17,6 @@ export const styles = StyleSheet.create({
   },
   imageText: { color: '#666' },
   nickname: {
-    fontSize: 20,
-    fontWeight: 'bold',
     marginBottom: 8,
   },
   editButton: {
@@ -28,8 +26,7 @@ export const styles = StyleSheet.create({
     borderRadius: 15,
   },
   editButtonText: {
-    fontSize: 12,
-    color: '#555',
+    color: '#000000',
   },
   logoutButton: {
     marginTop: 10,
@@ -37,7 +34,6 @@ export const styles = StyleSheet.create({
   },
   logoutButtonText: {
     color: '#888',
-    fontSize: 13,
     textDecorationLine: 'underline',
   },
 });

@@ -1,3 +1,4 @@
+import { Typography } from '@/constants/Typography';
 import { useRouter } from 'expo-router';
 import React from 'react';
 import { Alert, Text, TouchableOpacity, View } from 'react-native';
@@ -25,16 +26,16 @@ export default function ProfileInfo() {
         <Text style={styles.imageText}>프로필</Text>
       </View>
 
-      <Text style={styles.nickname}>
+      <Text style={[styles.nickname, Typography.Pretendard_B_16]}>
         {user?.nickname || '알 수 없음'}
       </Text>
 
       <TouchableOpacity style={styles.editButton}>
-        <Text style={styles.editButtonText}>내 정보 수정</Text>
+        <Text style={[styles.editButtonText, Typography.Pretendard_M_12]}>내 정보 수정</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-        <Text style={styles.logoutButtonText}>로그아웃</Text>
+        <Text style={[styles.logoutButtonText, Typography.Pretendard_M_12]}>로그아웃</Text>
       </TouchableOpacity>
     </View>
   );

@@ -20,12 +20,9 @@ export const styles = StyleSheet.create({
     marginRight: 10,
   },
   userName: {
-    fontSize: 14,
-    fontWeight: 'bold',
     flex: 1,
   },
   timeText: {
-    fontSize: 12,
     color: '#666',
   },
   divider: {
@@ -34,7 +31,6 @@ export const styles = StyleSheet.create({
     marginBottom: 15,
   },
   content: {
-    fontSize: 15,
     color: '#000',
     marginBottom: 20,
     minHeight: 40,
@@ -51,7 +47,6 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
   },
   interactionText: {
-    fontSize: 12,
     color: '#888',
     marginLeft: 5,
   },

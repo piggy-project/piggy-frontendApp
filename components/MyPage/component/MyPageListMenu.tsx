@@ -1,3 +1,4 @@
+import { Typography } from '@/constants/Typography';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { styles } from './MyPageListMenu.styles';
@@ -9,7 +10,7 @@ export default function MyPageListMenu() {
     <View style={styles.container}>
       {menus.map((menu) => (
         <TouchableOpacity key={menu} style={styles.menuItem}>
-          <Text style={styles.menuText}>{menu}</Text>
+          <Text style={[styles.menuText, Typography.Pretendard_M_14]}>{menu}</Text>
         </TouchableOpacity>
       ))}
     </View>

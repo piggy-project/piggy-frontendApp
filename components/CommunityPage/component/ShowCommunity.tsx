@@ -1,3 +1,4 @@
+import { Typography } from '@/constants/Typography';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { styles } from './ShowCommunity.styles';
@@ -21,7 +22,7 @@ const ShowCommunity = ({ activeTab, setActiveTab }: ShowCommunityProps) => {
           onPress={() => setActiveTab(tab)}
           style={[styles.tab, activeTab === tab && styles.activeTab]}
         >
-          <Text style={[styles.tabText, activeTab === tab && styles.activeTabText]}>
+          <Text style={[[styles.tabText, Typography.Pretendard_M_16], activeTab === tab && [styles.activeTabText, Typography.Pretendard_M_16]]}>
             {tab}
           </Text>
         </TouchableOpacity>

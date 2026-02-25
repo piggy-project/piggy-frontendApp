@@ -11,11 +11,9 @@ export const styles = StyleSheet.create({
     backgroundColor: '#D9D9D9',
     borderRadius: 12,
     justifyContent: 'center',
-    alignItems: 'center', // 텍스트 중앙 배치 (이미지 기준)
+    alignItems: 'center',
   },
   menuText: {
-    fontSize: 15,
-    fontWeight: '500',
     color: '#000',
   },
 });
