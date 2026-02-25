@@ -1,9 +1,8 @@
-// ProfileInfo.tsx 수정
+import { useRouter } from 'expo-router';
 import React from 'react';
-import { Text, TouchableOpacity, View, Alert } from 'react-native';
+import { Alert, Text, TouchableOpacity, View } from 'react-native';
 import { useAuth } from '../../utils/AuthContext';
 import { styles } from './ProfileInfo.styles';
-import { useRouter } from 'expo-router';
 
 export default function ProfileInfo() {
   const { user, logout } = useAuth();

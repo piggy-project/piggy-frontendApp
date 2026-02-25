@@ -7,6 +7,7 @@ import { exchangeApi } from '@/components/utils/api';
 import ExchangeHeader from '../Header/ExchangeHeader';
 import SearchCountry from './component/SearchCountry';
 import ShowCountry from './component/ShowCountry';
+import TodayTravelDestination from './component/TodayTravelDestination';
 
 export interface CountryData {
   id: string;
@@ -132,10 +133,11 @@ export default function ExchangePage() {
   return (
     <View style={styles.container}>
       <ExchangeHeader
-        title="환율 목록"
+        //title="환율 목록"
         time={updateTime}
       />
       <View style={[styles.sectionGap, { flex: 1 }]}>
+        <TodayTravelDestination/>
         <SearchCountry value={searchText} onChangeText={setSearchText} />
         {isLoading ? (
           <View style={{ flex: 1, justifyContent: 'center' }}>

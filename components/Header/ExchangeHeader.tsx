@@ -2,7 +2,6 @@ import { Typography } from '@/constants/Typography';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import BaseHeader from './BaseHeader';
-import BackButton from './component/BackButton';
 import WonSign from './component/WonSign';
 
 interface Props {
@@ -18,14 +17,20 @@ export default function ExchangeHeader({ title, country, code, flag, time }: Pro
         <BaseHeader
             left={
                 <View style={styles.leftContainer}>
-                    <WonSign/>
+                    <WonSign />
+                    {/* 1순위: title이 있으면 title 표시 */}
                     {title ? (
-                        <Text style={[styles.title, Typography.Pretendard_M_16]}>{title}</Text>
-                    ) : (
-                        // 국가명과 코드가 있는 경우
                         <Text style={[styles.title, Typography.Pretendard_M_16]}>
-                            {country} <Text style={styles.codeText}>({code})</Text>
+                            {title}
                         </Text>
+                    ) : (
+                        /* 2순위: title은 없지만 국가명이나 코드가 있으면 표시 */
+                        (country || code) && (
+                            <Text style={[styles.title, Typography.Pretendard_M_16]}>
+                                {country} <Text style={styles.codeText}>({code})</Text>
+                            </Text>
+                        )
+                        /* 3순위: 둘 다 없으면 자동으로 아무것도 렌더링되지 않음 (공백) */
                     )}
                 </View>
             }

@@ -1,3 +1,4 @@
+import { Typography } from '@/constants/Typography';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
@@ -15,7 +16,6 @@ import { styles } from './LoginPage.styles';
 import ActionLinks from './component/ActionLinks';
 import InputField from './component/InputField';
 import LoginButton from './component/LoginButton';
-import { Typography } from '@/constants/Typography';
 
 type Props = {
   onBack: () => void;
