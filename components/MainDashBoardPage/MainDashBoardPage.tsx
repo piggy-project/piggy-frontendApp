@@ -1,93 +1,93 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Animated, Dimensions, PanResponder, View } from 'react-native';
 import MainHeader from '../Header/MainHeader';
 import { styles } from './MainDashBoard.styles';
 import BottomInfoContainer from './component/BottomInfoContainer';
 import ChoiceCountry from './component/ChoiceCountry';
 import MainImageContainer from './component/MainImageContainer';
+import { exchangeApi } from '@/components/utils/api'; // API 함수 임포트
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
+// 1. 국가 이름을 통화 코드로 변환하는 매핑 테이블
+const COUNTRY_MAP: Record<string, string> = {
+  '일본': 'JPY',
+  '미국': 'USD',
+  '중국': 'CNY',
+  '베트남': 'VND',
+  '태국': 'THB',
+  '필리핀': 'PHP',
+  '홍콩': 'HKD',
+  '대만': 'TWD',
+  '영국': 'GBP',
+};
+
 export default function MainDashBoardPage() {
   const INITIAL_TOP = SCREEN_HEIGHT * 0.5;
+  const [exchangeData, setExchangeData] = useState<any>(null); // 선택된 환율 정보를 담을 상태
   
-  // 1. 실제 애니메이션되는 값
   const panY = useRef(new Animated.Value(INITIAL_TOP)).current;
-  
-  // 2. 마지막으로 멈췄던 위치를 기억할 변수
   const lastOffset = useRef(INITIAL_TOP);
+
+  // 2. 국가 선택 시 데이터를 가져오는 함수
+  const handleCountrySelect = async (country: string) => {
+    const code = COUNTRY_MAP[country];
+    if (!code) return;
+
+    try {
+      console.log(`[메인페이지] ${country}(${code}) 데이터 요청 중...`);
+      const data = await exchangeApi.getExchangeDetail(code);
+      setExchangeData(data); // 가져온 데이터를 상태에 저장
+    } catch (error) {
+      console.error('환율 상세 정보 로딩 에러:', error);
+    }
+  };
+
+  // 3. 앱 처음 진입 시 기본값(일본) 데이터 로드
+  useEffect(() => {
+    handleCountrySelect('일본');
+  }, []);
 
   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
       onMoveShouldSetPanResponder: () => true,
-      
       onPanResponderGrant: () => {
         panY.setOffset(lastOffset.current);
         panY.setValue(0);
       },
-
       onPanResponderMove: (event, gestureState) => {
-        // 현재 위치가 초기 위치(INITIAL_TOP)보다 더 내려가려고 하면 무시
         const nextPosition = lastOffset.current + gestureState.dy;
-        
         if (nextPosition > INITIAL_TOP) {
-          // 저항감 표현 시 아래 코드 적용
-          //panY.setValue(gestureState.dy / 3); 
-          
-          // 아예 못 내리게 하려면 그냥 값을 업데이트 안 하거나, 한계값으로 고정
           panY.setValue(INITIAL_TOP - lastOffset.current); 
         } else {
-          // 위로 올릴 때는 정상적으로 이동
           panY.setValue(gestureState.dy);
         }
       },
-
       onPanResponderRelease: (event, gestureState) => {
         panY.flattenOffset(); 
-
-        // 현재 위치 확인
-        // 올리는 동작 감지 (위로 100 이상 밀었거나, 위쪽 영역에 있을 때)
         if (gestureState.dy < -100 || (lastOffset.current < INITIAL_TOP && gestureState.dy < 50)) {
-          // 끝까지 올리기
           lastOffset.current = 150;
-          Animated.spring(panY, {
-            toValue: 150,
-            useNativeDriver: false,
-            bounciness: 8, // 약간의 탄성 추가
-          }).start();
+          Animated.spring(panY, { toValue: 150, useNativeDriver: false, bounciness: 8 }).start();
         } else {
-          // 다시 초기 위치로 복귀 (내리는 동작)
           lastOffset.current = INITIAL_TOP;
-          Animated.spring(panY, {
-            toValue: INITIAL_TOP,
-            useNativeDriver: false,
-             bounciness: 8,
-          }).start();
+          Animated.spring(panY, { toValue: INITIAL_TOP, useNativeDriver: false, bounciness: 8 }).start();
         }
       },
     })
   ).current;
 
-  const handleCountrySelect = (country: string) => {
-    console.log(`[메인페이지] ${country} 데이터 요청 중...`);
-    
-    // 나중에 여기에 API 코드를 넣으면 됩니다.
-    // fetch(`http://.../api/rates?country=${country}`)
-    //   .then(res => res.json())
-    //   .then(data => { ... })
-  };
-
   return (
     <View style={styles.container}>
       <MainHeader />
       <View style={[styles.sectionGap, { flex: 1 }]}>
-        {/*<기능 컴포넌트 넣기/>*/}
         <View>
           <ChoiceCountry onSelect={handleCountrySelect} />
         </View>
         
-        <MainImageContainer/>
+        {/* 선택된 국가 코드를 이미지 컨테이너로 전달 (필요 시) */}
+        <MainImageContainer />
+
         <Animated.View
           style={[
             {
@@ -96,14 +96,14 @@ export default function MainDashBoardPage() {
               left: 0,
               right: 0,
               bottom: 0,
-              transform: [{ translateY: panY }], // 애니메이션 값 연결
+              transform: [{ translateY: panY }],
             }
           ]}
-          {...panResponder.panHandlers} // 터치 이벤트 연결
+          {...panResponder.panHandlers}
         >
-        <BottomInfoContainer />
-      </Animated.View>
-        {/*<QuestionAI/>*/}
+          {/* 4. 가져온 데이터를 하단 시트로 전달 */}
+          <BottomInfoContainer data={exchangeData} />
+        </Animated.View>
       </View>
     </View>
   );
