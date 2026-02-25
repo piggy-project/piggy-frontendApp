@@ -1,11 +1,11 @@
-import React, { useRef, useState, useEffect } from 'react';
+import { exchangeApi } from '@/components/utils/api'; // API 함수 임포트
+import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Dimensions, PanResponder, View } from 'react-native';
 import MainHeader from '../Header/MainHeader';
 import { styles } from './MainDashBoard.styles';
 import BottomInfoContainer from './component/BottomInfoContainer';
 import ChoiceCountry from './component/ChoiceCountry';
 import MainImageContainer from './component/MainImageContainer';
-import { exchangeApi } from '@/components/utils/api'; // API 함수 임포트
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
