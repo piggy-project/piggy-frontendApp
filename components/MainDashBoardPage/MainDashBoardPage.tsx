@@ -35,7 +35,6 @@ export default function MainDashBoardPage() {
     if (!code) return;
 
     try {
-      console.log(`[메인페이지] ${country}(${code}) 데이터 요청 중...`);
       const data = await exchangeApi.getExchangeDetail(code);
       setExchangeData(data); // 가져온 데이터를 상태에 저장
     } catch (error) {

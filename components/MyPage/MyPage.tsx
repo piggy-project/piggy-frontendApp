@@ -2,10 +2,10 @@ import React from 'react';
 import { View } from 'react-native';
 import MyPageHeader from '../Header/MyPageHeader';
 import { styles } from './MyPage.styles';
-import SavedCountries from './component/SavedCountries';
 import MyWishlist from './component/MyWishlist';
-import UserActivity from './component/UserActivity'
 import ProfileInfo from './component/ProfileInfo';
+import SavedCountries from './component/SavedCountries';
+import UserActivity from './component/UserActivity';
 
 export default function MyPage() {
   return (

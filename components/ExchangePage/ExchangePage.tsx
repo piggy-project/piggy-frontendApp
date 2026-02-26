@@ -4,6 +4,7 @@ import { ActivityIndicator, Alert, View } from 'react-native';
 import { styles } from './Exchange.styles';
 
 import { exchangeApi } from '@/components/utils/api';
+import { FLAG_MAP } from '@/constants/Currency';
 import ExchangeHeader from '../Header/ExchangeHeader';
 import SearchCountry from './component/SearchCountry';
 import ShowCountry from './component/ShowCountry';
@@ -17,14 +18,6 @@ export interface CountryData {
   flag: string;
   time?: string;
 }
-
-const FLAG_MAP: Record<string, string> = {
-  USD: '🇺🇸', EUR: '🇪🇺', JPY: '🇯🇵', CNY: '🇨🇳', HKD: '🇭🇰',
-  TWD: '🇹🇼', GBP: '🇬🇧', CHF: '🇨🇭', CAD: '🇨🇦', AUD: '🇦🇺',
-  NZD: '🇳🇿', SGD: '🇸🇬', THB: '🇹🇭', MYR: '🇲🇾', IDR: '🇮🇩',
-  VND: '🇻🇳', PHP: '🇵🇭', INR: '🇮🇳', SAR: '🇸🇦', AED: '🇦🇪',
-  KWD: '🇰🇼', BHD: '🇧🇭'
-};
 
 export default function ExchangePage() {
   const router = useRouter();

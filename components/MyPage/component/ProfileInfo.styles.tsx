@@ -33,4 +33,13 @@ export const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   editButtonText: { color: '#333' },
+  logoutButton: {
+    marginTop: 10,
+    padding: 5,
+  },
+  logoutButtonText: {
+    color: '#888',
+    fontSize: 13,
+    textDecorationLine: 'underline',
+  },
 });
