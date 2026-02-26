@@ -2,8 +2,9 @@ import React from 'react';
 import { View } from 'react-native';
 import MyPageHeader from '../Header/MyPageHeader';
 import { styles } from './MyPage.styles';
-import MyPageActionButtons from './component/MyPageActionButtons';
-import MyPageListMenu from './component/MyPageListMenu';
+import SavedCountries from './component/SavedCountries';
+import MyWishlist from './component/MyWishlist';
+import UserActivity from './component/UserActivity'
 import ProfileInfo from './component/ProfileInfo';
 
 export default function MyPage() {
@@ -11,9 +12,10 @@ export default function MyPage() {
     <View style={styles.container}>
       <MyPageHeader />
       <View style={[styles.sectionGap, { flex: 1 }]}>
-        <ProfileInfo/>
-        <MyPageActionButtons />
-        <MyPageListMenu />
+        <ProfileInfo />
+        <SavedCountries />
+        <MyWishlist />
+        <UserActivity />
       </View>
     </View>
   );
