@@ -1,10 +1,10 @@
+import { Typography } from '@/constants/Typography';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { ActivityIndicator, Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'; // Image 제거
 import { useSignupData } from '../../components/utils/SignupContext';
 import { authApi } from '../../components/utils/api';
-import { Typography } from '@/constants/Typography';
 
 export default function SignupNickname() {
   const router = useRouter();

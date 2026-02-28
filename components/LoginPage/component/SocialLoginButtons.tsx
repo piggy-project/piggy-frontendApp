@@ -8,7 +8,7 @@ import { Alert, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 WebBrowser.maybeCompleteAuthSession();
 
 export default function SocialLoginButtons() {
-  const { loginWithToken } = useAuth(); 
+  const { loginWithToken } = useAuth();
   const router = useRouter();
 
   // 2. 백엔드 주소 설정
@@ -18,23 +18,31 @@ export default function SocialLoginButtons() {
   const handleSocialLogin = async (provider: 'kakao' | 'google' | 'naver') => {
     try {
       const authUrl = `${BACKEND_URL}/oauth2/authorization/${provider}?target=app`;
-      //엑스포용 리다이렉트 주소. 나중에 변경 필요
-      const returnUrl = 'exp://localhost:8081/--/oauth/success';
+      // 백엔드가 리다이렉트할 베이스 주소
+      const returnUrl = 'exp://localhost:8081';
 
       const result = await WebBrowser.openAuthSessionAsync(authUrl, returnUrl);
 
       if (result.type === 'success' && result.url) {
-        const urlObj = new URL(result.url);
-        const params = new URLSearchParams(urlObj.search);
+        const url = result.url;
+        const params = new URLSearchParams(url.split('?')[1]);
         const token = params.get('token');
+        const refreshToken = params.get('refreshToken');
 
         if (token) {
-          await loginWithToken(token);
-          router.replace('/(tabs)');
+          if (url.includes('additional-info')) {
+            router.push({
+              pathname: '/oauth/additional-info',
+              params: { token }
+            });
+          } else {
+            await loginWithToken(token);
+            router.replace('/(tabs)');
+          }
         } else {
           Alert.alert('오류', '토큰을 찾을 수 없습니다.');
         }
-      } 
+      }
     } catch (error) {
       console.error('Social Login Error:', error);
       Alert.alert('로그인 실패', '소셜 로그인 중 오류가 발생했습니다.');
@@ -44,8 +52,8 @@ export default function SocialLoginButtons() {
   return (
     <View style={styles.container}>
       {/* 1. 카카오톡 */}
-      <TouchableOpacity 
-        style={styles.circle} 
+      <TouchableOpacity
+        style={styles.circle}
         onPress={() => handleSocialLogin('kakao')}
       >
         <Image
@@ -55,7 +63,7 @@ export default function SocialLoginButtons() {
       </TouchableOpacity>
 
       {/* 2. 구글 */}
-      <TouchableOpacity 
+      <TouchableOpacity
         style={[styles.circle, styles.googleCircle]}
         onPress={() => handleSocialLogin('google')}
       >
@@ -66,7 +74,7 @@ export default function SocialLoginButtons() {
       </TouchableOpacity>
 
       {/* 3. 네이버 */}
-      <TouchableOpacity 
+      <TouchableOpacity
         style={styles.circle}
         onPress={() => handleSocialLogin('naver')}
       >
@@ -83,7 +91,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 20, 
+    gap: 20,
     marginBottom: 30,
   },
   circle: {
@@ -94,7 +102,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logoIcon: {
-    width: 50, 
+    width: 50,
     height: 50,
     resizeMode: 'contain',
   },
@@ -103,7 +111,7 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.2,
-    shadowRadius: 4, 
+    shadowRadius: 4,
     elevation: 2,
   },
 });

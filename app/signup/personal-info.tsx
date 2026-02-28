@@ -1,9 +1,9 @@
+import { Typography } from '@/constants/Typography';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSignupData } from '../../components/utils/SignupContext';
-import { Typography } from '@/constants/Typography';
 
 export default function SignupPersonalInfo() {
   const router = useRouter();
