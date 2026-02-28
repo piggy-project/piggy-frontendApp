@@ -1,5 +1,5 @@
 import { shoppingApi } from '@/components/utils/api';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, ScrollView, View } from 'react-native';
 import MainHeader from '../Header/MainHeader';
 import ChoiceCountry from '../MainDashBoardPage/component/ChoiceCountry';
@@ -9,17 +9,12 @@ import SearchProduct from './component/SearchProduct';
 import ShoppingUtility from './component/ShoppingUtility';
 import { styles } from './Shopping.styles';
 
-const dummyProducts = [
-    { id: '1', name: '바나나 6송이', discount: '74%', priceKrw: '4,800₩', localPrice: '9,0000동', originalPrice: '18,000₩' },
-    { id: '2', name: '바나나 6송이', discount: '74%', priceKrw: '4,800₩', localPrice: '9,0000동', originalPrice: '18,000₩' },
-    { id: '3', name: '바나나 6송이', discount: '74%', priceKrw: '4,800₩', localPrice: '9,0000동', originalPrice: '18,000₩' },
-  ];
-
 export default function ShoppingPage() {
   const [searchResult, setSearchResult] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [recommendItems, setRecommendItems] = useState([]);
 
-    // 검색 결과 초기화 함수
+  // 검색 결과 초기화 함수
   const handleReset = () => {
     setSearchResult(null);
   };
@@ -29,18 +24,44 @@ export default function ShoppingPage() {
       handleReset(); // 검색어가 없으면 초기화
       return;
     }
-  
-  try {
-    setIsLoading(true);
-    const data = await shoppingApi.comparePrices(query);
-    
-    setSearchResult(data);
-  } catch (error) {
-    console.error("검색 실패:", error);
-  } finally {
-    setIsLoading(false);
-  }
-};
+
+    try {
+      setIsLoading(true);
+      const data = await shoppingApi.comparePrices(query);
+
+      setSearchResult(data);
+    } catch (error) {
+      console.error("검색 실패:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 컴포넌트 마운트 시 인기 아이템 로드
+  useEffect(() => {
+    const fetchRecommendations = async () => {
+      try {
+        const rawData = await shoppingApi.getPopularItems();
+
+        const formattedData = rawData.map((item: any) => {
+          const price = item.price ?? 0;
+          const rate = (item.exchangeRate ?? 925) / 100;
+
+          return {
+            ...item,
+            image: item.imageUrl,
+            localPrice: `${price.toLocaleString()} JPY`,
+            priceKrw: `${Math.floor(price * rate).toLocaleString()}원`,
+          };
+        });
+
+        setRecommendItems(formattedData);
+      } catch (error) {
+        console.error("추천템 로드 실패:", error);
+      }
+    };
+    fetchRecommendations();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -48,7 +69,7 @@ export default function ShoppingPage() {
       <View style={[styles.sectionGap, { flex: 1 }]}>
         <ChoiceCountry />
         {/* SearchProduct에 검색 함수 전달 */}
-        <SearchProduct onSearch={handleSearch} />
+        <SearchProduct onSearch={handleSearch} onClear={handleReset} />
 
         <ScrollView style={{ flex: 1, backgroundColor: '#fff' }}>
           <ShoppingUtility />
@@ -59,8 +80,8 @@ export default function ShoppingPage() {
             <ComparisonResultList data={searchResult} />
           ) : (
             <>
-              <ProductSection title="국가 현지 구매 필수템" data={dummyProducts} />
-              <ProductSection title="국가 직구 추천템" data={dummyProducts} />
+              <ProductSection title="🔥 실시간 다른 여행자들이 찾는 템" data={recommendItems} />
+              <ProductSection title="✈️ 일본 현지 인기 굿즈" data={recommendItems} />
             </>
           )}
         </ScrollView>

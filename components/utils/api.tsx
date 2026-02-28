@@ -46,7 +46,7 @@ export const authApi = {
   // 이메일 중복 체크
   checkEmail: (email: string) => {
     return request(`/users/check-email?email=${email}`, { method: 'POST' });
-},
+  },
 
   // 회원가입
   signUp: (userData: any) => {
@@ -63,7 +63,7 @@ export const authApi = {
       body: JSON.stringify(credentials),
     });
   },
-  
+
   // 마이페이지 정보 조회
   getMyInfo: () => {
     return request('/users/me', { method: 'GET' });
@@ -94,17 +94,21 @@ export const shoppingApi = {
   // 1. 가격 비교 검색
   //라쿠텐(일본)과 네이버(한국)의 가격을 비교한 결과를 가져옵니다.
   comparePrices: (query: string) => {
-    return request(`/api/v1/shopping/compare?query=${encodeURIComponent(query)}`, { 
-      method: 'GET' 
+    return request(`/api/v1/shopping/compare?query=${encodeURIComponent(query)}`, {
+      method: 'GET'
     });
   },
-
-
   // 2. OCR 스캔 요청 
-scanProductPrice: (base64Image: string) => {
+  scanProductPrice: (base64Image: string) => {
     return request('/api/v1/ocr/scan', {
       method: 'POST',
       body: JSON.stringify({ image: base64Image }),
+    });
+  },
+  // 3. 인기 상품 조회(많이 검색한 아이템)
+  getPopularItems: () => {
+    return request('/api/v1/shopping/popular', {
+      method: 'GET'
     });
   }
 };

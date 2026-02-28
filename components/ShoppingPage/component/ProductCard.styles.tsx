@@ -12,6 +12,13 @@ export const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 8,
   },
+  image: {
+    width: 110,
+    height: 110,
+    borderRadius: 8,
+    marginBottom: 8,
+    backgroundColor: '#f0f0f0',
+  },
   name: {
     color: '#333',
     marginBottom: 2,

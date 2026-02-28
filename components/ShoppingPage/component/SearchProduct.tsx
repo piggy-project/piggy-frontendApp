@@ -35,7 +35,7 @@ export default function SearchProduct({ onSearch, onClear }: SearchProductProps)
           onSubmitEditing={handleSearch}
         />
         {searchText.length > 0 && (
-          <TouchableOpacity onPress={() => setSearchText('')}>
+          <TouchableOpacity onPress={handleClear}> 
             <Ionicons name="close-circle" size={18} color="#ccc" />
           </TouchableOpacity>
         )}
