@@ -89,3 +89,22 @@ export const exchangeApi = {
     return request(`/api/exchange/history?code=${code}`, { method: 'GET' });
   },
 };
+export const shoppingApi = {
+
+  // 1. 가격 비교 검색
+  //라쿠텐(일본)과 네이버(한국)의 가격을 비교한 결과를 가져옵니다.
+  comparePrices: (query: string) => {
+    return request(`/api/v1/shopping/compare?query=${encodeURIComponent(query)}`, { 
+      method: 'GET' 
+    });
+  },
+
+
+  // 2. OCR 스캔 요청 
+scanProductPrice: (base64Image: string) => {
+    return request('/api/v1/ocr/scan', {
+      method: 'POST',
+      body: JSON.stringify({ image: base64Image }),
+    });
+  }
+};
