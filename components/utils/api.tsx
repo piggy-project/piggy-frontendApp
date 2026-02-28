@@ -1,7 +1,7 @@
 import { getToken } from './authStore'; // 금고에서 토큰 가져오는 함수 임포트
 
 // 1. 기본 서버 주소 설정 (안드로이드 에뮬레이터 기준) - 현재 내 ip
-const BASE_URL = 'https://piggys.mooo.com';
+const BASE_URL = 'http://localhost:8080';
 
 // 2. Fetch를 더 편하게 쓰기 위한 래퍼 함수 (Interceptor 역할)
 const request = async (endpoint: string, options: RequestInit = {}) => {

@@ -5,8 +5,8 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 20,
-    backgroundColor: '#fff',
     paddingBottom: 20,
+    backgroundColor: '#fff',
   },
   profileImage: {
     width: 80,
@@ -16,30 +16,15 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  imageText: { color: '#666' },
+  imageText: { 
+    color: '#666' 
+  },
   infoContent: {
-    alignItems: 'flex-end',
-    flex: 1,
+    flex: 1,           // 남은 공간을 다 차지함
+    marginLeft: 16,    // 이미지와의 간격
+    alignItems: 'flex-start', // 닉네임을 왼쪽으로 정렬
   },
   nickname: {
     color: '#000',
-    marginBottom: 8,
-  },
-  editButton: {
-    backgroundColor: '#E5E5E5',
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 15,
-    alignItems: 'flex-end',
-  },
-  editButtonText: { color: '#333' },
-  logoutButton: {
-    marginTop: 10,
-    padding: 5,
-  },
-  logoutButtonText: {
-    color: '#888',
-    fontSize: 13,
-    textDecorationLine: 'underline',
   },
 });
