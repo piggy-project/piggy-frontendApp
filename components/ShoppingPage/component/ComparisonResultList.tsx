@@ -3,69 +3,93 @@ import React from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
 
 export default function ComparisonResultList({ data }: { data: any }) {
-  // 데이터가 없을 경우를 대비한 안전장치
-  if (!data || !data.rakutenResults) return null;
+  // 1. 안전장치: 데이터가 아예 없거나 리스트가 모두 비어있으면 null 반환
+  const hasRakutenData = data?.rakutenResults?.Items?.length > 0;
+  const hasSerpData = data?.serpResults?.length > 0;
 
-  const { naverResults, rakutenResults, exchangeRate } = data;
-  const rakutenItems = rakutenResults.Items || []; 
-  
-  // 네이버 최저가 (sony 검색 결과 첫 번째 상품 가격)
+  if (!data || (!hasRakutenData && !hasSerpData)) {
+    return (
+      <View style={styles.container}>
+        <Text style={[styles.title, Typography.Pretendard_B_16]}>검색 결과 비교</Text>
+        <Text style={{ textAlign: 'center', marginTop: 20 }}>검색 결과가 없습니다.</Text>
+      </View>
+    );
+  }
+
+  const { naverResults, rakutenResults, serpResults, exchangeRate, currencyCode } = data;
   const naverBestPrice = naverResults?.items?.[0]?.lprice || 0;
+
+  // 2. 환율 계산 함수 (100단위 통화 체크)
+  const calculateKrw = (localPrice: number) => {
+    const isHundredUnit = ['JPY', 'VND'].includes(currencyCode);
+    return isHundredUnit 
+      ? Math.floor((localPrice * exchangeRate) / 100) 
+      : Math.floor(localPrice * exchangeRate);
+  };
+
+  // 3. 공통 카드 렌더링 함수
+  const renderItemCard = (item: any, key: string) => {
+    const priceInKrw = calculateKrw(item.price);
+    const diff = naverBestPrice - priceInKrw;
+
+    return (
+      <View key={key} style={styles.card}>
+        <View style={styles.row}>
+          <Image 
+            source={{ uri: item.image || 'https://via.placeholder.com/80' }} 
+            style={styles.image} 
+          />
+          <View style={styles.info}>
+            <Text numberOfLines={2} style={[styles.itemName, Typography.Pretendard_M_14]}>
+              {item.name}
+            </Text>
+            
+            <View style={styles.priceRow}>
+              <Text style={[styles.localPrice, Typography.Pretendard_B_16]}>
+                {item.price.toLocaleString()} {currencyCode}
+              </Text>
+              <Text style={[styles.krwPrice, Typography.Pretendard_M_12]}>
+                (약 {priceInKrw.toLocaleString()}원)
+              </Text>
+            </View>
+
+            <View style={styles.compareBox}>
+              <Text style={Typography.Pretendard_M_12}>국내 최저가 대비 </Text>
+              <Text style={[
+                Typography.Pretendard_B_16, 
+                { color: diff > 0 ? '#E74C3C' : '#2ECC71' }
+              ]}>
+                {diff > 0 ? `${diff.toLocaleString()}원 저렴` : `${Math.abs(diff).toLocaleString()}원 비쌈`}
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+    );
+  };
 
   return (
     <View style={styles.container}>
       <Text style={[styles.title, Typography.Pretendard_B_16]}>검색 결과 비교</Text>
       
-      {rakutenItems.length === 0 ? (
-        <Text style={{ textAlign: 'center', marginTop: 20 }}>검색 결과가 없습니다.</Text>
-      ) : (
-        rakutenItems.map((itemObj: any, index: number) => {
-          const item = itemObj.Item;
-          if (!item) return null;
+      {/* 4. 일본(라쿠텐) 리스트 출력 */}
+      {currencyCode === 'JPY' && rakutenResults?.Items?.map((itemObj: any, index: number) => {
+        const item = itemObj.Item;
+        return renderItemCard({
+          name: item.itemName,
+          price: item.itemPrice,
+          image: item.mediumImageUrls?.[0]?.imageUrl,
+        }, `rakuten-${index}`);
+      })}
 
-          const imageUrl = item.mediumImageUrls?.[0]?.imageUrl;
-          
-          // JPY 100 기준 환율 계산 (현재 환율: 924.58)
-          const priceInKrw = Math.floor((item.itemPrice * exchangeRate) / 100);
-          const diff = naverBestPrice - priceInKrw;
-
-          return (
-            <View key={index} style={styles.card}>
-              <View style={styles.row}>
-                <Image 
-                  source={{ uri: imageUrl || 'https://via.placeholder.com/80' }} 
-                  style={styles.image} 
-                />
-                <View style={styles.info}>
-                  <Text numberOfLines={2} style={[styles.itemName, Typography.Pretendard_M_14]}>
-                    {/* 네이버와 달리 라쿠텐은 HTML 태그가 없을 수 있지만 안전하게 처리 */}
-                    {item.itemName}
-                  </Text>
-                  
-                  <View style={styles.priceRow}>
-                    <Text style={[styles.localPrice, Typography.Pretendard_B_16]}>
-                      {item.itemPrice.toLocaleString()} JPY
-                    </Text>
-                    <Text style={[styles.krwPrice, Typography.Pretendard_M_12]}>
-                      (약 {priceInKrw.toLocaleString()}원)
-                    </Text>
-                  </View>
-
-                  <View style={styles.compareBox}>
-                    <Text style={Typography.Pretendard_M_12}>국내 최저가({naverBestPrice.toLocaleString()}원) 대비 </Text>
-                    <Text style={[
-                      Typography.Pretendard_B_16, 
-                      { color: diff > 0 ? '#E74C3C' : '#2ECC71' }
-                    ]}>
-                      {diff > 0 ? `${diff.toLocaleString()}원 저렴` : `${Math.abs(diff).toLocaleString()}원 비쌈`}
-                    </Text>
-                  </View>
-                </View>
-              </View>
-            </View>
-          );
-        })
-      )}
+      {/* 5. 동남아/미국/유럽 (SERP 리스트) 10개 출력 */}
+      {currencyCode !== 'JPY' && serpResults?.map((item: any, index: number) => {
+        return renderItemCard({
+          name: item.title,
+          price: item.price,
+          image: item.thumbnail,
+        }, `serp-${index}`);
+      })}
     </View>
   );
 }

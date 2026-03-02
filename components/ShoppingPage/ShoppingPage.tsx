@@ -21,16 +21,15 @@ export default function ShoppingPage() {
   const [lastQuery, setLastQuery] = useState('');
 
   // 1. 추천 아이템 로드 로직 (통화별 환율 계산 로직 개선)
-  const fetchRecommendations = useCallback(async () => {
+  const fetchRecommendations = useCallback(async (currency: string) => {
     try {
-      const rawData = await shoppingApi.getPopularItems();
+      const rawData = await shoppingApi.getPopularItems(currency); 
+      
       const formattedData = rawData.map((item: any) => {
         const price = item.price ?? 0;
-        // 서버에서 온 아이템의 원천 통화 확인 (기본값 JPY)
-        const itemCurrency = item.currencyCode || 'JPY'; 
+        const itemCurrency = currency; // 현재 탭의 통화 기준
         const rate = item.exchangeRate ?? 900;
 
-        // JPY, VND 등 100단위 통화인지 확인하여 원화 계산
         const isHundredUnit = ['JPY', 'VND', 'IDR'].includes(itemCurrency);
         const krwValue = isHundredUnit 
           ? Math.floor((price * rate) / 100) 
@@ -45,9 +44,15 @@ export default function ShoppingPage() {
       });
       setRecommendItems(formattedData);
     } catch (error) {
-      console.error("추천템 로드 실패:", error);
+      console.error(`${currency} 추천템 로드 실패:`, error);
+      setRecommendItems([]); // 에러 발생 시 리스트 비우기
     }
   }, []);
+
+  useEffect(() => {
+    // 탭이 바뀔 때마다 해당 국가의 추천 아이템을 가져옵니다.
+    fetchRecommendations(selectedCurrency);
+  }, [selectedCurrency, fetchRecommendations]);
 
   // 2. 국가 탭 변경 핸들러
   const handleCountrySelect = (currencyCode: string) => {
@@ -87,13 +92,9 @@ export default function ShoppingPage() {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await fetchRecommendations();
+    await fetchRecommendations(selectedCurrency);
     setRefreshing(false);
   };
-
-  useEffect(() => {
-    fetchRecommendations();
-  }, [fetchRecommendations]);
 
   return (
     <View style={styles.container}>

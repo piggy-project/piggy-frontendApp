@@ -17,7 +17,7 @@ export default function ProductSection({ title, data }: ProductSectionProps) {
         data={data}
         horizontal
         showsHorizontalScrollIndicator={false}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item, index) => `${item.id}-${index}`}
         renderItem={({ item }) => <ProductCard {...item} />}
       />
     </View>

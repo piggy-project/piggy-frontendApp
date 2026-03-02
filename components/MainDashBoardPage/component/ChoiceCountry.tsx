@@ -15,6 +15,7 @@ import { styles } from './ChoiceCountry.style';
 const COUNTRY_MAP: { [key: string]: string } = {
     '일본': 'JPY',
     '미국': 'USD',
+    '유럽': 'EUR',
     '중국': 'CNY',
     '베트남': 'VND',
     '태국': 'THB',
@@ -26,11 +27,11 @@ const COUNTRY_MAP: { [key: string]: string } = {
 
 const AVAILABLE_CURRENCIES = [
     { label: '베트남', code: 'VND' },
+    { label: '유럽', code: 'EUR' },
     { label: '태국', code: 'THB' },
     { label: '필리핀', code: 'PHP' },
     { label: '홍콩', code: 'HKD' },
     { label: '대만', code: 'TWD' },
-    { label: '영국', code: 'GBP' },
 ];
 
 interface Props {
@@ -40,7 +41,7 @@ interface Props {
 
 export default function ChoiceCountry({ onSelect }: Props) {
     // 탭 리스트 관리 (화면 표시용 이름)
-    const [tabList, setTabList] = useState(['일본', '미국', '중국', '+']);
+    const [tabList, setTabList] = useState(['일본', '미국', '베트남', '태국', '필리핀', '+']);
     const [selectedLabel, setSelectedLabel] = useState('일본');
     const [dropdownVisible, setDropdownVisible] = useState(false);
 

@@ -123,9 +123,9 @@ export const shoppingApi = {
     });
   },
   // 3. 인기 상품 조회(많이 검색한 아이템)
-  getPopularItems: () => {
-    return request('/api/v1/shopping/popular', {
-      method: 'GET'
-    });
+  getPopularItems: (currencyCode: string) => {
+    return request(`/api/v1/shopping/popular?currencyCode=${currencyCode}`, {
+    method: 'GET'
+  });
   }
 };
