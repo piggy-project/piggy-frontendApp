@@ -11,6 +11,19 @@ import {
 } from 'react-native';
 import { styles } from './ChoiceCountry.style';
 
+// 모든 지원 국가 및 코드 매핑
+const COUNTRY_MAP: { [key: string]: string } = {
+    '일본': 'JPY',
+    '미국': 'USD',
+    '중국': 'CNY',
+    '베트남': 'VND',
+    '태국': 'THB',
+    '필리핀': 'PHP',
+    '홍콩': 'HKD',
+    '대만': 'TWD',
+    '영국': 'GBP',
+};
+
 const AVAILABLE_CURRENCIES = [
     { label: '베트남', code: 'VND' },
     { label: '태국', code: 'THB' },
@@ -21,34 +34,45 @@ const AVAILABLE_CURRENCIES = [
 ];
 
 interface Props {
-    onSelect?: (country: string) => void;
+    // 이제 부모에게 'JPY', 'USD' 같은 코드를 넘겨줍니다.
+    onSelect?: (currencyCode: string) => void; 
 }
 
 export default function ChoiceCountry({ onSelect }: Props) {
+    // 탭 리스트 관리 (화면 표시용 이름)
     const [tabList, setTabList] = useState(['일본', '미국', '중국', '+']);
-    const [selectedCountry, setSelectedCountry] = useState(tabList[0]);
+    const [selectedLabel, setSelectedLabel] = useState('일본');
     const [dropdownVisible, setDropdownVisible] = useState(false);
 
-    const handleTabPress = (country: string) => {
-        if (country === '+') {
+    // 탭 클릭 핸들러
+    const handleTabPress = (label: string) => {
+        if (label === '+') {
             setDropdownVisible(true);
         } else {
-            setSelectedCountry(country);
-            if (onSelect) onSelect(country);
+            setSelectedLabel(label);
+            const code = COUNTRY_MAP[label];
+            if (onSelect && code) onSelect(code);
         }
     };
 
+    // 드롭다운에서 국가 추가 핸들러
     const handleAddCountry = (currency: any) => {
         setDropdownVisible(false);
+        
+        // 이미 탭에 있는 경우 선택만 변경
         if (tabList.includes(currency.label)) {
-            setSelectedCountry(currency.label);
+            setSelectedLabel(currency.label);
+            if (onSelect) onSelect(currency.code);
             return;
         }
+
+        // 새 국가를 '+' 앞에 추가
         const newList = [...tabList];
         newList.splice(newList.length - 1, 0, currency.label);
         setTabList(newList);
-        setSelectedCountry(currency.label);
-        if (onSelect) onSelect(currency.label);
+        setSelectedLabel(currency.label);
+        
+        if (onSelect) onSelect(currency.code);
     };
 
     return (
@@ -58,16 +82,16 @@ export default function ChoiceCountry({ onSelect }: Props) {
                 showsHorizontalScrollIndicator={false}
                 bounces={false}
             >
-                {tabList.map((country) => {
-                    const isSelected = selectedCountry === country;
+                {tabList.map((label) => {
+                    const isSelected = selectedLabel === label;
                     return (
                         <TouchableOpacity
-                            key={country}
+                            key={label}
                             style={[
                                 styles.tabItem,
                                 isSelected && styles.selectedTabItem
                             ]}
-                            onPress={() => handleTabPress(country)}
+                            onPress={() => handleTabPress(label)}
                             activeOpacity={0.7}
                         >
                             <Text style={[
@@ -75,7 +99,7 @@ export default function ChoiceCountry({ onSelect }: Props) {
                                 isSelected && styles.selectedText, 
                                 Typography.Pretendard_M_16
                             ]}>
-                                {country}
+                                {label}
                             </Text>
                         </TouchableOpacity>
                     );
