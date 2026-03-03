@@ -1,4 +1,4 @@
-// 1. 깃발 이모지 맵
+// 1. 깃발 이모지 맵 (유럽 확인됨)
 export const FLAG_MAP: Record<string, string> = {
   USD: '🇺🇸', EUR: '🇪🇺', JPY: '🇯🇵', CNY: '🇨🇳', HKD: '🇭🇰',
   TWD: '🇹🇼', GBP: '🇬🇧', CHF: '🇨🇭', CAD: '🇨🇦', AUD: '🇦🇺',
@@ -7,26 +7,30 @@ export const FLAG_MAP: Record<string, string> = {
   KWD: '🇰🇼', BHD: '🇧🇭'
 };
 
-// 2. 통화 정보
+// 2. 통화 정보 (유럽 추가)
 export const AVAILABLE_CURRENCIES = [
+  { label: '일본', code: 'JPY' },
+  { label: '미국', code: 'USD' },
+  { label: '유럽', code: 'EUR' },
   { label: '베트남', code: 'VND' },
   { label: '태국', code: 'THB' },
   { label: '필리핀', code: 'PHP' },
   { label: '홍콩', code: 'HKD' },
   { label: '대만', code: 'TWD' },
   { label: '영국', code: 'GBP' },
-  { label: '일본', code: 'JPY' },
-  { label: '미국', code: 'USD' },
 ];
+
 export interface DetailedFlag {
   icon: string;
   color: string;
   name: string;
 }
 
+// 3. 상세 깃발 맵 (EUR 정보 추가)
 export const DETAILED_FLAG_MAP: Record<string, DetailedFlag> = {
   JPY: { icon: 'disc', color: '#BC002D', name: '일본 엔' },
   USD: { icon: 'logo-usd', color: '#85bb65', name: '미국 달러' },
+  EUR: { icon: 'logo-euro', color: '#003399', name: '유럽 유로' },
   CNY: { icon: 'flag', color: '#EE1C25', name: '중국 위안' },
   VND: { icon: 'star', color: '#FFFF00', name: '베트남 동' },
   THB: { icon: 'flag', color: '#ED1C24', name: '태국 바트' },

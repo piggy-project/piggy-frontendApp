@@ -9,19 +9,6 @@ import MainImageContainer from './component/MainImageContainer';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
-// 1. 국가 이름을 통화 코드로 변환하는 매핑 테이블
-const COUNTRY_MAP: Record<string, string> = {
-  '일본': 'JPY',
-  '미국': 'USD',
-  '중국': 'CNY',
-  '베트남': 'VND',
-  '태국': 'THB',
-  '필리핀': 'PHP',
-  '홍콩': 'HKD',
-  '대만': 'TWD',
-  '영국': 'GBP',
-};
-
 export default function MainDashBoardPage() {
   const INITIAL_TOP = SCREEN_HEIGHT * 0.5;
   const [exchangeData, setExchangeData] = useState<any>(null); // 선택된 환율 정보를 담을 상태
@@ -29,22 +16,22 @@ export default function MainDashBoardPage() {
   const panY = useRef(new Animated.Value(INITIAL_TOP)).current;
   const lastOffset = useRef(INITIAL_TOP);
 
-  // 2. 국가 선택 시 데이터를 가져오는 함수
-  const handleCountrySelect = async (country: string) => {
-    const code = COUNTRY_MAP[country];
+  // 국가 선택 시 데이터를 가져오는 함수
+  const handleCountrySelect = async (code: string) => {
     if (!code) return;
 
     try {
+      console.log("선택된 통화 코드:", code); // 디버깅용 로그
       const data = await exchangeApi.getExchangeDetail(code);
-      setExchangeData(data); // 가져온 데이터를 상태에 저장
+      setExchangeData(data);
     } catch (error) {
       console.error('환율 상세 정보 로딩 에러:', error);
     }
   };
 
-  // 3. 앱 처음 진입 시 기본값(일본) 데이터 로드
+  // 앱 처음 진입 시 기본값(일본) 데이터 로드
   useEffect(() => {
-    handleCountrySelect('일본');
+    handleCountrySelect('JPY'); 
   }, []);
 
   const panResponder = useRef(

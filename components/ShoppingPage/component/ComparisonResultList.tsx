@@ -1,9 +1,8 @@
 import { Typography } from '@/constants/Typography';
 import React from 'react';
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { Alert, Image, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function ComparisonResultList({ data }: { data: any }) {
-  // 1. 안전장치: 데이터가 아예 없거나 리스트가 모두 비어있으면 null 반환
   const hasRakutenData = data?.rakutenResults?.Items?.length > 0;
   const hasSerpData = data?.serpResults?.length > 0;
 
@@ -19,7 +18,6 @@ export default function ComparisonResultList({ data }: { data: any }) {
   const { naverResults, rakutenResults, serpResults, exchangeRate, currencyCode } = data;
   const naverBestPrice = naverResults?.items?.[0]?.lprice || 0;
 
-  // 2. 환율 계산 함수 (100단위 통화 체크)
   const calculateKrw = (localPrice: number) => {
     const isHundredUnit = ['JPY', 'VND'].includes(currencyCode);
     return isHundredUnit 
@@ -27,13 +25,30 @@ export default function ComparisonResultList({ data }: { data: any }) {
       : Math.floor(localPrice * exchangeRate);
   };
 
-  // 3. 공통 카드 렌더링 함수
-  const renderItemCard = (item: any, key: string) => {
+  // 클릭 시 브라우저를 여는 핸들러
+  const openProductLink = async (url: string) => {
+    if (!url || !url.startsWith('http')) {
+      Alert.alert("알림", "연결 가능한 상품 페이지가 없습니다.");
+      return;
+    }
+    const supported = await Linking.canOpenURL(url);
+    if (supported) {
+      await Linking.openURL(url);
+    }
+  };
+
+  // 공통 카드 렌더링 함수 (link 인자 추가)
+  const renderItemCard = (item: any, key: string, link: string) => {
     const priceInKrw = calculateKrw(item.price);
     const diff = naverBestPrice - priceInKrw;
 
     return (
-      <View key={key} style={styles.card}>
+      <TouchableOpacity 
+        key={key} 
+        style={styles.card} 
+        onPress={() => openProductLink(link)}
+        activeOpacity={0.8}
+      >
         <View style={styles.row}>
           <Image 
             source={{ uri: item.image || 'https://via.placeholder.com/80' }} 
@@ -64,7 +79,7 @@ export default function ComparisonResultList({ data }: { data: any }) {
             </View>
           </View>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -72,23 +87,23 @@ export default function ComparisonResultList({ data }: { data: any }) {
     <View style={styles.container}>
       <Text style={[styles.title, Typography.Pretendard_B_16]}>검색 결과 비교</Text>
       
-      {/* 4. 일본(라쿠텐) 리스트 출력 */}
+      {/* 4. 일본(라쿠텐) 리스트: item.itemUrl 사용 */}
       {currencyCode === 'JPY' && rakutenResults?.Items?.map((itemObj: any, index: number) => {
         const item = itemObj.Item;
         return renderItemCard({
           name: item.itemName,
           price: item.itemPrice,
           image: item.mediumImageUrls?.[0]?.imageUrl,
-        }, `rakuten-${index}`);
+        }, `rakuten-${index}`, item.itemUrl);
       })}
 
-      {/* 5. 동남아/미국/유럽 (SERP 리스트) 10개 출력 */}
+      {/* 5. 동남아/미국/유럽 (SERP/eBay 리스트): item.link 사용 */}
       {currencyCode !== 'JPY' && serpResults?.map((item: any, index: number) => {
         return renderItemCard({
           name: item.title,
           price: item.price,
           image: item.thumbnail,
-        }, `serp-${index}`);
+        }, `serp-${index}`, item.link);
       })}
     </View>
   );
