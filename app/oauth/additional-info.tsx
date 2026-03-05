@@ -13,58 +13,46 @@ export default function SocialBasicInfo() {
   const { logout } = useAuth();
   const navigation = useNavigation();
 
-  const [name, setName] = useState('');
   const [birth, setBirth] = useState('');
   const [phoneNum, setPhoneNum] = useState('');
 
-  // 토큰이 들어오면 즉시 로그인 처리 (다음 페이지 API 호출을 위해)
   useEffect(() => {
     if (token) loginWithToken(token.toString());
   }, [token]);
 
-  // 뒤로가기 버튼 감지 로직
   useEffect(() => {
     const unsubscribe = navigation.addListener('beforeRemove', (e) => {
-      // 닉네임 페이지로 '다음' 버튼 눌러서 가는 경우는 제외 (action type 확인)
       if (e.data.action.type === 'PUSH' || e.data.action.type === 'REPLACE') {
         return;
       }
-      // 뒤로가기 발생 시 실행
       handleCancelSignup();
     });
-
     return unsubscribe;
   }, [navigation]);
 
-  const isNameValid = name.length >= 2;
   const isPhoneValid = /^\d{11}$/.test(phoneNum);
   const isBirthValid = /^\d{8}$/.test(birth);
-  const isValid = isNameValid && isPhoneValid && isBirthValid;
+  const isValid = isPhoneValid && isBirthValid;
 
-  // 다음 단계(닉네임)로 데이터 가지고 이동
   const handleNext = () => {
     router.push({
       pathname: '/oauth/additional-nickname',
-      params: { name, birth, phoneNum }
+      params: { birth, phoneNum }
     });
   };
-  // 취소 로직: 서버 데이터 지우고 뒤로 가기
+
   const handleCancelSignup = async () => {
-  try {
-    await logout(); 
-
-    // 서버에 삭제 요청
-    authApi.cancelSocialSignup().catch(err => console.error("서버 삭제 실패:", err));
-
-    // 즉시 로그인 화면으로 교체
-    router.replace('/'); 
-  } catch (error) {
-    console.error("취소 처리 중 에러:", error);
-  } finally {
-    await logout(); 
-    router.replace('/'); 
-  }
-};
+    try {
+      await logout(); 
+      authApi.cancelSocialSignup().catch(err => console.error("서버 삭제 실패:", err));
+      router.replace('/'); 
+    } catch (error) {
+      console.error("취소 처리 중 에러:", error);
+    } finally {
+      await logout(); 
+      router.replace('/'); 
+    }
+  };
 
   const formatBirthDateView = (text: string) => {
     const cleaned = ('' + text).replace(/\D/g, '');
@@ -86,17 +74,6 @@ export default function SocialBasicInfo() {
       <View style={styles.content}>
         <Text style={[styles.title, Typography.Pretendard_B_24]}>기본정보를 입력해주세요</Text>
 
-        {/* 이름 */}
-        <View style={styles.inputGroup}>
-          <Text style={[styles.label, Typography.Pretendard_M_14]}>이름</Text>
-          <TextInput
-            style={[styles.input, Typography.Pretendard_M_16]}
-            placeholder="성함"
-            value={name}
-            onChangeText={setName}
-          />
-        </View>
-
         {/* 전화번호 */}
         <View style={styles.inputGroup}>
           <Text style={[styles.label, Typography.Pretendard_M_14]}>전화번호</Text>
@@ -104,7 +81,7 @@ export default function SocialBasicInfo() {
             style={[styles.input, Typography.Pretendard_M_16]}
             placeholder="010 0000 0000"
             value={formatPhoneNumberView(phoneNum)}
-            onChangeText={(text) => setPhoneNum(text.replace(/\s/g, ''))} // 저장할 땐 공백 제거
+            onChangeText={(text) => setPhoneNum(text.replace(/\s/g, ''))}
             keyboardType="number-pad"
             maxLength={13}
           />

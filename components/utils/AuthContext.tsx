@@ -14,6 +14,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
   login: (credentials: any) => Promise<void>;
   logout: () => Promise<void>;
   loginWithToken: (accessToken: string) => Promise<void>;
@@ -104,7 +105,7 @@ const logout = async () => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, logout, loginWithToken }}>
+    <AuthContext.Provider value={{ user, setUser, isLoading, login, logout, loginWithToken }}>
       {children}
     </AuthContext.Provider>
   );
