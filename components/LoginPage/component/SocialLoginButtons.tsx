@@ -26,6 +26,33 @@ export default function SocialLoginButtons() {
       if (result.type === 'success' && result.url) {
         const url = result.url;
         const params = new URLSearchParams(url.split('?')[1]);
+
+        // 1. 에러 처리 로직 (oauth/error 경로 확인)
+        // 1. 에러 처리 로직 (oauth/error 경로 확인)
+        if (url.includes('/oauth/error')) {
+          const rawErrorMessage = params.get('message');
+
+          if (rawErrorMessage) {
+            // 일단 한글로 복구
+            const decodedMsg = decodeURIComponent(rawErrorMessage);
+            let finalMessage = decodedMsg; // 기본은 서버 메시지
+
+            // 2. 메시지 커스텀 로직
+            if (decodedMsg.includes('카카오')) {
+              finalMessage = "이미 카카오 계정으로 가입되어 있네요!\n카카오 로그인을 이용해 주세요.";
+            } else if (decodedMsg.includes('네이버')) {
+              finalMessage = "이미 네이버 계정으로 가입되어 있네요!\n네이버 로그인을 이용해 주세요.";
+            } else if (decodedMsg.includes('구글')) {
+              finalMessage = "이미 네이버 계정으로 가입되어 있네요!\n구글 로그인을 이용해 주세요.";
+            } else if (decodedMsg.includes('일반 이메일')) {
+              finalMessage = "이미 일반 계정으로 가입되어 있네요!!\n이메일 계정 로그인을 이용해 주세요.";
+            }
+
+            Alert.alert('확인해 주세요', finalMessage);
+            return;
+          }
+        }
+
         const token = params.get('token');
         const refreshToken = params.get('refreshToken');
 
