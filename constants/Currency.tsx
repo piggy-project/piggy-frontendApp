@@ -1,22 +1,28 @@
-// 1. 깃발 이모지 맵 (유럽 확인됨)
+// 1. 깃발 이모지 맵 (10개국 최적화)
 export const FLAG_MAP: Record<string, string> = {
-  USD: '🇺🇸', EUR: '🇪🇺', JPY: '🇯🇵', CNY: '🇨🇳', HKD: '🇭🇰',
-  TWD: '🇹🇼', GBP: '🇬🇧', CHF: '🇨🇭', CAD: '🇨🇦', AUD: '🇦🇺',
-  NZD: '🇳🇿', SGD: '🇸🇬', THB: '🇹🇭', MYR: '🇲🇾', IDR: '🇮🇩',
-  VND: '🇻🇳', PHP: '🇵🇭', INR: '🇮🇳', SAR: '🇸🇦', AED: '🇦🇪',
-  KWD: '🇰🇼', BHD: '🇧🇭'
+  JPY: '🇯🇵',
+  USD: '🇺🇸',
+  CNY: '🇨🇳',
+  VND: '🇻🇳',
+  THB: '🇹🇭',
+  PHP: '🇵🇭',
+  DEU_EUR: '🇩🇪', // 독일
+  FRA_EUR: '🇫🇷', // 프랑스
+  AUD: '🇦🇺',
+  GBP: '🇬🇧',
 };
 
-// 2. 통화 정보 (유럽 추가)
+// 2. 지원 국가/통화 정보 (ChoiceCountry 등에서 사용)
 export const AVAILABLE_CURRENCIES = [
   { label: '일본', code: 'JPY' },
   { label: '미국', code: 'USD' },
-  { label: '유럽', code: 'EUR' },
+  { label: '중국', code: 'CNY' },
   { label: '베트남', code: 'VND' },
   { label: '태국', code: 'THB' },
   { label: '필리핀', code: 'PHP' },
-  { label: '홍콩', code: 'HKD' },
-  { label: '대만', code: 'TWD' },
+  { label: '독일', code: 'DEU_EUR' },
+  { label: '프랑스', code: 'FRA_EUR' },
+  { label: '호주', code: 'AUD' },
   { label: '영국', code: 'GBP' },
 ];
 
@@ -26,17 +32,16 @@ export interface DetailedFlag {
   name: string;
 }
 
-// 3. 상세 깃발 맵 (EUR 정보 추가)
+// 3. 상세 정보 맵 (유로존 국가별 색상 및 이름 분리)
 export const DETAILED_FLAG_MAP: Record<string, DetailedFlag> = {
   JPY: { icon: 'disc', color: '#BC002D', name: '일본 엔' },
   USD: { icon: 'logo-usd', color: '#85bb65', name: '미국 달러' },
-  EUR: { icon: 'logo-euro', color: '#003399', name: '유럽 유로' },
   CNY: { icon: 'flag', color: '#EE1C25', name: '중국 위안' },
   VND: { icon: 'star', color: '#FFFF00', name: '베트남 동' },
   THB: { icon: 'flag', color: '#ED1C24', name: '태국 바트' },
   PHP: { icon: 'flag', color: '#0038A8', name: '필리핀 페소' },
-  HKD: { icon: 'flower', color: '#7B001C', name: '홍콩 달러' },
-  TWD: { icon: 'flag', color: '#FE0000', name: '대만 달러' },
+  DEU_EUR: { icon: 'logo-euro', color: '#FFCE00', name: '독일 유로' },
+  FRA_EUR: { icon: 'logo-euro', color: '#003399', name: '프랑스 유로' },
+  AUD: { icon: 'flag', color: '#012169', name: '호주 달러' },
   GBP: { icon: 'flag', color: '#00247D', name: '영국 파운드' },
-  CAD: { icon: 'leaf', color: '#FF0000', name: '캐나다 달러' },
 };

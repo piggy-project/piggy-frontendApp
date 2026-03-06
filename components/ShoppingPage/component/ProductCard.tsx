@@ -1,6 +1,5 @@
 import { Typography } from '@/constants/Typography';
 import React from 'react';
-// ✨ Linking, TouchableOpacity, Alert 추가 임포트
 import { Alert, Image, Linking, Text, TouchableOpacity, View } from 'react-native';
 import { styles } from './ProductCard.styles';
 

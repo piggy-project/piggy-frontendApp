@@ -127,5 +127,11 @@ export const shoppingApi = {
     return request(`/api/v1/shopping/popular?currencyCode=${currencyCode}`, {
     method: 'GET'
   });
+  },
+  // 4. 추천 음식
+  getRegionalFoods: (currencyCode: string) => {
+    return request(`/food?currencyCode=${currencyCode}`, {
+    method: 'GET'
+  });
   }
 };

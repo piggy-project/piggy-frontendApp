@@ -14,24 +14,28 @@ import { styles } from './ChoiceCountry.style';
 // 모든 지원 국가 및 코드 매핑
 const COUNTRY_MAP: { [key: string]: string } = {
     '일본': 'JPY',
-    '미국': 'USD',
-    '유럽': 'EUR',
     '중국': 'CNY',
+    '미국': 'USD',
     '베트남': 'VND',
-    '태국': 'THB',
     '필리핀': 'PHP',
-    '홍콩': 'HKD',
-    '대만': 'TWD',
+    '태국': 'THB',
+    '독일': 'DEU_EUR',
+    '프랑스': 'FRA_EUR',
+    '호주': 'AUD',
     '영국': 'GBP',
 };
 
 const AVAILABLE_CURRENCIES = [
+    { label: '일본', code: 'JPY' },
+    { label: '중국', code: 'CNY' },
+    { label: '미국', code: 'USD' },
     { label: '베트남', code: 'VND' },
-    { label: '유럽', code: 'EUR' },
-    { label: '태국', code: 'THB' },
     { label: '필리핀', code: 'PHP' },
-    { label: '홍콩', code: 'HKD' },
-    { label: '대만', code: 'TWD' },
+    { label: '태국', code: 'THB' },
+    { label: '독일', code: 'DEU_EUR' },
+    { label: '프랑스', code: 'FRA_EUR' },
+    { label: '호주', code: 'AUD' },
+    { label: '영국', code: 'GBP' },
 ];
 
 interface Props {
@@ -41,7 +45,7 @@ interface Props {
 
 export default function ChoiceCountry({ onSelect }: Props) {
     // 탭 리스트 관리 (화면 표시용 이름)
-    const [tabList, setTabList] = useState(['일본', '미국', '베트남', '태국', '필리핀', '+']);
+    const [tabList, setTabList] = useState(['일본', '미국', '중국', '베트남', '태국', '+']);
     const [selectedLabel, setSelectedLabel] = useState('일본');
     const [dropdownVisible, setDropdownVisible] = useState(false);
 
