@@ -26,7 +26,12 @@ const request = async (endpoint: string, options: RequestInit = {}) => {
     });
 
     // 응답 데이터 파싱
-    const data = await response.json().catch(() => ({}));
+    const data = await response.json().catch(async (err) => {
+      // JSON 파싱 실패 시 서버가 보낸 '진짜 텍스트'를 로그로 찍어보세요.
+      const rawText = await response.text();
+      console.log("🚨 서버에서 온 생데이터(JSON 아님!):", rawText);
+      return {}; // 여기서 {}를 주니까 result가 {}가 되는 거예요.
+    });
 
     // 성공(200~299)이 아니면 에러 던지기
     if (!response.ok) {
@@ -89,8 +94,8 @@ export const exchangeApi = {
   // 1. 환율 리스트 및 정렬 필터 (이제 얘가 메인입니다!)
   // sort: RISE(급상승), FALL(급하락), HIGH(높은순), LOW(낮은순)
   getExchangeRanking: (sort: string = 'RISE') => {
-    return request(`/api/exchange/ranking?sort=${sort}`, { 
-      method: 'GET' 
+    return request(`/api/exchange/ranking?sort=${sort}`, {
+      method: 'GET'
     });
   },
   // 2. 특정 통화 상세 정보 가져오기
@@ -103,12 +108,12 @@ export const exchangeApi = {
     return request(`/api/exchange/history?code=${code}`, { method: 'GET' });
   },
 };
-export const shoppingApi = {
 
+export const shoppingApi = {
   // 1. 가격 비교 검색
   comparePrices: (query: string, currencyCode: string) => {
     return request(
-      `/api/v1/shopping/compare?query=${encodeURIComponent(query)}&currencyCode=${currencyCode}`, 
+      `/api/v1/shopping/compare?query=${encodeURIComponent(query)}&currencyCode=${currencyCode}`,
       { method: 'GET' }
     );
   },
@@ -128,13 +133,53 @@ export const shoppingApi = {
   // 3. 인기 상품 조회(많이 검색한 아이템)
   getPopularItems: (currencyCode: string) => {
     return request(`/api/v1/shopping/popular?currencyCode=${currencyCode}`, {
-    method: 'GET'
-  });
+      method: 'GET'
+    });
   },
   // 4. 추천 음식
   getRegionalFoods: (currencyCode: string) => {
     return request(`/food?currencyCode=${currencyCode}`, {
-    method: 'GET'
-  });
+      method: 'GET'
+    });
   }
+};
+export const communityApi = {
+  // 1. 게시글 등록하기
+  // category: '환율 수다방' | '여행 공유방' | '정보방'
+  createPost: (postData: { title: string; content: string; category: string }) => {
+    return request('/api/community', {
+      method: 'POST',
+      body: JSON.stringify(postData),
+    });
+  },
+
+  // 2. 게시글 목록 조회하기 (필터 및 검색 포함)
+  getPosts: (category: string, search: string = '') => {
+    const encodedCategory = encodeURIComponent(category);
+    const encodedSearch = encodeURIComponent(search);
+    return request(`/api/community?category=${encodedCategory}&search=${encodedSearch}`, {
+      method: 'GET'
+    });
+  },
+
+  // 3. 게시글 상세 조회 (게시글 클릭 시 사용)
+  getPostDetail: (postId: number) => {
+    return request(`/api/community/${postId}`, {
+      method: 'GET'
+    });
+  },
+
+  // 4. 게시글 삭제 (본인 글일 경우)
+  deletePost: (postId: number) => {
+    return request(`/api/community/${postId}`, {
+      method: 'DELETE'
+    });
+  },
+  // 5. 좋아요
+  toggleLike: (postId: number) => {
+    return request(`/api/community/${postId}/like`, {
+      method: 'POST',
+      body: JSON.stringify({})
+    });
+  },
 };

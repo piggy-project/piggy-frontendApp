@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useFonts } from 'expo-font';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -7,6 +8,8 @@ import { AuthProvider, useAuth } from '../components/utils/AuthContext';
 
 // 앱이 로드될 때까지 스플래시 화면 유지
 SplashScreen.preventAutoHideAsync();
+
+const queryClient = new QueryClient();
 
 // RootLayout: 폰트 로딩 & AuthProvider 제공
 export default function RootLayout() {
@@ -33,9 +36,11 @@ export default function RootLayout() {
 
   return (
     // AuthProvider로 감싸고, 실제 로직은 AppLayout에서 처리
-    <AuthProvider>
-      <AppLayout />
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <AppLayout />
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }
 

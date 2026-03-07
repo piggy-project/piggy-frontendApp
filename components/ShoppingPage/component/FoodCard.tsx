@@ -46,7 +46,7 @@ export default function FoodCard({ rank, name, category, rating, desc, image }: 
                 ) : (
                     <View style={styles.placeholder}>
                         <Text style={[styles.placeholderText, Typography.Pretendard_M_11]}>
-                            사진이{"\n"}준비중입니다
+                            사진 준비중입니다
                         </Text>
                     </View>
                 )}

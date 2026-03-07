@@ -1,7 +1,20 @@
-import React from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { communityApi } from '@/components/utils/api';
+import { useQuery } from '@tanstack/react-query';
+import React, { useState } from 'react';
+import { ActivityIndicator, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { styles } from './CommunityContainer.styles';
 import CommunityPost from './CommunityPost';
+
+interface PostData {
+  id: number;
+  title: string;
+  content: string;
+  category: string;
+  authorNickname: string;
+  createdAt: string;
+  likeCount: number;
+  isLiked: boolean;
+}
 
 interface ContainerProps {
   activeTab: string;
@@ -9,26 +22,62 @@ interface ContainerProps {
 }
 
 const CommunityContainer = ({ activeTab, searchText }: ContainerProps) => {
-  // 전체 데이터 (보통 API에서 가져오거나 상위에서 관리)
-  const allPosts = [
-    { id: 1, category: '환율 수다방', user: '엉망진창 고등어', time: '1시간 전', content: '오늘 엔화 환율 어때요?', likes: 10, comments: 5 },
-    { id: 2, category: '환율 수다방', user: '알뜰한 고래', time: '2시간 전', content: '달러 가즈아', likes: 50, comments: 20 },
-    { id: 3, category: '여행 공유방', user: '떠나자 도다리', time: '3시간 전', content: '일본 맛집 추천좀', likes: 100, comments: 80 },
-    { id: 4, category: '정보방', user: '정보왕 상어', time: '5분 전', content: '수수료 우대 꿀팁', likes: 200, comments: 150 },
-  ];
-
-  // 필터링 로직: 1. 탭 분류 -> 2. 제목(content) 검색
-  const filteredPosts = allPosts.filter((post) => {
-    const matchesTab = post.category === activeTab;
-    const matchesSearch = post.content.toLowerCase().includes(searchText.toLowerCase());
-    return matchesTab && matchesSearch;
+  const [userRefreshing, setUserRefreshing] = useState(false);
+  // 모든 상태 관리는 useQuery 사용
+  const { 
+    data: posts = [], 
+    isLoading, 
+    isFetching, 
+    refetch 
+  } = useQuery<PostData[]>({
+    queryKey: ['posts', activeTab, searchText],
+    queryFn: () => communityApi.getPosts(activeTab, searchText),
+    staleTime: 1000 * 60, // 1분간은 캐시 데이터를 즉시 사용
   });
 
+  // 수동 새로고침 함수
+  const onRefresh = async () => {
+    setUserRefreshing(true); // 아이콘 보여주기
+    await refetch();         // 데이터 다시 가져오기
+    setUserRefreshing(false); // 아이콘 숨기기
+  };
+
+  // 로딩 상태 처리
+  // 첫 로딩일 때만 큰 인디케이터 사용
+  if (isLoading && posts.length === 0) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', marginTop: 50 }}>
+        <ActivityIndicator size="large" color="#FFB7C5" />
+      </View>
+    );
+  }
+
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView 
+      style={styles.container}
+      refreshControl={
+        <RefreshControl 
+          refreshing={userRefreshing}
+          onRefresh={onRefresh} 
+          tintColor="#FFB7C5" 
+        />
+      }
+    >
       <View style={styles.inner}>
-        {filteredPosts.length > 0 ? (
-          filteredPosts.map((post) => <CommunityPost key={post.id} {...post} />)
+        {posts.length > 0 ? (
+          posts.map((post) => (
+            <CommunityPost 
+              key={post.id} 
+              id={post.id} 
+              category={post.category}
+              user={post.authorNickname}
+              time={formatTime(post.createdAt)}
+              content={post.title}
+              likes={post.likeCount}
+              comments={0}
+              isLiked={post.isLiked}
+            />
+          ))
         ) : (
           <Text style={{ textAlign: 'center', marginTop: 50, color: '#888' }}>
             검색 결과가 없습니다.
@@ -37,6 +86,17 @@ const CommunityContainer = ({ activeTab, searchText }: ContainerProps) => {
       </View>
     </ScrollView>
   );
+};
+
+// 간단한 시간 포맷팅 (예: 2026-03-07T...)
+const formatTime = (dateString: string) => {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diff = (now.getTime() - date.getTime()) / 1000;
+  if (diff < 60) return '방금 전';
+  if (diff < 3600) return `${Math.floor(diff / 60)}분 전`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}시간 전`;
+  return `${date.getMonth() + 1}월 ${date.getDate()}일`;
 };
 
 export default CommunityContainer;
