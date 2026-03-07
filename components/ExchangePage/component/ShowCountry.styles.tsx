@@ -6,6 +6,31 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 20,
   },
+  filterWrapper: {
+    flexDirection: 'row',
+    paddingVertical: 12,
+    backgroundColor: '#fff', // 스티키 효과를 위해 배경색 필수
+    gap: 8,
+  },
+  filterTab: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 15,
+    backgroundColor: '#F5F5F5',
+    borderWidth: 1,
+    borderColor: '#EEE',
+  },
+  activeTab: {
+    backgroundColor: '#FFD700', // Piggys 포인트 컬러
+    borderColor: '#FFD700',
+  },
+  activeFilterText: {
+    color: '#000',
+    fontWeight: 'bold',
+  },
+  inactiveFilterText: {
+    color: '#888',
+  },
   itemContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',

@@ -86,9 +86,12 @@ export const authApi = {
 };
 
 export const exchangeApi = {
-  // 최신 환율 리스트 가져오기
-  getLatestRates: () => {
-    return request('/api/exchange/rates', { method: 'GET' });
+  // 1. 환율 리스트 및 정렬 필터 (이제 얘가 메인입니다!)
+  // sort: RISE(급상승), FALL(급하락), HIGH(높은순), LOW(낮은순)
+  getExchangeRanking: (sort: string = 'RISE') => {
+    return request(`/api/exchange/ranking?sort=${sort}`, { 
+      method: 'GET' 
+    });
   },
   // 2. 특정 통화 상세 정보 가져오기
   getExchangeDetail: (code: string) => {

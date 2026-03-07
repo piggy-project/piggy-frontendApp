@@ -72,8 +72,7 @@ export default function ShoppingPage() {
       // 프론트에서 변환한 국가 코드를 백엔드에 보냅니다.
       const countryCode = getCountryCode(currency);
       const data = await shoppingApi.getRegionalFoods(countryCode);
-      console.log(`${countryCode} 음식 데이터 수신:`, data);
-
+      
       // 음식 데이터 매핑
       const formattedFood = data.map((food: any) => ({
         ...food,

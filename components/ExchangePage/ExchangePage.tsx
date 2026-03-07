@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, View } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
 import { styles } from './Exchange.styles';
 
 import { exchangeApi } from '@/components/utils/api';
@@ -15,6 +15,7 @@ export interface CountryData {
   name: string;
   code: string;
   rate: string;
+  percentChange: number;
   flag: string;
   time?: string;
 }
@@ -25,6 +26,7 @@ export default function ExchangePage() {
   const [exchangeData, setExchangeData] = useState<CountryData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [updateTime, setUpdateTime] = useState('');
+  const [currentSort, setCurrentSort] = useState('RISE');
 
   const formatData = (rawData: any[]): CountryData[] => {
     return rawData.map((item: any) => ({
@@ -32,25 +34,25 @@ export default function ExchangePage() {
       name: item.curNm,
       code: item.curUnit,
       rate: `${item.rate?.toLocaleString(undefined, { minimumFractionDigits: 2 })} KRW`,
+      percentChange: item.percentChange || 0,
       flag: FLAG_MAP[item.curUnit] || '🏳️',
       time: item.time,
     }));
   };
 
-  const fetchExchangeRates = async () => {
+  // 필터 변경 시 랭킹 API 호출 함수
+  const handleFilterChange = async (sort: string) => {
+    setCurrentSort(sort);
     try {
       setIsLoading(true);
-      const response = await exchangeApi.getLatestRates();
+      const response = await exchangeApi.getExchangeRanking(sort);
       const rawData = response.data || response;
       if (Array.isArray(rawData)) {
-        if (rawData.length > 0 && rawData[0].time) {
-          setUpdateTime(rawData[0].time);
-        }
+        if (rawData.length > 0 && rawData[0].time) setUpdateTime(rawData[0].time);
         setExchangeData(formatData(rawData));
       }
     } catch (error) {
-      console.error('환율 정보 호출 에러:', error);
-      Alert.alert('알림', '환율 정보를 불러올 수 없습니다.');
+      console.error('데이터 로드 에러:', error);
     } finally {
       setIsLoading(false);
     }
@@ -58,12 +60,10 @@ export default function ExchangePage() {
 
   const silentFetchExchangeRates = async () => {
     try {
-      const response = await exchangeApi.getLatestRates();
+      const response = await exchangeApi.getExchangeRanking(currentSort); // 현재 선택된 필터 유지
       const rawData = response.data || response;
       if (Array.isArray(rawData)) {
-        if (rawData.length > 0 && rawData[0].time) {
-          setUpdateTime(rawData[0].time);
-        }
+        if (rawData.length > 0 && rawData[0].time) setUpdateTime(rawData[0].time);
         setExchangeData(formatData(rawData));
       }
     } catch (e) {
@@ -72,37 +72,18 @@ export default function ExchangePage() {
   };
 
   useEffect(() => {
-    // 1. 앱 진입 시 즉시 실행
-    fetchExchangeRates();
+    handleFilterChange('RISE');
 
-    // 2. 다음 '정각'까지 남은 밀리초(ms) 계산 로직
     const calculateNextHourTick = () => {
       const now = new Date();
-      const minutes = now.getMinutes();
-      const seconds = now.getSeconds();
-      const milliseconds = now.getMilliseconds();
-
-      // 다음 정각(60분)까지 남은 분 계산
-      const nextMinuteTick = 60 - minutes;
-
-      // 밀리초 단위 변환: (남은 분 * 60,000) - (현재 지난 초 * 1,000) - 현재 지난 밀리초
-      const delay = (nextMinuteTick * 60 * 1000) - (seconds * 1000) - milliseconds;
-
-      // 서버가 정각에 데이터를 갱신할 시간을 벌어주기 위해 2초 버퍼 추가
+      const delay = (60 - now.getMinutes()) * 60 * 1000 - now.getSeconds() * 1000 - now.getMilliseconds();
       return delay + 2000;
     };
 
     let intervalId: ReturnType<typeof setInterval> | undefined;
-
-    // 3. 첫 번째 정각까지 기다리는 타이머
     const timeoutId = setTimeout(() => {
       silentFetchExchangeRates();
-
-      // 4. 이후에는 정확히 '1시간(3,600,000ms)'마다 주기적으로 호출
-      intervalId = setInterval(() => {
-        silentFetchExchangeRates();
-      }, 3600000);
-
+      intervalId = setInterval(silentFetchExchangeRates, 3600000);
     }, calculateNextHourTick());
 
     return () => {
@@ -137,7 +118,7 @@ export default function ExchangePage() {
             <ActivityIndicator size="large" color="#4A90E2" />
           </View>
         ) : (
-          <ShowCountry data={filteredData} onPressItem={handlePressItem} />
+          <ShowCountry data={filteredData} onPressItem={handlePressItem} onFilterChange={handleFilterChange} activeFilter={currentSort}/>
         )}
       </View>
     </View>
