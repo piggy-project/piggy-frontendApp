@@ -103,4 +103,89 @@ export const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
   },
+  // ───── 댓글 섹션 ─────
+  commentSection: {
+    marginTop: 8,
+    paddingBottom: 16,
+  },
+  commentTitle: {
+    color: '#333',
+    marginBottom: 12,
+  },
+  commentItem: {
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0F0F0',
+  },
+  commentHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  commentProfileCircle: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#FFE4EA',
+    marginRight: 8,
+  },
+  commentAuthorInfo: {
+    flex: 1,
+  },
+  commentAuthorName: {
+    color: '#333',
+  },
+  commentDate: {
+    color: '#aaa',
+    marginTop: 1,
+  },
+  commentDeleteButton: {
+    padding: 4,
+  },
+  commentContent: {
+    color: '#444',
+    lineHeight: 20,
+    paddingLeft: 36,
+  },
+  emptyComment: {
+    color: '#aaa',
+    textAlign: 'center',
+    paddingVertical: 24,
+  },
+
+  // ───── 댓글 입력창 ─────
+  commentInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#F0F0F0',
+    backgroundColor: '#fff',
+  },
+  commentInput: {
+    flex: 1,
+    minHeight: 40,
+    maxHeight: 100,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    marginRight: 8,
+    fontSize: 14,
+    color: '#333',
+    backgroundColor: '#FAFAFA',
+  },
+  commentSubmitButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#FFB7C5',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  commentSubmitButtonDisabled: {
+    backgroundColor: '#E0E0E0',
+  },
 });

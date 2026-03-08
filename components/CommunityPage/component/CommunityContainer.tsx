@@ -14,6 +14,7 @@ interface PostData {
   createdAt: string;
   likeCount: number;
   isLiked: boolean;
+  commentCount: number;
 }
 
 interface ContainerProps {
@@ -74,7 +75,7 @@ const CommunityContainer = ({ activeTab, searchText }: ContainerProps) => {
               time={formatTime(post.createdAt)}
               content={post.title}
               likes={post.likeCount}
-              comments={0}
+              comments={post.commentCount ?? 0}
               isLiked={post.isLiked}
             />
           ))

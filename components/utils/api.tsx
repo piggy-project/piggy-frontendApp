@@ -187,5 +187,23 @@ export const communityApi = {
       body: JSON.stringify({})
     });
   },
-  // 6. 댓글쓰기
+  // 6. 댓글 쓰기
+  createComment: (postId: number, content: string) => {
+    return request(`/api/community/${postId}/comments`, {
+      method: 'POST',
+      body: JSON.stringify({ content }),
+    });
+  },
+  // 7. 댓글 삭제
+  deleteComment: (commentId: number) => {
+    return request(`/api/community/comments/${commentId}`, {
+      method: 'DELETE',
+    });
+  },
+  // 8. 댓글 목록 조회
+  getComments: (postId: number) => {
+    return request(`/api/community/${postId}/comments`, {
+      method: 'GET',
+    });
+  },
 };
