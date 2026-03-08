@@ -61,8 +61,9 @@ export const styles = StyleSheet.create({
   },
   footer: {
     flexDirection: 'row',
-    marginTop: 40,
-    paddingTop: 20,
+    marginTop: 20,
+    paddingTop: 10,
+    paddingBottom: 10,
     borderTopWidth: 1,
     borderTopColor: '#F5F5F5',
   },
@@ -105,8 +106,7 @@ export const styles = StyleSheet.create({
   },
   // ───── 댓글 섹션 ─────
   commentSection: {
-    marginTop: 8,
-    paddingBottom: 16,
+    paddingBottom: 10,
   },
   commentTitle: {
     color: '#333',
