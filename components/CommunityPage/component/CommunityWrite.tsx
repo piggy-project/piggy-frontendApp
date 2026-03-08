@@ -1,6 +1,7 @@
 import NoneHeader from '@/components/Header/NoneHeader';
 import { communityApi } from '@/components/utils/api';
 import { Typography } from '@/constants/Typography';
+import { useQueryClient } from '@tanstack/react-query';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
@@ -18,6 +19,7 @@ import { styles } from './CommunityWrite.styles';
 
 export default function CommunityWrite() {
     const router = useRouter();
+    const queryClient = useQueryClient();
     const { initialCategory } = useLocalSearchParams<{ initialCategory: string }>();
 
     const [category, setCategory] = useState<string>(initialCategory || '환율 수다방');
@@ -30,22 +32,18 @@ export default function CommunityWrite() {
             Alert.alert('알림', '제목과 내용을 모두 입력해주세요.');
             return;
         }
-
         try {
             setIsSubmitting(true);
-
-            // 📍 백엔드 API 호출
             await communityApi.createPost({
                 title,
                 content,
                 category
             });
-
+            await queryClient.invalidateQueries({ queryKey: ['posts'] });
             Alert.alert('성공', '게시글이 등록되었습니다.', [
                 {
                     text: '확인',
                     onPress: () => {
-                        // 글쓰기 성공 후 돌아가서 목록이 갱신되도록 처리
                         router.replace('/community');
                     }
                 }

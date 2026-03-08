@@ -3,9 +3,9 @@ import { communityApi } from '@/components/utils/api';
 import { getToken } from '@/components/utils/authStore';
 import { Typography } from '@/constants/Typography';
 import { Ionicons } from '@expo/vector-icons';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'; // 📍 깔끔하게 통합
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React from 'react'; // 📍 useEffect, useState 삭제 가능 (필요 시에만 추가)
+import React from 'react';
 import { ActivityIndicator, Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { styles } from './CommunityDetail.styles';
 
@@ -14,16 +14,15 @@ export default function CommunityDetailPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  // 1. 상세 데이터 조회 (useQuery)
-  // isLoading, data 등을 여기서 한 번에 관리합니다.
+
+  // 상세 데이터 조회 (useQuery)
   const { data: post, isLoading } = useQuery({
     queryKey: ['post', Number(id)],
     queryFn: () => communityApi.getPostDetail(Number(id)),
     enabled: !!id,
-    staleTime: 1000 * 60 * 5,
   });
 
-  // 2. 좋아요 처리 (useMutation)
+  // 좋아요 처리 (useMutation)
   const likeMutation = useMutation({
     mutationFn: () => communityApi.toggleLike(Number(id)),
     onSuccess: (result) => {
@@ -51,23 +50,29 @@ export default function CommunityDetailPage() {
     }
     likeMutation.mutate();
   };
+  // 게시물 삭제 처리
+  const deleteMutation = useMutation({
+    mutationFn: () => communityApi.deletePost(Number(id)),
+    onSuccess: () => {
+      Alert.alert('성공', '게시글이 삭제되었습니다.');
+      queryClient.invalidateQueries({ queryKey: ['posts'] }); // 목록 갱신
+      router.back(); // 이전 화면으로 이동
+    },
+    onError: (error: any) => {
+      Alert.alert('오류', error.message || '삭제 중 오류가 발생했습니다.');
+    }
+  });
 
-  // 4. 로딩 및 에러 처리
-  if (isLoading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#FFB7C5" />
-      </View>
-    );
-  }
+  // 삭제 확인 핸들러
+  const handleDelete = () => {
+    Alert.alert('게시글 삭제', '정말로 이 게시글을 삭제하시겠습니까?', [
+      { text: '취소', style: 'cancel' },
+      { text: '삭제', style: 'destructive', onPress: () => deleteMutation.mutate() },
+    ]);
+  };
 
-  if (!post) {
-    return (
-      <View style={styles.errorContainer}>
-        <Text>게시글을 찾을 수 없습니다.</Text>
-      </View>
-    );
-  }
+  if (isLoading) return <View style={styles.loadingContainer}><ActivityIndicator size="large" color="#FFB7C5" /></View>;
+  if (!post) return <View style={styles.errorContainer}><Text>게시글을 찾을 수 없습니다.</Text></View>;
 
   return (
     <View style={styles.container}>
@@ -117,6 +122,17 @@ export default function CommunityDetailPage() {
               {post.likeCount}
             </Text>
           </TouchableOpacity>
+          {/* 삭제 버튼: 작성자일 때만 노출 */}
+          {post.isAuthor && (
+            <TouchableOpacity
+              onPress={handleDelete}
+              style={styles.deleteButton}
+              disabled={deleteMutation.isPending}
+            >
+              <Ionicons name="trash-outline" size={18} color="#FF5252" />
+              <Text style={styles.deleteText}>삭제</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </ScrollView>
     </View>

@@ -25,13 +25,18 @@ const request = async (endpoint: string, options: RequestInit = {}) => {
       headers,
     });
 
+    const responseText = await response.text();
+
     // 응답 데이터 파싱
-    const data = await response.json().catch(async (err) => {
-      // JSON 파싱 실패 시 서버가 보낸 '진짜 텍스트'를 로그로 찍어보세요.
-      const rawText = await response.text();
-      console.log("🚨 서버에서 온 생데이터(JSON 아님!):", rawText);
-      return {}; // 여기서 {}를 주니까 result가 {}가 되는 거예요.
-    });
+    let data: any = {};
+    if (responseText) {
+      try {
+        data = JSON.parse(responseText);
+      } catch (err) {
+        console.log("🚨 JSON 파싱 실패:", responseText);
+        data = { message: responseText };
+      }
+    }
 
     // 성공(200~299)이 아니면 에러 던지기
     if (!response.ok) {
@@ -182,4 +187,5 @@ export const communityApi = {
       body: JSON.stringify({})
     });
   },
+  // 6. 댓글쓰기
 };
