@@ -1,21 +1,28 @@
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    paddingHorizontal: 20,
-    gap: 12,
-    marginVertical: 10,
+  floatingActionContainer: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'flex-end',
+    alignItems: 'flex-end',
+    zIndex: 10,
+    pointerEvents: 'box-none',
   },
-  button: {
-    flex: 1,
+  floatingCameraButton: {
+    width: 60, // 원형 크기
     height: 60,
-    backgroundColor: '#D9D9D9',
-    borderRadius: 12,
+    borderRadius: 30,
+    backgroundColor: '#FFB7C5',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  buttonText: {
-    color: '#000',
+    position: 'absolute',
+    bottom: 20, // 하단 여백
+    right: 20, // 우측 여백
+    // 그림자 효과 (iOS)
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 8,
   },
 });

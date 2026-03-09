@@ -1,11 +1,11 @@
-import { shoppingApi } from '@/components/utils/api';
+import { exchangeApi, shoppingApi } from '@/components/utils/api';
 import { Typography } from '@/constants/Typography';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 import React, { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, Dimensions, Modal, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Dimensions, Modal, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 // 통화별 설정 데이터
 const CURRENCIES = [
@@ -30,12 +30,30 @@ export default function OCRScanner({ onClose }: { onClose: () => void }) {
   const [showPicker, setShowPicker] = useState(false);
   const cameraRef = useRef<any>(null);
 
+  const [showManualModal, setShowManualModal] = useState(false);
+  const [manualInput, setManualInput] = useState('');
+  const [currentRate, setCurrentRate] = useState<number>(0);
+
   const [showResultModal, setShowResultModal] = useState(false);
   const [scanResult, setScanResult] = useState<{
     originalText: string;
     krwAmount: number;
     exchangeRate: string;
   } | null>(null);
+
+  const fetchRate = async (currencyCode: string) => {
+    try {
+      const response = await exchangeApi.getExchangeDetail(currencyCode);
+      if (response && response.currentRate) {
+        setCurrentRate(response.currentRate);
+      } else if (response && response.data?.currentRate) {
+        setCurrentRate(response.data.currentRate);
+      }
+    } catch (error) {
+      console.error("환율 로드 실패:", error);
+    }
+  };
+
   // 1. 초기 로드 시 저장된 통화 불러오기
   useEffect(() => {
     const loadCurrency = async () => {
@@ -51,6 +69,11 @@ export default function OCRScanner({ onClose }: { onClose: () => void }) {
     };
     loadCurrency();
   }, []);
+
+  // 통화가 바뀔 때마다 환율을 미리 받아둡니다.
+  useEffect(() => {
+    fetchRate(selectedCurrency.value);
+  }, [selectedCurrency]);
 
   // 2. 통화 변경 시 저장하기
   const changeCurrency = async (currency: typeof CURRENCIES[0]) => {
@@ -68,6 +91,7 @@ export default function OCRScanner({ onClose }: { onClose: () => void }) {
   const currentGuideHeight = 150;
 
   if (!permission) return <View />;
+
   if (!permission.granted) {
     return (
       <View style={styles.container}>
@@ -119,6 +143,16 @@ export default function OCRScanner({ onClose }: { onClose: () => void }) {
       if (result && result.statusCode === 200 && result.data) {
 
         const { originalText, krwAmount, exchangeRate } = result.data;
+
+        let finalKrw = krwAmount;
+        const numericValue = parseFloat(originalText.replace(/[^0-9.]/g, '')) || 0;
+
+        if (selectedCurrency.value === 'JPY' || selectedCurrency.value === 'VND') {
+          finalKrw = (numericValue / 100) * parseFloat(exchangeRate);
+        } else {
+          finalKrw = numericValue * parseFloat(exchangeRate);
+        }
+
         setScanResult({
           originalText,
           krwAmount: krwAmount ?? 0,
@@ -135,6 +169,16 @@ export default function OCRScanner({ onClose }: { onClose: () => void }) {
       setLoading(false);
     }
   };
+
+  const getCalculatedAmount = (input: string, rate: number, currencyCode: string) => {
+    const amount = parseFloat(input) || 0;
+    if (currencyCode === 'JPY' || currencyCode === 'VND') {
+      return (amount / 100) * rate;
+    }
+    return amount * rate;
+  };
+  // 실시간 계산 결과 (입력값 * 환율)
+  const calculatedKrw = getCalculatedAmount(manualInput, currentRate, selectedCurrency.value);
 
   return (
     <View style={{ flex: 1 }}>
@@ -166,7 +210,7 @@ export default function OCRScanner({ onClose }: { onClose: () => void }) {
               <Text style={[Typography.Pretendard_M_12, styles.pillText]}>
                 {selectedCurrency.label.split('(')[0].trim()}
               </Text>
-              <Ionicons name="chevron-down" size={12} color="#888" style={{marginLeft: 2}} />
+              <Ionicons name="chevron-down" size={12} color="#888" style={{ marginLeft: 2 }} />
             </TouchableOpacity>
           </View>
         </View>
@@ -184,18 +228,76 @@ export default function OCRScanner({ onClose }: { onClose: () => void }) {
 
       </View>
 
-      {/* 하단 촬영 버튼 */}
+      {/* 하단 버튼 영역 */}
       <View style={styles.buttonContainer}>
+        {/* 왼쪽: 갤러리 버튼 (대칭을 위해 추가) */}
+        <TouchableOpacity style={styles.sideButton}>
+          <Ionicons name="image" size={24} color="#444" />
+        </TouchableOpacity>
+
+        {/* 중앙: 촬영 버튼 */}
         <TouchableOpacity onPress={handleCapture} disabled={loading} style={styles.captureButton}>
           {loading ? (
             <ActivityIndicator color="white" size="large" />
           ) : (
-            <Ionicons name="scan-circle" size={80} color="white" />
+            <Ionicons name="scan-circle" size={80} color="#FFB7C5" />
           )}
         </TouchableOpacity>
-      </View>
 
-      {/* 통화 선택 모달 (드롭다운 역할) */}
+        {/* 오른쪽: 수동 입력 'A' 버튼 */}
+        <TouchableOpacity
+          style={styles.sideButton}
+          onPress={() => setShowManualModal(true)}
+        >
+          <Text style={[Typography.Pretendard_B_24, { color: '#444' }]}>A</Text>
+        </TouchableOpacity>
+      </View>
+      {/* 수동 입력 계산기 모달 */}
+      <Modal visible={showManualModal} transparent animationType="fade">
+        <View style={styles.resultModalOverlay}>
+          <View style={styles.manualModalContent}>
+            <Text style={[Typography.Pretendard_B_16, styles.manualTitle]}>
+              환전할 금액을 직접 입력해주세요!
+            </Text>
+
+            <View style={styles.inputWrapper}>
+              <TextInput
+                style={[Typography.Pretendard_B_32, styles.manualInput]}
+                placeholder="0"
+                keyboardType="numeric"
+                value={manualInput}
+                onChangeText={setManualInput}
+                autoFocus
+              />
+              <View>
+                <Text style={styles.currencySuffix}>{selectedCurrency.value}</Text>
+                {(selectedCurrency.value === 'JPY' || selectedCurrency.value === 'VND') && (
+                  <Text style={{ fontSize: 10, color: '#FFB7C5' }}>per 100</Text>
+                )}
+              </View>
+            </View>
+
+            <View style={styles.manualDivider} />
+
+            <View style={styles.manualResultContainer}>
+              <Text style={[Typography.Pretendard_B_24, styles.resultText]}>
+                {Math.floor(calculatedKrw).toLocaleString()} (원)
+              </Text>
+            </View>
+            <TouchableOpacity
+              style={styles.manualCheckButton}
+              onPress={() => {
+                setShowManualModal(false);
+                setManualInput('');
+              }}
+            >
+              <Text style={[Typography.Pretendard_B_16, styles.checkButtonText]}>확인</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* 통화 선택 모달 */}
       <Modal visible={showPicker} transparent animationType="fade">
         <TouchableOpacity style={styles.modalOverlay} onPress={() => setShowPicker(false)}>
           <View style={styles.pickerContainer}>
@@ -238,8 +340,8 @@ export default function OCRScanner({ onClose }: { onClose: () => void }) {
             </View>
 
             {/* 분홍색 확인 버튼 */}
-            <TouchableOpacity 
-              style={styles.checkButton} 
+            <TouchableOpacity
+              style={styles.checkButton}
               onPress={() => setShowResultModal(false)}
             >
               <Text style={[Typography.Pretendard_B_16, styles.checkButtonText]}>확인</Text>
@@ -254,7 +356,7 @@ export default function OCRScanner({ onClose }: { onClose: () => void }) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#000', justifyContent: 'center', alignItems: 'center' },
   overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'center', alignItems: 'center' },
-  
+
   headerCloseButton: {
     position: 'absolute',
     top: Platform.OS === 'ios' ? 60 : 50,
@@ -318,7 +420,7 @@ const styles = StyleSheet.create({
     borderColor: '#FFFFFF',
     borderRadius: 12,
     backgroundColor: 'transparent',
-    justifyContent: 'center', 
+    justifyContent: 'center',
     alignItems: 'center',
   },
   crosshair: {
@@ -345,12 +447,33 @@ const styles = StyleSheet.create({
     top: (screenHeight / 2) - 75 - 50,
     color: '#FFFFFF',
     textAlign: 'center',
-    width: '100%', 
+    width: '100%',
     paddingHorizontal: 10,
   },
-  buttonContainer: { position: 'absolute', bottom: 50, width: '100%', alignItems: 'center' },
+  buttonContainer: {
+    position: 'absolute',
+    bottom: 50,
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 20,
+  },
   captureButton: { width: 90, height: 90, borderRadius: 45, justifyContent: 'center', alignItems: 'center' },
   permissionButton: { backgroundColor: '#fff', padding: 10, borderRadius: 8 },
+  sideButton: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: 'white',
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+  },
 
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center' },
   pickerContainer: { width: '80%', backgroundColor: '#222', borderRadius: 15, padding: 10 },
@@ -404,5 +527,65 @@ const styles = StyleSheet.create({
   },
   checkButtonText: {
     color: 'white',
+  },
+  manualButton: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: 'white',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 20,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+  },
+  manualCheckButton: {
+    backgroundColor: '#ffb7c5',
+    paddingVertical: 15,
+    borderRadius: 25,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 10,
+  },
+  manualModalContent: {
+    width: '85%',
+    backgroundColor: 'white',
+    borderRadius: 25,
+    padding: 25,
+    alignItems: 'center',
+  },
+  manualTitle: {
+    marginBottom: 25,
+    color: '#333',
+  },
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+  },
+  manualInput: {
+    borderBottomWidth: 0,
+    textAlign: 'center',
+    color: '#FFB7C5',
+    minWidth: 100,
+  },
+  currencySuffix: {
+    marginLeft: 10,
+    color: '#888',
+    fontSize: 16,
+  },
+  manualDivider: {
+    width: '100%',
+    height: 1,
+    backgroundColor: '#EEE',
+    marginVertical: 20,
+  },
+  manualResultContainer: {
+    marginBottom: 30,
   },
 });

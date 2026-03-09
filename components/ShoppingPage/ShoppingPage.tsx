@@ -140,15 +140,11 @@ export default function ShoppingPage() {
     <View style={styles.container}>
       <MainHeader />
       <View style={[styles.sectionGap, { flex: 1 }]}>
-
-        {/* 국가 선택 시 handleCountrySelect 호출 */}
         <ChoiceCountry onSelect={handleCountrySelect} />
-
         <SearchProduct
           onSearch={(q) => handleSearch(q)}
           onClear={handleReset}
         />
-
         <ScrollView
           style={{ flex: 1, backgroundColor: '#fff' }}
           refreshControl={
@@ -160,8 +156,6 @@ export default function ShoppingPage() {
             />
           }
         >
-          <ShoppingUtility />
-
           {isLoading ? (
             <ActivityIndicator size="large" color="#FFD700" style={{ marginTop: 50 }} />
           ) : searchResult ? (
@@ -181,6 +175,7 @@ export default function ShoppingPage() {
             </>
           )}
         </ScrollView>
+        <ShoppingUtility />
       </View>
     </View>
   );
