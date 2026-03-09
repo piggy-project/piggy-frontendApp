@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
+import * as ImagePicker from 'expo-image-picker';
 import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Dimensions, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { styles } from './OCRScanner.styles';
@@ -84,6 +85,63 @@ export default function OCRScanner({ onClose }: { onClose: () => void }) {
       await AsyncStorage.setItem(STORAGE_KEY, currency.value);
     } catch (e) {
       console.error("Failed to save currency", e);
+    }
+  };
+
+  // 앨범에서 사진 선택 및 분석 함수
+  const handlePickImage = async () => {
+    // 1. 갤러리 접근 권한 확인
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('알림', '갤러리 접근 권한이 필요합니다.');
+      return;
+    }
+
+    // 2. 이미지 선택 (편집 허용하여 부분 선택 가능하게 설정)
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: 'images',
+      allowsEditing: true, //사진의 일부분만 선택(크롭) 가능하게 함
+      quality: 0.7,
+      base64: true,
+    });
+
+    if (!result.canceled && result.assets[0].base64) {
+      try {
+        setLoading(true);
+
+        // 3. 서버로 OCR 분석 요청 (카메라 촬영과 동일한 API 사용)
+        const response = await shoppingApi.scanProductPrice(
+          result.assets[0].base64,
+          selectedCurrency.value
+        );
+
+        if (response && response.statusCode === 200 && response.data) {
+          const { originalText, krwAmount, exchangeRate } = response.data;
+
+          // 4. 엔화/동화 등 100단위 통화 정밀 재계산 (기존 로직 활용)
+          let finalKrw = krwAmount;
+          const numericValue = parseFloat(originalText.replace(/[^0-9.]/g, '')) || 0;
+
+          if (selectedCurrency.value === 'JPY' || selectedCurrency.value === 'VND') {
+            finalKrw = (numericValue / 100) * parseFloat(exchangeRate);
+          } else {
+            finalKrw = numericValue * parseFloat(exchangeRate);
+          }
+
+          setScanResult({
+            originalText,
+            krwAmount: Math.floor(finalKrw),
+            exchangeRate: Number(exchangeRate).toFixed(2),
+          });
+          setShowResultModal(true);
+        } else {
+          Alert.alert("인식 실패", "이미지에서 가격을 찾지 못했습니다.");
+        }
+      } catch (error) {
+        Alert.alert("오류", "이미지를 분석하는 중 문제가 발생했습니다.");
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -189,7 +247,7 @@ export default function OCRScanner({ onClose }: { onClose: () => void }) {
       <View style={styles.overlay} pointerEvents="box-none">
         {/* 우상단 닫기 버튼 */}
         <TouchableOpacity onPress={onClose} style={styles.headerCloseButton}>
-          <Ionicons name="close" size={26} color="#444" />
+          <Ionicons name="close" size={26} color="#FFF" />
         </TouchableOpacity>
 
         {/* 중상단 통화 선택 Pill Bar */}
@@ -202,7 +260,7 @@ export default function OCRScanner({ onClose }: { onClose: () => void }) {
 
             {/* 가운데 교환 아이콘: < > (사진 형식) */}
             <View style={styles.pillSeparator}>
-              <Text style={styles.separatorText}>{"<>"}</Text>
+              <Text style={styles.separatorText}>{"->"}</Text>
             </View>
 
             {/* 도착 통화: 선택된 통화 Dynamic */}
@@ -232,8 +290,12 @@ export default function OCRScanner({ onClose }: { onClose: () => void }) {
       {/* 하단 버튼 영역 */}
       <View style={styles.buttonContainer}>
         {/* 왼쪽: 갤러리 버튼 (대칭을 위해 추가) */}
-        <TouchableOpacity style={styles.sideButton}>
-          <Ionicons name="image" size={24} color="#444" />
+        <TouchableOpacity
+          style={styles.sideButton}
+          onPress={handlePickImage}
+          disabled={loading}
+        >
+          <Ionicons name="image" size={26} color="#555" />
         </TouchableOpacity>
 
         {/* 중앙: 촬영 버튼 */}

@@ -26,6 +26,10 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
+      [
+        "expo-image-picker",
+        { "photosPermission": "가격을 인식할 사진을 선택하기 위해 갤러리 권한이 필요합니다." }
+      ],
       "expo-router",
       [
         "expo-splash-screen",
@@ -41,6 +45,7 @@
       ],
       "expo-web-browser"
     ],
+    
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
