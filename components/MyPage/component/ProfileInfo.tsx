@@ -2,7 +2,7 @@ import { Typography } from '@/constants/Typography';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { useAuth } from '../../utils/AuthContext';
 import { styles } from './ProfileInfo.styles';
 
@@ -11,14 +11,21 @@ export default function ProfileInfo() {
   const router = useRouter();
 
   return (
-    <TouchableOpacity 
-      style={styles.container} 
+    <TouchableOpacity
+      style={styles.container}
       onPress={() => router.push('/profile-detail')}
       activeOpacity={0.7}
     >
       {/* 1. 좌측 프로필 이미지 */}
-      <View style={styles.profileImage}>
-        <Text style={[styles.imageText, Typography.Pretendard_M_12]}>프로필</Text>
+      <View style={styles.imageWrapper}>
+        <Image
+          source={
+            user?.profileImageUrl
+              ? { uri: user.profileImageUrl }
+              : require('@/assets/images/basicprofileicon.png')
+          }
+          style={styles.profileImage}
+        />
       </View>
 
       {/* 2. 중앙 닉네임 영역 (왼쪽 정렬) */}

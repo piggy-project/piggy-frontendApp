@@ -9,6 +9,7 @@ interface User {
   nickname: string;
   name?: string;
   role: string;
+  profileImageUrl?: string;
 }
 
 interface AuthContextType {

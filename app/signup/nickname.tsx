@@ -98,6 +98,7 @@ export default function SignupNickname() {
         phoneNum: data.phoneNum,
         provider: 'LOCAL',
         providerId: null,
+        profileImageUrl: "https://유빈님버킷이름.s3.ap-northeast-2.amazonaws.com/basicprofileicon.png",
       };
 
       console.log('가입 요청:', requestBody);

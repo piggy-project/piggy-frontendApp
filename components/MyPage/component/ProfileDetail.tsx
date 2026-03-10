@@ -1,15 +1,89 @@
 import MyPageDetailHeader from '@/components/Header/MyPageDetailHeader';
+import { authApi } from '@/components/utils/api';
 import { useAuth } from '@/components/utils/AuthContext';
 import { Typography } from '@/constants/Typography';
 import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
-import React from 'react';
-import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import React, { useState } from 'react';
+import { ActivityIndicator, Alert, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { styles } from './ProfileDetail.styles';
 
 export default function ProfileDetail() {
-  const { user, logout } = useAuth();
+  const { user, setUser, logout } = useAuth();
   const router = useRouter();
+  const [isUploading, setIsUploading] = useState(false);
+
+  const DEFAULT_IMAGE = require('@/assets/images/basicprofileicon.png');
+
+  const handleProfilePress = () => {
+    Alert.alert("프로필 설정", "수행할 동작을 선택해주세요.", [
+      { text: "앨범에서 선택", onPress: pickImage },
+      { text: "기본 이미지로 변경", onPress: removeImage },
+      { text: "취소", style: "cancel" },
+    ]);
+  };
+
+  // 갤러리에서 사진 변경하기 (PATCH)
+  const pickImage = async () => {
+    try {
+      // 권한 요청
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('알림', '갤러리 접근 권한이 필요합니다.');
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: 'images', // 최신 방식 (경고 해결)
+        allowsEditing: true,  // 기본 크롭 도구 활성화
+        aspect: [1, 1],       // 1:1 비율 고정 (프로필용)
+        quality: 0.7,
+      });
+
+      if (!result.canceled && result.assets && result.assets[0]) {
+        setIsUploading(true);
+        const selectedImage = result.assets[0];
+
+        const formData = new FormData();
+        formData.append('image', {
+          uri: selectedImage.uri,
+          type: selectedImage.mimeType || 'image/jpeg', // mimeType이 없을 경우 대비
+          name: `profile_${user?.id || 'temp'}.jpg`,
+        } as any);
+
+        const res = await authApi.updateProfileImage(formData);
+
+        // 백엔드에서 준 새 이미지 URL로 로컬 상태 동기화
+        if (user) setUser({ ...user, profileImageUrl: res.data });
+        Alert.alert("알림", "프로필 사진이 변경되었습니다.");
+      }
+    } catch (error: any) {
+      Alert.alert("오류", "사진 업로드에 실패했습니다.");
+      console.error(error);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const removeImage = async () => {
+    try {
+      setIsUploading(true);
+
+      const res = await authApi.deleteProfileImage();
+      const updatedUrl = res.data;
+
+      if (user) {
+        setUser({ ...user, profileImageUrl: updatedUrl });
+      }
+
+      Alert.alert("알림", "기본 프로필로 변경되었습니다.");
+    } catch (error) {
+      Alert.alert("오류", "프로필 삭제에 실패했습니다.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const handleLogout = () => {
     Alert.alert("로그아웃", "정말 로그아웃 하시겠습니까?", [
@@ -26,14 +100,25 @@ export default function ProfileDetail() {
 
   return (
     <ScrollView style={styles.container}>
-      <MyPageDetailHeader/>
+      <MyPageDetailHeader />
       <View style={styles.profileSection}>
-        <View style={styles.largeProfileImage}>
-          <Text style={Typography.Pretendard_M_12}>프로필</Text>
+        <TouchableOpacity
+          style={styles.largeProfileImage}
+          onPress={handleProfilePress}
+          disabled={isUploading}
+        >
+          {isUploading ? (
+            <ActivityIndicator color="#FFB7C5" />
+          ) : (
+            <Image
+              source={user?.profileImageUrl ? { uri: user.profileImageUrl } : DEFAULT_IMAGE}
+              style={{ width: '100%', height: '100%', borderRadius: 50 }}
+            />
+          )}
           <View style={styles.cameraBadge}>
             <Ionicons name="camera" size={12} color="white" />
           </View>
-        </View>
+        </TouchableOpacity>
         <View style={styles.nicknameRow}>
           <Text style={[styles.nickname, Typography.Pretendard_B_16]}>
             {user?.nickname || "사용자"}

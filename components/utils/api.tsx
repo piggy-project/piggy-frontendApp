@@ -93,6 +93,18 @@ export const authApi = {
   checkNickname: (nickname: string) => {
     return request(`/users/check-nickname?nickname=${nickname}`, { method: 'POST' });
   },
+  // 프로필 이미지 변경 (PATCH)
+  updateProfileImage: (formData: FormData) => {
+    return request('/users/profile-image', {
+      method: 'PATCH',
+      body: formData,
+      headers: { 'Content-Type': 'multipart/form-data' }, // 📍 중요!
+    });
+  },
+  // 프로필 이미지 삭제 (DELETE)
+  deleteProfileImage: () => {
+    return request('/users/profile-image', { method: 'DELETE' });
+  },
 };
 
 export const exchangeApi = {

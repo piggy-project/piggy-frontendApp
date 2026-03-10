@@ -8,13 +8,17 @@ export const styles = StyleSheet.create({
     paddingBottom: 20,
     backgroundColor: '#fff',
   },
+  imageWrapper: {
+    width: 50,
+    height: 50,
+    borderRadius: 25, // 📍 완벽한 원형
+    overflow: 'hidden', // 📍 영역 밖 이미지 잘라내기
+    backgroundColor: '#F5F5F5',
+  },
   profileImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: '#D9D9D9',
-    justifyContent: 'center',
-    alignItems: 'center',
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover', // 비율 유지하며 꽉 채우기
   },
   imageText: { 
     color: '#666' 
