@@ -98,6 +98,35 @@ export default function ProfileDetail() {
     ]);
   };
 
+  // 비밀번호 재설정 요청 함수
+  const handlePasswordResetRequest = () => {
+    if (!user?.email) return;
+
+    Alert.alert(
+      "비밀번호 재설정",
+      `${user.email}로 재설정 이메일을 보낼까요?`,
+      [
+        { text: "취소", style: "cancel" },
+        { 
+          text: "보내기", 
+          onPress: async () => {
+            try {
+              setIsUploading(true);
+              await authApi.requestPasswordReset(user.email, 'app');
+              Alert.alert("발송 완료", "이메일함에서 재설정 링크(또는 토큰)를 확인해주세요.");
+              
+              // 여기서 토큰을 입력받는 모달을 띄우거나 페이지를 이동할 수 있습니다.
+            } catch (error) {
+              Alert.alert("오류", "이메일 발송에 실패했습니다.");
+            } finally {
+              setIsUploading(false);
+            }
+          } 
+        },
+      ]
+    );
+  };
+
   return (
     <ScrollView style={styles.container}>
       <MyPageDetailHeader />
@@ -130,12 +159,7 @@ export default function ProfileDetail() {
       </View>
 
       <View style={styles.infoSection}>
-        <View style={styles.sectionHeader}>
-          <Text style={[styles.sectionTitle, Typography.Pretendard_B_16]}>회원 정보</Text>
-          <TouchableOpacity>
-            <Text style={styles.editLink}>수정</Text>
-          </TouchableOpacity>
-        </View>
+        <Text style={[styles.sectionTitle, Typography.Pretendard_B_16]}>회원 정보</Text>
         {/* value에 명시적으로 문자열 변환 처리 */}
         <InfoRow label="이름" value={String(user?.name || "알 수 없음")} />
         <InfoRow label="전화번호" value="010-****-****" />
@@ -143,10 +167,21 @@ export default function ProfileDetail() {
       </View>
 
       <View style={styles.infoSection}>
-        <Text style={[styles.sectionTitle, Typography.Pretendard_B_16, { marginBottom: 15 }]}>
+        <Text style={[styles.sectionTitle, Typography.Pretendard_B_16]}>
           계정 정보
         </Text>
+
+
         <InfoRow label="로그인 계정" value={String(user?.email || "")} />
+        <View style={styles.sectionContent}>
+          <View style={{ flex: 1 }}>
+            <InfoRow label="비밀번호" value="************" />
+          </View>
+          <TouchableOpacity>
+            <Text style={styles.editLink} onPress={handlePasswordResetRequest}>재설정</Text>
+          </TouchableOpacity>
+        </View>
+
       </View>
 
       <TouchableOpacity style={styles.logoutContainer} onPress={handleLogout}>

@@ -4,18 +4,20 @@ import { getToken, removeToken } from './authStore';
 const BASE_URL = 'https://piggys.mooo.com';
 
 // 2. Fetch를 더 편하게 쓰기 위한 래퍼 함수 (Interceptor 역할)
-const request = async (endpoint: string, options: RequestInit = {}) => {
+const request = async (endpoint: string, options: any = {}) => {
   try {
-    // 📍 금고에서 암호화된 토큰 복호화해서 가져오기
-    const token = await getToken();
+    const { skipAuth = false, ...fetchOptions } = options;
 
     const headers: any = {
       'Content-Type': 'application/json',
       ...options.headers,
     };
 
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
+    if (!skipAuth) {
+      const token = await getToken();
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
     }
 
     const response = await fetch(`${BASE_URL}${endpoint}`, {
@@ -33,9 +35,8 @@ const request = async (endpoint: string, options: RequestInit = {}) => {
       }
     }
 
-    // 📍 정교한 처리: 토큰이 만료(401)되었다면 금고를 즉시 비웁니다.
     if (!response.ok) {
-      if (response.status === 401) {
+      if (response.status === 401 && !skipAuth) {
         console.warn("🚨 인증 만료: 금고를 비우고 로그아웃 처리를 유도합니다.");
         await removeToken();
       }
@@ -96,17 +97,32 @@ export const authApi = {
     return request('/users/profile-image', {
       method: 'PATCH',
       body: formData,
-      headers: { 'Content-Type': 'multipart/form-data' }, // 📍 중요!
+      headers: { 'Content-Type': 'multipart/form-data' },
     });
   },
   // 프로필 이미지 삭제 (DELETE)
   deleteProfileImage: () => {
     return request('/users/profile-image', { method: 'DELETE' });
   },
+  // 비밀번호 재설정 이메일 요청
+  requestPasswordReset: (email: string, source: 'web' | 'app') => {
+    return request(`/users/password/reset-request?email=${email}&source=${source}`, {
+      method: 'POST',
+      skipAuth: true
+    });
+  },
+  // 새 비밀번호로 재설정 (토큰 필요)
+  resetPassword: (dto: { token: string; newPassword: string }) => {
+    return request('/users/password/reset', {
+      method: 'POST',
+      skipAuth: true,
+      body: JSON.stringify(dto),
+    });
+  },
 };
 
 export const exchangeApi = {
-  // 1. 환율 리스트 및 정렬 필터 (이제 얘가 메인입니다!)
+  // 1. 환율 리스트 및 정렬 필터
   // sort: RISE(급상승), FALL(급하락), HIGH(높은순), LOW(낮은순)
   getExchangeRanking: (sort: string = 'RISE') => {
     return request(`/api/exchange/ranking?sort=${sort}`, {

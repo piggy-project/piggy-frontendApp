@@ -54,18 +54,17 @@ export default function ExchangePage() {
     try {
       const response = await exchangeApi.getExchangeRanking(sort);
       const rawData = response.data || response;
-      
       if (Array.isArray(rawData)) {
         const formatted = formatData(rawData);
-        const time = rawData.length > 0 ? rawData[0].time : '';
+        const serverTime = rawData[0].time || '';
 
         // 상태 업데이트
         setExchangeData(formatted);
-        setUpdateTime(time);
+        setUpdateTime(formatTimeForDisplay(serverTime));
 
         // 창고(AsyncStorage)에 데이터 백업
         await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(formatted));
-        await AsyncStorage.setItem(TIME_KEY, time);
+        await AsyncStorage.setItem(TIME_KEY, formatTimeForDisplay(serverTime));
       }
     } catch (error) {
       console.error('데이터 로드 에러:', error);
@@ -82,11 +81,19 @@ export default function ExchangePage() {
 
   const silentFetchExchangeRates = async () => {
     try {
-      const response = await exchangeApi.getExchangeRanking(currentSortRef.current); // 현재 선택된 필터 유지
+      const response = await exchangeApi.getExchangeRanking(currentSortRef.current);
       const rawData = response.data || response;
-      if (Array.isArray(rawData)) {
-        if (rawData.length > 0 && rawData[0].time) setUpdateTime(rawData[0].time);
-        setExchangeData(formatData(rawData));
+
+      if (Array.isArray(rawData) && rawData.length > 0) {
+        const formatted = formatData(rawData);
+        const serverTime = rawData[0].time || '';
+
+        setExchangeData(formatted);
+        setUpdateTime(formatTimeForDisplay(serverTime));
+
+        // 조용히 업데이트될 때도 창고를 최신화해줍니다.
+        await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(formatted));
+        await AsyncStorage.setItem(TIME_KEY, formatTimeForDisplay(String(serverTime)));
       }
     } catch (e) {
       console.log("Silent update failed", e);
@@ -105,7 +112,7 @@ export default function ExchangePage() {
         if (cachedData) {
           // 2. 캐시 데이터가 있으면 즉시 보여주기
           setExchangeData(JSON.parse(cachedData));
-          setUpdateTime(cachedTime || '');
+          setUpdateTime(cachedTime ? formatTimeForDisplay(cachedTime) : '');
           setIsLoading(false); // 캐시가 있으면 로딩 완료 처리
         }
 
@@ -149,6 +156,17 @@ export default function ExchangePage() {
     });
   };
 
+  // 시간을 "20:00 기준" 포맷으로 변경하는 함수
+  const formatTimeForDisplay = (timeStr: string) => {
+    if (!timeStr) return '';
+    // "2026.03.12 20:00" -> ["2026.03.12", "20:00"]
+    const parts = timeStr.split(' ');
+    if (parts.length > 1) {
+      return `${parts[1]}`;
+    }
+    return timeStr;
+  };
+
   return (
     <View style={styles.container}>
       <ExchangeHeader
@@ -156,14 +174,14 @@ export default function ExchangePage() {
         time={updateTime}
       />
       <View style={[styles.sectionGap, { flex: 1 }]}>
-        <TodayTravelDestination/>
+        <TodayTravelDestination />
         <SearchCountry value={searchText} onChangeText={setSearchText} />
         {isLoading ? (
           <View style={{ flex: 1, justifyContent: 'center' }}>
             <ActivityIndicator size="large" color="#4A90E2" />
           </View>
         ) : (
-          <ShowCountry data={filteredData} onPressItem={handlePressItem} onFilterChange={handleFilterChange} activeFilter={currentSort}/>
+          <ShowCountry data={filteredData} onPressItem={handlePressItem} onFilterChange={handleFilterChange} activeFilter={currentSort} />
         )}
       </View>
     </View>

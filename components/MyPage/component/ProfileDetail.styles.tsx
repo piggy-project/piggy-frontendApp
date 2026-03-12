@@ -49,11 +49,10 @@ export const styles = StyleSheet.create({
     paddingVertical: 20,
     marginBottom: 8,
   },
-  sectionHeader: {
+  sectionContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 15,
   },
   sectionTitle: {
     color: '#495057',
@@ -67,7 +66,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 12,
+    paddingVertical: 10,
   },
   infoLabel: {
     color: '#868E96',

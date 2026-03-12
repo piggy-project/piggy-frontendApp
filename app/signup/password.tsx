@@ -1,8 +1,8 @@
+import { Typography } from '@/constants/Typography';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSignupData } from '../../components/utils/SignupContext';
-import { Typography } from '@/constants/Typography';
 
 export default function SignupPassword() {
   const router = useRouter();
@@ -10,12 +10,20 @@ export default function SignupPassword() {
   const [password, setPassword] = useState('');
   const [confirmPw, setConfirmPw] = useState('');
 
-  const isValid = password.length >= 6 && password === confirmPw;
-  const isMismatch = confirmPw.length > 0 && password !== confirmPw;
+  // 8자 이상으로 기준 변경 및 조건 분리
+  const isLengthValid = password.length >= 8;
+  const isMatch = password === confirmPw;
+  const isValid = isLengthValid && isMatch;
+
+  // 에러 메시지 표시 조건
+  const showLengthError = password.length > 0 && !isLengthValid;
+  const showMismatchError = confirmPw.length > 0 && !isMatch;
 
   const handleNext = () => {
-    updateData({ password });
-    router.push('/signup/personal-info');
+    if (isValid) {
+      updateData({ password });
+      router.push('/signup/personal-info');
+    }
   };
 
   return (
@@ -30,7 +38,12 @@ export default function SignupPassword() {
           onChangeText={setPassword}
           secureTextEntry
         />
-        <Text style={[styles.helperText, Typography.Pretendard_M_11]}>- 6자 이상 30자 이하 입력</Text>
+        
+        {showLengthError ? (
+          <Text style={[styles.errorText, Typography.Pretendard_M_11]}>비밀번호는 8자 이상입니다.</Text>
+        ) : (
+          <Text style={[styles.helperText, Typography.Pretendard_M_11]}>- 8자 이상 30자 이하 입력</Text>
+        )}
 
         <TextInput 
           style={[styles.input, { marginTop: 30 }, Typography.Pretendard_M_14]}
@@ -40,8 +53,10 @@ export default function SignupPassword() {
           secureTextEntry
         />
         
-        {isMismatch && (
-          <Text style={[styles.errorText, Typography.Pretendard_M_14]}>비밀번호가 일치하지 않습니다.</Text>
+        {showMismatchError && (
+          <Text style={[styles.errorText, Typography.Pretendard_M_11, { marginTop: 5 }]}>
+            비밀번호가 일치하지 않습니다.
+          </Text>
         )}
       </View>
 
@@ -62,7 +77,7 @@ const styles = StyleSheet.create({
   title: { marginBottom: 30 },
   input: { borderBottomWidth: 1, borderBottomColor: '#ccc', paddingVertical: 10 },
   helperText: { marginTop: 5, color: '#888' },
-  errorText: { color: 'red', marginTop: 10 },
+  errorText: { color: '#FF3B30', marginTop: 5 }, // 📍 조금 더 선명한 iOS 스타일 레드로 변경
   button: { backgroundColor: '#333', padding: 16, borderRadius: 8, alignItems: 'center', marginBottom: 20 },
   disabledButton: { backgroundColor: '#ddd' },
   buttonText: { color: '#fff' },
