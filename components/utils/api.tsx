@@ -1,4 +1,4 @@
-import { getToken } from './authStore'; // 금고에서 토큰 가져오는 함수 임포트
+import { getToken, removeToken } from './authStore';
 
 // 1. 기본 서버 주소 설정 (안드로이드 에뮬레이터 기준) - 현재 내 ip
 const BASE_URL = 'https://piggys.mooo.com';
@@ -6,10 +6,9 @@ const BASE_URL = 'https://piggys.mooo.com';
 // 2. Fetch를 더 편하게 쓰기 위한 래퍼 함수 (Interceptor 역할)
 const request = async (endpoint: string, options: RequestInit = {}) => {
   try {
-    // 저장된 토큰 가져오기
+    // 📍 금고에서 암호화된 토큰 복호화해서 가져오기
     const token = await getToken();
 
-    // 헤더 설정 (기본적으로 JSON, 토큰 있으면 추가)
     const headers: any = {
       'Content-Type': 'application/json',
       ...options.headers,
@@ -19,33 +18,32 @@ const request = async (endpoint: string, options: RequestInit = {}) => {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
-    // 실제 요청 보내기
     const response = await fetch(`${BASE_URL}${endpoint}`, {
       ...options,
       headers,
     });
 
     const responseText = await response.text();
-
-    // 응답 데이터 파싱
     let data: any = {};
     if (responseText) {
       try {
         data = JSON.parse(responseText);
       } catch (err) {
-        console.log("🚨 JSON 파싱 실패:", responseText);
         data = { message: responseText };
       }
     }
 
-    // 성공(200~299)이 아니면 에러 던지기
+    // 📍 정교한 처리: 토큰이 만료(401)되었다면 금고를 즉시 비웁니다.
     if (!response.ok) {
+      if (response.status === 401) {
+        console.warn("🚨 인증 만료: 금고를 비우고 로그아웃 처리를 유도합니다.");
+        await removeToken();
+      }
       throw { status: response.status, message: data.message || '서버 오류 발생', data };
     }
 
     return data;
   } catch (error: any) {
-    // 네트워크 에러나 서버 에러를 여기서 통일해서 처리 가능
     console.error('API Error:', error);
     throw error;
   }

@@ -28,7 +28,9 @@
     "plugins": [
       [
         "expo-image-picker",
-        { "photosPermission": "가격을 인식할 사진을 선택하기 위해 갤러리 권한이 필요합니다." }
+        {
+          "photosPermission": "가격을 인식할 사진을 선택하기 위해 갤러리 권한이 필요합니다."
+        }
       ],
       "expo-router",
       [
@@ -43,9 +45,9 @@
           }
         }
       ],
-      "expo-web-browser"
+      "expo-web-browser",
+      "expo-secure-store"
     ],
-    
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true

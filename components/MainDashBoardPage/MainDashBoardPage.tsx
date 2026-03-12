@@ -1,4 +1,5 @@
 import { exchangeApi } from '@/components/utils/api'; // API 함수 임포트
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Dimensions, PanResponder, View } from 'react-native';
 import MainHeader from '../Header/MainHeader';
@@ -16,14 +17,25 @@ export default function MainDashBoardPage() {
   const panY = useRef(new Animated.Value(INITIAL_TOP)).current;
   const lastOffset = useRef(INITIAL_TOP);
 
+  const getCacheKey = (code: string) => `DASHBOARD_CACHE_${code}`;
+
   // 국가 선택 시 데이터를 가져오는 함수
   const handleCountrySelect = async (code: string) => {
     if (!code) return;
+    const cacheKey = getCacheKey(code);
 
     try {
-      console.log("선택된 통화 코드:", code); // 디버깅용 로그
-      const data = await exchangeApi.getExchangeDetail(code);
-      setExchangeData(data);
+      const cached = await AsyncStorage.getItem(cacheKey);
+      if (cached) {
+        setExchangeData(JSON.parse(cached));
+      }
+
+      const response = await exchangeApi.getExchangeDetail(code);
+      const freshData = response.data || response;
+      
+      setExchangeData(freshData);
+      await AsyncStorage.setItem(cacheKey, JSON.stringify(freshData));
+      
     } catch (error) {
       console.error('환율 상세 정보 로딩 에러:', error);
     }
@@ -71,7 +83,7 @@ export default function MainDashBoardPage() {
           <ChoiceCountry onSelect={handleCountrySelect} />
         </View>
         
-        {/* 선택된 국가 코드를 이미지 컨테이너로 전달 (필요 시) */}
+        {/* 선택된 국가 코드를 이미지 컨테이너로 전달 */}
         <MainImageContainer />
 
         <Animated.View

@@ -1,14 +1,17 @@
-import { useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, View } from 'react-native';
-import { styles } from './Exchange.styles';
-
 import { exchangeApi } from '@/components/utils/api';
 import { FLAG_MAP } from '@/constants/Currency';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRouter } from 'expo-router';
+import React, { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, View } from 'react-native';
 import ExchangeHeader from '../Header/ExchangeHeader';
 import SearchCountry from './component/SearchCountry';
 import ShowCountry from './component/ShowCountry';
 import TodayTravelDestination from './component/TodayTravelDestination';
+import { styles } from './Exchange.styles';
+
+const CACHE_KEY = 'EXCHANGE_DATA_CACHE';
+const TIME_KEY = 'EXCHANGE_TIME_CACHE';
 
 export interface CountryData {
   id: string;
@@ -27,6 +30,11 @@ export default function ExchangePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [updateTime, setUpdateTime] = useState('');
   const [currentSort, setCurrentSort] = useState('RISE');
+  const currentSortRef = useRef(currentSort);
+
+  useEffect(() => {
+    currentSortRef.current = currentSort;
+  }, [currentSort]);
 
   const formatData = (rawData: any[]): CountryData[] => {
     return rawData.map((item: any) => ({
@@ -40,16 +48,24 @@ export default function ExchangePage() {
     }));
   };
 
-  // 필터 변경 시 랭킹 API 호출 함수
-  const handleFilterChange = async (sort: string) => {
-    setCurrentSort(sort);
+  // 데이터를 서버에서 가져오고 캐시에 저장하는 함수
+  const fetchAndCacheData = async (sort: string, isBackground = false) => {
+    if (!isBackground) setIsLoading(true);
     try {
-      setIsLoading(true);
       const response = await exchangeApi.getExchangeRanking(sort);
       const rawData = response.data || response;
+      
       if (Array.isArray(rawData)) {
-        if (rawData.length > 0 && rawData[0].time) setUpdateTime(rawData[0].time);
-        setExchangeData(formatData(rawData));
+        const formatted = formatData(rawData);
+        const time = rawData.length > 0 ? rawData[0].time : '';
+
+        // 상태 업데이트
+        setExchangeData(formatted);
+        setUpdateTime(time);
+
+        // 창고(AsyncStorage)에 데이터 백업
+        await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(formatted));
+        await AsyncStorage.setItem(TIME_KEY, time);
       }
     } catch (error) {
       console.error('데이터 로드 에러:', error);
@@ -58,9 +74,15 @@ export default function ExchangePage() {
     }
   };
 
+  // 필터 변경 시 랭킹 API 호출 함수
+  const handleFilterChange = (sort: string) => {
+    setCurrentSort(sort);
+    fetchAndCacheData(sort);
+  };
+
   const silentFetchExchangeRates = async () => {
     try {
-      const response = await exchangeApi.getExchangeRanking(currentSort); // 현재 선택된 필터 유지
+      const response = await exchangeApi.getExchangeRanking(currentSortRef.current); // 현재 선택된 필터 유지
       const rawData = response.data || response;
       if (Array.isArray(rawData)) {
         if (rawData.length > 0 && rawData[0].time) setUpdateTime(rawData[0].time);
@@ -72,7 +94,30 @@ export default function ExchangePage() {
   };
 
   useEffect(() => {
-    handleFilterChange('RISE');
+    const initializeData = async () => {
+      try {
+        // 1. 창고에서 기존 데이터 먼저 꺼내기
+        const [cachedData, cachedTime] = await Promise.all([
+          AsyncStorage.getItem(CACHE_KEY),
+          AsyncStorage.getItem(TIME_KEY),
+        ]);
+
+        if (cachedData) {
+          // 2. 캐시 데이터가 있으면 즉시 보여주기
+          setExchangeData(JSON.parse(cachedData));
+          setUpdateTime(cachedTime || '');
+          setIsLoading(false); // 캐시가 있으면 로딩 완료 처리
+        }
+
+        // 3. 캐시를 보여주는 동안 배경에서 새 데이터 받아오기
+        await fetchAndCacheData('RISE', !!cachedData);
+      } catch (e) {
+        console.error("초기화 에러", e);
+        fetchAndCacheData('RISE');
+      }
+    };
+
+    initializeData();
 
     const calculateNextHourTick = () => {
       const now = new Date();

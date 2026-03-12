@@ -1,12 +1,12 @@
+import { exchangeApi } from '@/components/utils/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Text, View } from 'react-native';
-import { styles } from './ExchangeDetail.styles';
-
-import { exchangeApi } from '@/components/utils/api';
 import ExchangeHeader from '../Header/ExchangeHeader';
 import ExchangeGraph from './component/ExchangeGraph';
 import ExchangeInfo from './component/ExchangeInfo';
+import { styles } from './ExchangeDetail.styles';
 
 interface ExchangeDetail {
   currentRate: number;
@@ -21,19 +21,35 @@ export default function ExchangeDetailPage() {
   const [detail, setDetail] = useState<ExchangeDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const getCacheKey = (code: string) => `EXCHANGE_DETAIL_${code}`;
+
   useEffect(() => {
     const fetchDetail = async () => {
+      const code = String(params.code);
+      const cacheKey = getCacheKey(code);
+
       try {
-        setIsLoading(true);
-        const response = await exchangeApi.getExchangeDetail(String(params.code));
-        console.log('서버 응답 데이터:', response);
-        setDetail(response.data || response);
+        const cachedData = await AsyncStorage.getItem(cacheKey);
+        if (cachedData) {
+          setDetail(JSON.parse(cachedData));
+          setIsLoading(false);
+        } else {
+          setIsLoading(true);
+        }
+
+        const response = await exchangeApi.getExchangeDetail(code);
+        const freshData = response.data || response;
+
+        setDetail(freshData);
+        await AsyncStorage.setItem(cacheKey, JSON.stringify(freshData));
+        
       } catch (error) {
         console.error('상세 정보 로드 실패:', error);
       } finally {
         setIsLoading(false);
       }
     };
+
     if (params.code) fetchDetail();
   }, [params.code]);
 
@@ -54,18 +70,14 @@ export default function ExchangeDetailPage() {
         <ExchangeGraph code={String(params.code)} />
         
         {/* isLoading이 false이면서 detail이 있을 때만 렌더링 */}
-        {isLoading ? (
+        {isLoading && !detail ? (
           <ActivityIndicator size="large" style={{ marginTop: 20 }} />
         ) : detail ? (
-          <ExchangeInfo 
-            // 1. 모든 수치 데이터에 ?? 0 을 붙여서 undefined 방지
+          <ExchangeInfo
             currentRate={(detail?.currentRate ?? 0).toLocaleString()}
             rateChange={`${sign}${changeValue.toFixed(2)} (${percentValue.toFixed(2)}%)`}
-            
-            // 2. 여기서 에러가 났을 확률이 높습니다! (Optional Chaining + 기본값 추가)
             high={(detail?.high ?? 0).toLocaleString()}
             low={(detail?.low ?? 0).toLocaleString()}
-            
             inflation="2.4" 
             inflationChange="-0.1"
           />

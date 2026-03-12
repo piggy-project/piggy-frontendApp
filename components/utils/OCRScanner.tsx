@@ -36,6 +36,8 @@ export default function OCRScanner({ onClose }: { onClose: () => void }) {
   const [manualInput, setManualInput] = useState('');
   const [currentRate, setCurrentRate] = useState<number>(0);
 
+  const getCacheKey = (code: string) => `EXCHANGE_DETAIL_${code}`;
+
   const [showResultModal, setShowResultModal] = useState(false);
   const [scanResult, setScanResult] = useState<{
     originalText: string;
@@ -44,38 +46,65 @@ export default function OCRScanner({ onClose }: { onClose: () => void }) {
   } | null>(null);
 
   const fetchRate = async (currencyCode: string) => {
+    const cacheKey = getCacheKey(currencyCode);
+
     try {
+      const cached = await AsyncStorage.getItem(cacheKey);
+      if (cached) {
+        const cachedData = JSON.parse(cached);
+        const rate = cachedData.currentRate ?? cachedData.data?.currentRate ?? 0;
+        if (rate > 0) {
+          console.log(`[OCR] ${currencyCode} 캐시 사용: ${rate}`);
+          setCurrentRate(rate);
+        }
+      }
+
       const response = await exchangeApi.getExchangeDetail(currencyCode);
-      if (response && response.currentRate) {
-        setCurrentRate(response.currentRate);
-      } else if (response && response.data?.currentRate) {
-        setCurrentRate(response.data.currentRate);
+      const freshRate = response.currentRate ?? response.data?.currentRate ?? 0;
+
+      if (freshRate > 0) {
+        setCurrentRate(freshRate);
+        await AsyncStorage.setItem(cacheKey, JSON.stringify(response.data || response));
       }
     } catch (error) {
       console.error("환율 로드 실패:", error);
     }
   };
 
+  useEffect(() => {
+    if (selectedCurrency) {
+      fetchRate(selectedCurrency.value);
+    }
+  }, [selectedCurrency]);
+
   // 1. 초기 로드 시 저장된 통화 불러오기
   useEffect(() => {
-    const loadCurrency = async () => {
+    const initializeOCR = async () => {
       try {
         const saved = await AsyncStorage.getItem(STORAGE_KEY);
+
         if (saved) {
           const found = CURRENCIES.find(c => c.value === saved);
-          if (found) setSelectedCurrency(found);
+          if (found) {
+            setSelectedCurrency(found);
+            return;
+          }
         }
+
+        fetchRate(selectedCurrency.value);
       } catch (e) {
-        console.error("Failed to load currency", e);
+        console.error("초기 설정 로드 실패", e);
+        fetchRate(selectedCurrency.value);
       }
     };
-    loadCurrency();
+
+    initializeOCR();
   }, []);
 
   // 통화가 바뀔 때마다 환율을 미리 받아둡니다.
   useEffect(() => {
     fetchRate(selectedCurrency.value);
-  }, [selectedCurrency]);
+  }, [selectedCurrency.value]);
 
   // 2. 통화 변경 시 저장하기
   const changeCurrency = async (currency: typeof CURRENCIES[0]) => {

@@ -1,10 +1,13 @@
 import { exchangeApi } from '@/components/utils/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Dimensions, Text, View } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 import { styles } from './ExchangeGraph.styles';
 
 const screenWidth = Dimensions.get('window').width;
+
+const getHistoryCacheKey = (code: string) => `EXCHANGE_HISTORY_${code}`;
 
 interface ExchangeGraphProps {
   code: string; // 예: USD, JPY
@@ -13,7 +16,7 @@ interface ExchangeGraphProps {
   width?: number;
 }
 
-// 백엔드에서 받아올 데이터 타입 정의 (예시)
+// 백엔드에서 받아올 데이터 타입 정의
 interface HistoryData {
   date: string;  // "05-01"
   rate: number;  // 1350.5
@@ -35,39 +38,51 @@ export default function ExchangeGraph({
     fetchGraphData();
   }, [code]);
 
+  // 데이터 가공 로직 분리
+  const processData = (result: HistoryData[]) => {
+    const lastMonthData = result.slice(-30);
+    const newRates = lastMonthData.map(item => item.rate);
+    const newLabels = lastMonthData.map((item, index) => {
+      const isFirst = index === 0;
+      const isLast = index === lastMonthData.length - 1;
+      const isWeekly = (lastMonthData.length - 1 - index) % 7 === 0;
+      return (isFirst || isLast || isWeekly) ? item.date : "";
+    });
+    return { newRates, newLabels };
+  };
+
   const fetchGraphData = async () => {
+    const cacheKey = getHistoryCacheKey(code);
+    
     try {
-      setLoading(true);
-      setError(false);
-      
+      const cached = await AsyncStorage.getItem(cacheKey);
+      if (cached) {
+        const cachedResult: HistoryData[] = JSON.parse(cached);
+        const { newRates, newLabels } = processData(cachedResult);
+        setLabels(newLabels);
+        setGraphData(newRates);
+        setLoading(false);
+      } else {
+        setLoading(true);
+      }
+
       const result: HistoryData[] = await exchangeApi.getExchangeHistory(code);
       
       if (result && result.length > 0) {
-        // 1. 최근 한 달(30일) 데이터만 자르기
-        const lastMonthData = result.slice(-30);
-
-        // 2. Y축 데이터(환율)는 30개 모두 사용 (선이 끊기면 안 되니까요!)
-        const newRates = lastMonthData.map(item => item.rate);
-
-        // 3. X축 라벨(날짜) 처리: 일주일(7일) 간격으로만 표시하고 나머지는 빈 문자열("")
-        // 마지막 날짜는 항상 보이게 처리하면 더 좋습니다.
-        const newLabels = lastMonthData.map((item, index) => {
-          const isFirst = index === 0;
-          const isLast = index === lastMonthData.length - 1;
-          const isWeekly = (lastMonthData.length - 1 - index) % 7 === 0; // 뒤에서부터 7일 간격
-
-          return (isFirst || isLast || isWeekly) ? item.date : "";
-        });
-
+        const { newRates, newLabels } = processData(result);
+        
         setLabels(newLabels);
         setGraphData(newRates);
+        await AsyncStorage.setItem(cacheKey, JSON.stringify(result));
       } else {
-        throw new Error('데이터가 존재하지 않습니다.');
+        if (!cached) throw new Error('데이터가 존재하지 않습니다.');
       }
     } catch (e: any) {
       console.error("그래프 데이터 로딩 에러:", e);
-      setError(true);
-      setErrorMessage(e.message || '데이터를 불러오는데 실패했습니다.'); 
+      if (graphData.length === 0) {
+        setError(true);
+        setErrorMessage(e.message || '데이터를 불러오는데 실패했습니다.');
+      }
     } finally {
       setLoading(false);
     }
