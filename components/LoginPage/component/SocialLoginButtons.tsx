@@ -1,4 +1,5 @@
 import { useAuth } from '@/components/utils/AuthContext';
+import { registerForPushNotificationsAsync } from '@/components/utils/NotificationHelper';
 import { useRouter } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import React from 'react';
@@ -64,6 +65,7 @@ export default function SocialLoginButtons() {
             });
           } else {
             await loginWithToken(token);
+            await registerForPushNotificationsAsync();
             router.replace('/(tabs)');
           }
         } else {

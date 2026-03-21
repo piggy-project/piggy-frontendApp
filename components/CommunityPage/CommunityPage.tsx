@@ -2,10 +2,10 @@ import { getToken } from '@/components/utils/authStore';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, Text, TouchableOpacity, View } from 'react-native';
-import MainHeader from '../Header/MainHeader';
+import CommunityHeader from '../Header/CommunityHeader';
 import { styles } from './Community.styles';
 import CommunityContainer from './component/CommunityContainer';
-import SearchCommunity from './component/SearchCommunity';
+import HotPost from './component/HotPost';
 import ShowCommunity from './component/ShowCommunity';
 
 export default function CommunityPage() {
@@ -39,15 +39,18 @@ export default function CommunityPage() {
 
   return (
     <View style={styles.container}>
-      <MainHeader />
+      <CommunityHeader 
+        searchText={searchText} 
+        setSearchText={setSearchText} 
+      />
       <View style={[styles.sectionGap, { flex: 1 }]}>
-        {/* 1. 검색 바 */}
-        <SearchCommunity searchText={searchText} setSearchText={setSearchText} />
 
-        {/* 2. 탭 메뉴 (setActiveTab을 props로 전달하여 상태 변경 가능하게 구현) */}
+
+        {/* 1. 탭 메뉴 (setActiveTab을 props로 전달하여 상태 변경 가능하게 구현) */}
         <ShowCommunity activeTab={activeTab} setActiveTab={setActiveTab} />
 
-        {/* 3. 필터링된 리스트 컨테이너 */}
+        <HotPost />
+        {/* 2. 필터링된 리스트 컨테이너 */}
         <CommunityContainer activeTab={activeTab} searchText={searchText} />
       </View>
       <TouchableOpacity

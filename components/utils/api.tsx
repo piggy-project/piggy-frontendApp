@@ -119,6 +119,13 @@ export const authApi = {
       body: JSON.stringify(dto),
     });
   },
+  // FCM 토큰 업데이트 API
+  updateFcmToken: (token: string) => {
+    return request('/users/fcm-token', {
+      method: 'POST',
+      body: JSON.stringify({ token }),
+    });
+  },
 };
 
 export const exchangeApi = {
@@ -230,6 +237,51 @@ export const communityApi = {
   getComments: (postId: number) => {
     return request(`/api/community/${postId}/comments`, {
       method: 'GET',
+    });
+  },
+  // 9. 실시간 핫 게시물(1위) 조회
+  getTopHotPost: () => {
+    return request('/api/community/hot', {
+      method: 'GET'
+    });
+  },
+};
+
+export const notificationApi = {
+  // 1. 알림 설정 저장 및 수정
+  // { currencyCode: "JPY", targetPercent: 3.0, period: "DAILY", isActive: true }
+  updateSetting: (data: {
+    currencyCode: string;
+    targetPercent: number;
+    period: 'DAILY' | 'WEEKLY' | 'MONTHLY';
+    isActive: boolean;
+  }) => {
+    return request('/api/notifications/settings', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  // 2. 내 알림 설정 목록 조회
+  getMySettings: () => {
+    return request('/api/notifications/settings', {
+      method: 'GET',
+    });
+  },
+
+  // 3. 알림 설정 삭제
+  deleteSetting: (settingId: number) => {
+    return request(`/api/notifications/settings/${settingId}`, {
+      method: 'DELETE',
+    });
+  },
+
+  // 4. FCM 토큰 업데이트 (알림 컨트롤러 전용 경로)
+  // 백엔드 Map<String, String> tokenRequest 구조에 맞춰서 전송
+  updateFcmToken: (token: string) => {
+    return request('/api/notifications/token', {
+      method: 'POST',
+      body: JSON.stringify({ fcmToken: token }), // 백엔드 key인 'fcmToken'과 일치시킴
     });
   },
 };

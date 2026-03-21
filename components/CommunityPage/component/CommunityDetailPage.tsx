@@ -15,21 +15,21 @@ export default function CommunityDetailPage() {
   const queryClient = useQueryClient();
   const [commentText, setCommentText] = useState('');
 
-  // 상세 데이터 조회 (useQuery)
+  // 1. 상세 데이터 조회 부분
   const { data: post, isLoading } = useQuery({
     queryKey: ['post', Number(id)],
     queryFn: async () => {
       const result = await communityApi.getPostDetail(Number(id));
       return result;
     },
-    enabled: !!id,
+    enabled: !!id && !isNaN(Number(id)),
   });
 
-  // 댓글 목록 별도 조회
+  // 2. 댓글 목록 조회 부분
   const { data: comments = [] } = useQuery({
     queryKey: ['comments', Number(id)],
     queryFn: () => communityApi.getComments(Number(id)),
-    enabled: !!id,
+    enabled: !!id && !isNaN(Number(id)),
   });
 
   // 좋아요 처리 (useMutation)
@@ -217,7 +217,7 @@ export default function CommunityDetailPage() {
           </Text>
 
           {/* 댓글 목록 */}
-          {comments.length > 0? (
+          {comments.length > 0 ? (
             comments.map((comment: any) => (
               <View key={comment.id} style={styles.commentItem}>
                 <View style={styles.commentHeader}>
