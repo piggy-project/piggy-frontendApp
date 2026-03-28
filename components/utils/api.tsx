@@ -1,3 +1,4 @@
+import { Alert } from 'react-native';
 import { getToken, removeToken } from './authStore';
 
 // 1. 기본 서버 주소 설정 (안드로이드 에뮬레이터 기준) - 현재 내 ip
@@ -37,8 +38,14 @@ const request = async (endpoint: string, options: any = {}) => {
 
     if (!response.ok) {
       if (response.status === 401 && !skipAuth) {
-        console.warn("🚨 인증 만료: 금고를 비우고 로그아웃 처리를 유도합니다.");
+        console.warn("인증 만료: 금고를 비우고 로그아웃 처리를 유도합니다.");
         await removeToken();
+        Alert.alert(
+          "세션 만료",
+          "로그인 세션이 만료되어 자동으로 로그아웃되었습니다. 다시 로그인해주세요.",
+          [{ text: "확인" }]
+        );
+        console.warn("인증 만료: 금고를 비우고 로그아웃 처리를 수행했습니다.");
       }
       throw { status: response.status, message: data.message || '서버 오류 발생', data };
     }
