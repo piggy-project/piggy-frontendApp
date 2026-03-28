@@ -1,59 +1,89 @@
+import axios, { AxiosRequestConfig } from 'axios';
 import { Alert } from 'react-native';
 import { getToken, removeToken } from './authStore';
 
-// 1. 기본 서버 주소 설정 (안드로이드 에뮬레이터 기준) - 현재 내 ip
+// 1. 기본 서버 주소 설정
 const BASE_URL = 'https://piggys.mooo.com';
 
-// 2. Fetch를 더 편하게 쓰기 위한 래퍼 함수 (Interceptor 역할)
+// 2. Axios 인스턴스 생성
+const api = axios.create({
+  baseURL: BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// 3. 기존 fetch 방식과 동일한 시그니처를 유지하는 request 함수
 const request = async (endpoint: string, options: any = {}) => {
-  try {
-    const { skipAuth = false, ...fetchOptions } = options;
+  const { method = 'GET', body, skipAuth = false, headers: customHeaders } = options;
 
-    const headers: any = {
-      'Content-Type': 'application/json',
-      ...options.headers,
+  // 토큰 가져오기
+  let token = null;
+  if (!skipAuth) {
+    token = await getToken();
+  }
+
+  // Axios 요청 설정
+  const config: AxiosRequestConfig = {
+    url: endpoint,
+    method: method,
+    headers: {
+      ...customHeaders,
+    },
+  };
+
+  // 토큰이 있으면 헤더에 추가
+  if (token) {
+    config.headers = {
+      ...config.headers,
+      Authorization: `Bearer ${token}`,
     };
+  }
 
-    if (!skipAuth) {
-      const token = await getToken();
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
-    }
-
-    const response = await fetch(`${BASE_URL}${endpoint}`, {
-      ...options,
-      headers,
-    });
-
-    const responseText = await response.text();
-    let data: any = {};
-    if (responseText) {
+  // 데이터 처리 (fetch의 body -> axios의 data)
+  if (body) {
+    // 기존 코드에서 JSON.stringify로 넘기던 데이터를 다시 객체로 변환 (Axios는 객체를 받음)
+    // 단, FormData(이미지)인 경우는 그대로 보냄
+    if (typeof body === 'string') {
       try {
-        data = JSON.parse(responseText);
-      } catch (err) {
-        data = { message: responseText };
+        config.data = JSON.parse(body);
+      } catch (e) {
+        config.data = body;
       }
+    } else {
+      config.data = body;
     }
+  }
 
-    if (!response.ok) {
-      if (response.status === 401 && !skipAuth) {
-        console.warn("인증 만료: 금고를 비우고 로그아웃 처리를 유도합니다.");
+  try {
+    const response = await api(config);
+    return response.data; // Axios는 응답 데이터를 .data에 담아줍니다.
+  } catch (error: any) {
+    // 에러 처리 (기존 401 로직 유지)
+    if (error.response) {
+      const { status, data } = error.response;
+
+      if (status === 401 && !skipAuth) {
+        console.warn(" 인증 만료: 금고를 비우고 로그아웃 처리를 유도합니다.");
         await removeToken();
         Alert.alert(
           "세션 만료",
           "로그인 세션이 만료되어 자동으로 로그아웃되었습니다. 다시 로그인해주세요.",
           [{ text: "확인" }]
         );
-        console.warn("인증 만료: 금고를 비우고 로그아웃 처리를 수행했습니다.");
       }
-      throw { status: response.status, message: data.message || '서버 오류 발생', data };
-    }
 
-    return data;
-  } catch (error: any) {
-    console.error('API Error:', error);
-    throw error;
+      // 기존 throw 형식 유지
+      throw { 
+        status: status, 
+        message: data?.message || '서버 오류 발생', 
+        data: data 
+      };
+    } else {
+      // 네트워크 에러 등
+      console.error('API Network Error:', error);
+      throw error;
+    }
   }
 };
 
@@ -104,7 +134,7 @@ export const authApi = {
     return request('/users/profile-image', {
       method: 'PATCH',
       body: formData,
-      headers: { 'Content-Type': 'multipart/form-data' },
+      // headers: { 'Content-Type': 'multipart/form-data' },
     });
   },
   // 프로필 이미지 삭제 (DELETE)
