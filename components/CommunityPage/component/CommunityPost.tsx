@@ -5,21 +5,24 @@ import { Ionicons } from '@expo/vector-icons';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { Alert, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Image, Text, TouchableOpacity, View } from 'react-native';
 import { styles } from './CommunityPost.styles';
 
 interface PostProps {
   id: number;
   category: string;
   user: string;
+  code: string | null;
   time: string;
+  title: string;
   content: string;
   likes: number;
   comments: number;
   isLiked: boolean;
+  imageUrl: string | null;
 }
 
-const CommunityPost: React.FC<PostProps> = ({ id, user, time, content, likes, comments, isLiked: serverIsLiked }) => {
+const CommunityPost: React.FC<PostProps> = ({ id, user, category, time, code, title, content, likes, comments, isLiked: serverIsLiked, imageUrl }) => {
   const router = useRouter();
   const queryClient = useQueryClient();
 
@@ -36,13 +39,14 @@ const CommunityPost: React.FC<PostProps> = ({ id, user, time, content, likes, co
   // 3. Mutation 설정 
   const mutation = useMutation({
     mutationFn: () => communityApi.toggleLike(id),
-    
+
     onSuccess: (result) => {
       setIsLiked(result.isLiked);
       setCurrentLikes(result.likeCount);
 
       queryClient.invalidateQueries({ queryKey: ['posts'] });
       queryClient.invalidateQueries({ queryKey: ['post', id] });
+      queryClient.invalidateQueries({ queryKey: ['hotPost'] });
     },
     onError: (error: any) => {
       const errorMsg = error.message || '좋아요 처리 중 오류가 발생했습니다.';
@@ -86,10 +90,33 @@ const CommunityPost: React.FC<PostProps> = ({ id, user, time, content, likes, co
       </View>
 
       <View style={styles.divider} />
+      <View style={styles.bodyContainer}>
+        {/* 왼쪽 텍스트 영역 */}
+        <View style={styles.textContent}>
+          {/* 제목 */}
+          <Text style={[styles.content, Typography.Pretendard_M_14, { marginBottom: 4 }]} numberOfLines={1}>
+            {category === 'EXCHANGE' && code ? `(${code}) ` : ''}{title}
+          </Text>
+          
+          {/* 본문 미리보기 (이미지 옆에 위치하므로 2줄 정도로 조절 가능) */}
+          <Text
+            style={[styles.contentPreview, Typography.Pretendard_M_14, { marginBottom: 0 }]}
+            numberOfLines={imageUrl ? 2 : 1} // 이미지가 있으면 2줄, 없으면 1줄
+            ellipsizeMode="tail"
+          >
+            {content}
+          </Text>
+        </View>
 
-      <Text style={[styles.content, Typography.Pretendard_M_14]} numberOfLines={3}>
-        {content}
-      </Text>
+        {/* 오른쪽 썸네일 이미지 영역 (이미지가 있을 때만 노출) */}
+        {imageUrl && (
+          <Image 
+            source={{ uri: imageUrl }} 
+            style={styles.thumbnail} 
+            resizeMode="cover"
+          />
+        )}
+      </View>
 
       <View style={styles.footer}>
         <View style={styles.interactionBox}>

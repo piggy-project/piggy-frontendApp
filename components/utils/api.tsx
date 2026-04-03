@@ -8,9 +8,6 @@ const BASE_URL = 'https://piggys.mooo.com';
 // 2. Axios 인스턴스 생성
 const api = axios.create({
   baseURL: BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
 });
 
 // 3. 기존 fetch 방식과 동일한 시그니처를 유지하는 request 함수
@@ -22,6 +19,8 @@ const request = async (endpoint: string, options: any = {}) => {
   if (!skipAuth) {
     token = await getToken();
   }
+
+  const headers: any = { ...customHeaders };
 
   // Axios 요청 설정
   const config: AxiosRequestConfig = {
@@ -42,16 +41,27 @@ const request = async (endpoint: string, options: any = {}) => {
 
   // 데이터 처리 (fetch의 body -> axios의 data)
   if (body) {
-    // 기존 코드에서 JSON.stringify로 넘기던 데이터를 다시 객체로 변환 (Axios는 객체를 받음)
-    // 단, FormData(이미지)인 경우는 그대로 보냄
-    if (typeof body === 'string') {
-      try {
-        config.data = JSON.parse(body);
-      } catch (e) {
+    if (body instanceof FormData) {
+      // formData일 경우: Content-Type을 명시하지 않아야 
+      // 브라우저/Expo가 자동으로 boundary를 포함한 헤더를 만듭니다.
+      // (axios.create에 기본값이 없으므로 안전합니다)
+      config.data = body;
+    } else {
+      // 일반 객체나 JSON 문자열일 경우: JSON 헤더 명시
+      config.headers = {
+        ...config.headers,
+        'Content-Type': 'application/json',
+      };
+
+      if (typeof body === 'string') {
+        try {
+          config.data = JSON.parse(body);
+        } catch (e) {
+          config.data = body;
+        }
+      } else {
         config.data = body;
       }
-    } else {
-      config.data = body;
     }
   }
 
@@ -74,10 +84,10 @@ const request = async (endpoint: string, options: any = {}) => {
       }
 
       // 기존 throw 형식 유지
-      throw { 
-        status: status, 
-        message: data?.message || '서버 오류 발생', 
-        data: data 
+      throw {
+        status: status,
+        message: data?.message || '서버 오류 발생',
+        data: data
       };
     } else {
       // 네트워크 에러 등
@@ -220,21 +230,50 @@ export const shoppingApi = {
 };
 export const communityApi = {
   // 1. 게시글 등록하기
-  // category: '환율 수다방' | '여행 공유방' | '정보방'
-  createPost: (postData: { title: string; content: string; category: string }) => {
+  // components/utils/api.ts 의 createPost 수정
+  createPost: (postData: {
+    title: string;
+    content: string;
+    category: string;
+    code?: string | null;
+    image?: any;
+  }) => {
+    const formData = new FormData();
+
+    formData.append('title', postData.title);
+    formData.append('content', postData.content);
+    formData.append('category', postData.category); // 'FREE', 'TRAVEL' 등이 직접 전달됨
+
+    if (postData.code) {
+      formData.append('code', postData.code);
+    }
+
+    // 이미지 추가
+    if (postData.image) {
+      formData.append('image', {
+        uri: postData.image.uri,
+        name: 'post_image.jpg',
+        type: 'image/jpeg',
+      } as any);
+    }
+
     return request('/api/community', {
       method: 'POST',
-      body: JSON.stringify(postData),
+      body: formData,
+      // request 함수에서 FormData일 때 Content-Type을 지워주므로 안전합니다.
     });
   },
 
   // 2. 게시글 목록 조회하기 (필터 및 검색 포함)
-  getPosts: (category: string, search: string = '') => {
+  getPosts: (category: string, code: string = '', search: string = '') => {
     const encodedCategory = encodeURIComponent(category);
+    const encodedCode = encodeURIComponent(code);
     const encodedSearch = encodeURIComponent(search);
-    return request(`/api/community?category=${encodedCategory}&search=${encodedSearch}`, {
-      method: 'GET'
-    });
+
+    return request(
+      `/api/community?category=${encodedCategory}&code=${encodedCode}&search=${encodedSearch}`,
+      { method: 'GET' }
+    );
   },
 
   // 3. 게시글 상세 조회 (게시글 클릭 시 사용)

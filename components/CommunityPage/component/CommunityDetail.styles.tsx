@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
   container: {
@@ -10,182 +10,232 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  scrollContent: {
-    padding: 20,
-    paddingBottom: 40,
+  postContentWrapper: {
+    paddingHorizontal: 20, // 기존에 scrollContent가 가졌던 패딩을 일로 옮깁니다.
+    paddingTop: 20,
+  },
+
+  // ───── 배지(Badge) 섹션 ─────
+  badgeRow: {
+    flexDirection: 'row',
+    marginBottom: 20,
+  },
+  hotBadge: {
+    backgroundColor: '#FFB7C5', // 인기글 핑크색
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    marginRight: 8,
+  },
+  hotBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: 'bold',
   },
   categoryBadge: {
-    backgroundColor: '#FFF9E5',
-    alignSelf: 'flex-start',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 6,
-    marginBottom: 12,
+    backgroundColor: '#D1D1D1', // 카테고리 회색
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
   },
   categoryText: {
-    color: '#FFD700',
+    color: '#FFFFFF',
+    fontSize: 12,
   },
-  title: {
-    color: '#333',
+
+  // ───── 작성자 정보 섹션 ─────
+  authorSection: {
     marginBottom: 20,
-    lineHeight: 30,
   },
-  authorRow: {
+  authorInfo: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 15,
   },
-  profileCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#F0F0F0',
-    marginRight: 12,
+  profilePlaceholder: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#F2F2F2',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 10,
   },
-  authorName: {
+  authorNickname: {
     color: '#333',
   },
-  dateText: {
-    color: '#999',
-    marginTop: 2,
-  },
-  divider: {
+  dividerLight: {
     height: 1,
-    backgroundColor: '#F0F0F0',
-    marginBottom: 20,
+    backgroundColor: '#F2F2F2',
+  },
+
+  // ───── 본문 ─────
+  title: {
+    color: '#000',
+    marginBottom: 15,
   },
   content: {
     color: '#444',
-    lineHeight: 26,
-    minHeight: 200,
+    lineHeight: 24,
+    marginBottom: 20
   },
-  footer: {
+  postImage: {
+    width: '100%',
+    height: 300, // 고정 높이를 주거나 비율에 맞게 조정 가능
+    borderRadius: 12,
+    backgroundColor: '#f5f5f5', // 로딩 전이나 빈 공간일 때 보일 배경색
+    marginBottom: 20,
+
+  },
+
+  // ───── 하단 메타 정보 & 통계 ─────
+  metaRow: {
     flexDirection: 'row',
-    marginTop: 20,
-    paddingTop: 10,
-    paddingBottom: 10,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingBottom: 20,
+    borderBottomWidth: 5,
+    borderBottomColor: '#F2F2F2', // 사진처럼 굵은 구분선
+    paddingHorizontal: 20,
+  },
+  metaText: {
+    color: '#888',
+    fontSize: 13,
+  },
+  interactionRow: {
+    flexDirection: 'row',
+  },
+  statItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 12,
+  },
+  statText: {
+    marginLeft: 4,
+    color: '#888',
+    fontSize: 14,
+  },
+
+  // ───── 댓글 섹션 (카드 스타일) ─────
+  commentSection: {
+    paddingTop: 15,
+    paddingHorizontal: 20,
+    backgroundColor: '#F2F2F2', // 사진처럼 전체 배경을 회색으로
+    minHeight: 500, // 댓글이 없을 때도 배경색이 유지되도록 설정
+  },
+  commentCountTitle: {
+    color: '#333',
+    marginBottom: 20,
+  },
+  commentCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 15,
+    marginBottom: 15,
+  },
+  authorInfoSmall: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  profilePlaceholderSmall: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: '#F2F2F2',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 6,
+  },
+  commentAuthor: {
+    fontSize: 13,
+    fontWeight: 'bold',
+    color: '#555',
+  },
+  commentTime: {
+    fontSize: 12,
+    color: '#AAA',
+  },
+  commentBody: {
+    fontSize: 14,
+    color: '#333',
+    marginBottom: 10,
+  },
+  commentStats: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+  },
+  statItemSmall: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 10,
+  },
+  statTextSmall: {
+    marginLeft: 3,
+    color: '#888',
+    fontSize: 12,
+  },
+  commentDeleteButton: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    padding: 5,
+  },
+
+  // ───── 하단 댓글 입력창 ─────
+  inputWrapper: {
+    padding: 15,
     borderTopWidth: 1,
-    borderTopColor: '#F5F5F5',
+    borderTopColor: '#F2F2F2',
+    backgroundColor: '#FFFFFF',
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F9F9F9',
+    borderRadius: 25,
+    paddingHorizontal: 20,
+    height: 50,
+  },
+  textInput: {
+    flex: 1,
+    fontSize: 14,
+    color: '#333',
+    paddingVertical: 0,
+    textAlignVertical: 'center',
+    includeFontPadding: false, // 안드로이드 전용 폰트 여백 제거
+  },
+
+  deleteButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 5,
+    marginLeft: 10,
+  },
+  deleteText: {
+    color: '#FF5252',
+    fontSize: 12,
+    marginLeft: 3,
   },
   errorContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  interactionItem: {
+  customHeader: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    marginRight: 20,
-    paddingVertical: 5,
-    paddingHorizontal: 2,
-  },
-  interactionText: {
-    marginLeft: 6,
-    color: '#888',
-  },
-  activeInteractionText: {
-    color: '#FFB7C5',
-    fontWeight: '600',
-  },
-  deleteButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 8,
-    backgroundColor: '#FFF5F5', 
-    borderWidth: 1,
-    borderColor: '#FFEAEA',
-    marginLeft: 'auto'
-  },
-  deleteText: {
-    color: '#FF5252',
-    marginLeft: 4,
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  // ───── 댓글 섹션 ─────
-  commentSection: {
-    paddingBottom: 10,
-  },
-  commentTitle: {
-    color: '#333',
-    marginBottom: 12,
-  },
-  commentItem: {
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
-  },
-  commentHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 6,
-  },
-  commentProfileCircle: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: '#FFE4EA',
-    marginRight: 8,
-  },
-  commentAuthorInfo: {
-    flex: 1,
-  },
-  commentAuthorName: {
-    color: '#333',
-  },
-  commentDate: {
-    color: '#aaa',
-    marginTop: 1,
-  },
-  commentDeleteButton: {
-    padding: 4,
-  },
-  commentContent: {
-    color: '#444',
-    lineHeight: 20,
-    paddingLeft: 36,
-  },
-  emptyComment: {
-    color: '#aaa',
-    textAlign: 'center',
-    paddingVertical: 24,
-  },
-
-  // ───── 댓글 입력창 ─────
-  commentInputContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
     paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderTopWidth: 1,
-    borderTopColor: '#F0F0F0',
+    paddingTop: Platform.OS === 'ios' ? 60 : 20,
+    paddingBottom: 10,
     backgroundColor: '#fff',
   },
-  commentInput: {
-    flex: 1,
-    minHeight: 40,
-    maxHeight: 100,
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    marginRight: 8,
-    fontSize: 14,
-    color: '#333',
-    backgroundColor: '#FAFAFA',
-  },
-  commentSubmitButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#FFB7C5',
+
+  commentHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between', // 양끝 정렬!
     alignItems: 'center',
-    justifyContent: 'center',
-  },
-  commentSubmitButtonDisabled: {
-    backgroundColor: '#E0E0E0',
+    marginBottom: 8,
   },
 });

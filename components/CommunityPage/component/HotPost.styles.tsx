@@ -5,7 +5,6 @@ export const styles = StyleSheet.create({
     backgroundColor: '#FFF0F3', // 연분홍색 배경
     marginHorizontal: 16,
     marginTop: 10,
-    marginBottom: 5,
     paddingVertical: 10,
     paddingHorizontal: 12,
     borderRadius: 12,

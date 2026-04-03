@@ -10,41 +10,54 @@ interface PostData {
   title: string;
   content: string;
   category: string;
+  code: string;
   authorNickname: string;
   createdAt: string;
   likeCount: number;
   isLiked: boolean;
   commentCount: number;
+  imageUrl: string | null;
 }
 
 interface ContainerProps {
   activeTab: string;
+  activeCode: string | null;
   searchText: string;
 }
 
-const CommunityContainer = ({ activeTab, searchText }: ContainerProps) => {
+// 한글 탭 이름을 백엔드 Enum 값으로 매핑하는 객체
+const categoryMap: Record<string, string> = {
+  '자유게시판': 'FREE',
+  '환율게시판': 'EXCHANGE',
+  '여행게시판': 'TRAVEL',
+};
+
+const CommunityContainer = ({ activeTab, activeCode, searchText }: ContainerProps) => {
   const [userRefreshing, setUserRefreshing] = useState(false);
-  // 모든 상태 관리는 useQuery 사용
+
+  // 탭 이름 변환 (예: '환율게시판' -> 'EXCHANGE')
+  const mappedCategory = categoryMap[activeTab] || 'FREE';
+
   const { 
     data: posts = [], 
     isLoading, 
-    isFetching, 
     refetch 
   } = useQuery<PostData[]>({
-    queryKey: ['posts', activeTab, searchText],
-    queryFn: () => communityApi.getPosts(activeTab, searchText),
-    staleTime: 1000 * 60, // 1분간은 캐시 데이터를 즉시 사용
+    // queryKey에 activeCode를 추가해야 코드가 바뀔 때마다 데이터를 새로 가져옵니다.
+    queryKey: ['posts', mappedCategory, activeCode, searchText], 
+    
+    // API 호출 시 category, code, search 세 가지 인자를 전달
+    queryFn: () => communityApi.getPosts(mappedCategory, activeCode || '', searchText),
+    
+    staleTime: 1000 * 60, 
   });
 
-  // 수동 새로고침 함수
   const onRefresh = async () => {
-    setUserRefreshing(true); // 아이콘 보여주기
-    await refetch();         // 데이터 다시 가져오기
-    setUserRefreshing(false); // 아이콘 숨기기
+    setUserRefreshing(true);
+    await refetch();
+    setUserRefreshing(false);
   };
 
-  // 로딩 상태 처리
-  // 첫 로딩일 때만 큰 인디케이터 사용
   if (isLoading && posts.length === 0) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', marginTop: 50 }}>
@@ -71,17 +84,20 @@ const CommunityContainer = ({ activeTab, searchText }: ContainerProps) => {
               key={post.id} 
               id={post.id} 
               category={post.category}
+              code={post.code}
               user={post.authorNickname}
               time={formatTime(post.createdAt)}
-              content={post.title}
+              title={post.title}
+              content={post.content}
               likes={post.likeCount}
               comments={post.commentCount ?? 0}
               isLiked={post.isLiked}
+              imageUrl={post.imageUrl}
             />
           ))
         ) : (
           <Text style={{ textAlign: 'center', marginTop: 50, color: '#888' }}>
-            검색 결과가 없습니다.
+            {activeCode ? `${activeCode} 게시판에 검색 결과가 없습니다.` : '검색 결과가 없습니다.'}
           </Text>
         )}
       </View>
@@ -89,7 +105,6 @@ const CommunityContainer = ({ activeTab, searchText }: ContainerProps) => {
   );
 };
 
-// 간단한 시간 포맷팅 (예: 2026-03-07T...)
 const formatTime = (dateString: string) => {
   const date = new Date(dateString);
   const now = new Date();

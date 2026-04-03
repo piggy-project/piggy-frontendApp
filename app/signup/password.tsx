@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
   title: { marginBottom: 30 },
   input: { borderBottomWidth: 1, borderBottomColor: '#ccc', paddingVertical: 10 },
   helperText: { marginTop: 5, color: '#888' },
-  errorText: { color: '#FF3B30', marginTop: 5 }, // 📍 조금 더 선명한 iOS 스타일 레드로 변경
+  errorText: { color: '#FF3B30', marginTop: 5 }, // 조금 더 선명한 iOS 스타일 레드로 변경
   button: { backgroundColor: '#333', padding: 16, borderRadius: 8, alignItems: 'center', marginBottom: 20 },
   disabledButton: { backgroundColor: '#ddd' },
   buttonText: { color: '#fff' },

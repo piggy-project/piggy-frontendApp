@@ -10,11 +10,17 @@ import ShowCommunity from './component/ShowCommunity';
 
 export default function CommunityPage() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState('환율 수다방');
+  
+  // 1. 탭 이름 일치 (ShowCommunity의 tabs 배열과 맞춤)
+  const [activeTab, setActiveTab] = useState('환율게시판'); 
+  
+  // 2. 선택된 통화 코드 상태 추가 (USD, JPY 등)
+  const [activeCode, setActiveCode] = useState<string | null>(null);
+  
   const [searchText, setSearchText] = useState('');
 
   const handleWritePress = async () => {
-    const token = await getToken(); //
+    const token = await getToken();
 
     if (!token) {
       Alert.alert(
@@ -28,12 +34,14 @@ export default function CommunityPage() {
           }
         ]
       );
-      return; // 로그인이 안 되어 있으면 여기서 함수 종료
+      return;
     }
-
     router.push({
       pathname: '/community_write',
-      params: { initialCategory: activeTab }
+      params: { 
+        initialCategory: activeTab,
+        initialCode: activeCode || '' 
+      }
     });
   };
 
@@ -45,14 +53,24 @@ export default function CommunityPage() {
       />
       <View style={[styles.sectionGap, { flex: 1 }]}>
 
-
-        {/* 1. 탭 메뉴 (setActiveTab을 props로 전달하여 상태 변경 가능하게 구현) */}
-        <ShowCommunity activeTab={activeTab} setActiveTab={setActiveTab} />
+        {/* 3. ShowCommunity에 필요한 4개의 Props 모두 전달 */}
+        <ShowCommunity 
+          activeTab={activeTab} 
+          setActiveTab={setActiveTab} 
+          activeCode={activeCode}
+          setActiveCode={setActiveCode}
+        />
 
         <HotPost />
-        {/* 2. 필터링된 리스트 컨테이너 */}
-        <CommunityContainer activeTab={activeTab} searchText={searchText} />
+
+        {/* 4. 필터링된 리스트에도 activeCode를 넘겨야 백엔드에서 해당 국가 글만 가져옵니다. */}
+        <CommunityContainer 
+          activeTab={activeTab} 
+          activeCode={activeCode}
+          searchText={searchText} 
+        />
       </View>
+
       <TouchableOpacity
         style={styles.fab}
         onPress={handleWritePress}

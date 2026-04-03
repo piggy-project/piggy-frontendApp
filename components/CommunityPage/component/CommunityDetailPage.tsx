@@ -1,4 +1,3 @@
-import NoneHeader from '@/components/Header/NoneHeader';
 import { communityApi } from '@/components/utils/api';
 import { getToken } from '@/components/utils/authStore';
 import { Typography } from '@/constants/Typography';
@@ -6,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { ActivityIndicator, Alert, KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Image, KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { styles } from './CommunityDetail.styles';
 
 export default function CommunityDetailPage() {
@@ -25,12 +24,20 @@ export default function CommunityDetailPage() {
     enabled: !!id && !isNaN(Number(id)),
   });
 
+  // 현재 실시간 1위 인기글 조회
+  const { data: topHotPost } = useQuery({
+    queryKey: ['topHotPost'],
+    queryFn: () => communityApi.getTopHotPost(),
+  });
+
   // 2. 댓글 목록 조회 부분
   const { data: comments = [] } = useQuery({
     queryKey: ['comments', Number(id)],
     queryFn: () => communityApi.getComments(Number(id)),
     enabled: !!id && !isNaN(Number(id)),
   });
+
+  const isHotPost = topHotPost?.id === Number(id);
 
   // 좋아요 처리 (useMutation)
   const likeMutation = useMutation({
@@ -87,6 +94,9 @@ export default function CommunityDetailPage() {
     onSuccess: () => {
       setCommentText('');
       queryClient.invalidateQueries({ queryKey: ['comments', Number(id)] });
+      queryClient.invalidateQueries({ queryKey: ['post', Number(id)] });
+      queryClient.invalidateQueries({ queryKey: ['hotPost'] });
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
     },
     onError: (error: any) => {
       Alert.alert('오류', error.message || '댓글 작성 중 오류가 발생했습니다.');
@@ -119,6 +129,9 @@ export default function CommunityDetailPage() {
     mutationFn: (commentId: number) => communityApi.deleteComment(commentId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['comments', Number(id)] });
+      queryClient.invalidateQueries({ queryKey: ['post', Number(id)] });
+      queryClient.invalidateQueries({ queryKey: ['hotPost'] });
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
     },
     onError: (error: any) => {
       Alert.alert('오류', error.message || '댓글 삭제 중 오류가 발생했습니다.');
@@ -143,144 +156,155 @@ export default function CommunityDetailPage() {
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
     >
-      <NoneHeader />
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* 카테고리 뱃지 */}
-        <View style={styles.categoryBadge}>
-          <Text style={[Typography.Pretendard_B_16, styles.categoryText]}>{post.category}</Text>
+      <View style={styles.customHeader}>
+        <TouchableOpacity onPress={() => router.back()}>
+          <Ionicons name="chevron-back" size={28} color="black" />
+        </TouchableOpacity>
+        {post.isAuthor && (
+          <TouchableOpacity onPress={handleDelete}>
+            <Ionicons name="ellipsis-vertical" size={20} color="black" />
+          </TouchableOpacity>
+        )}
+      </View>
+
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={styles.postContentWrapper}>
+          {/* 상단 배지 영역 */}
+          <View style={styles.badgeRow}>
+            {isHotPost && (
+              <View style={styles.hotBadge}>
+                <Text style={styles.hotBadgeText}>인기글</Text>
+              </View>
+            )}
+            <View style={styles.categoryBadge}>
+              <Text style={styles.categoryText}>
+                {post.category === 'EXCHANGE' ? `환율게시판(${post.code})` :
+                  post.category === 'FREE' ? '자유게시판' : '여행게시판'}
+              </Text>
+            </View>
+          </View>
+
+          {/* 작성자 정보 */}
+          <View style={styles.authorSection}>
+            <View style={styles.authorInfo}>
+              <View style={styles.profilePlaceholder}>
+                <Ionicons name="person" size={16} color="#FFB7C5" />
+              </View>
+              <Text style={[Typography.Pretendard_B_16, styles.authorNickname]}>
+                {post.authorNickname}
+              </Text>
+            </View>
+            <View style={styles.dividerLight} />
+          </View>
+
+          {/* 본문 */}
+          <Text style={[Typography.Pretendard_B_24, styles.title]}>{post.title}</Text>
+          <Text style={[Typography.Pretendard_M_16, styles.content]}>{post.content}</Text>
+
+          {post.imageUrl && (
+            <Image
+              source={{ uri: post.imageUrl }}
+              style={styles.postImage}
+              resizeMode="cover"
+            />
+          )}
         </View>
-
-        {/* 제목 */}
-        <Text style={[Typography.Pretendard_B_24, styles.title]}>{post.title}</Text>
-
-        {/* 작성자 정보 */}
-        <View style={styles.authorRow}>
-          <View style={styles.profileCircle} />
-          <View>
-            <Text style={[Typography.Pretendard_B_16, styles.authorName]}>{post.authorNickname}</Text>
-            <Text style={[Typography.Pretendard_M_12, styles.dateText]}>
-              {new Date(post.createdAt).toLocaleDateString()} · 조회 {post.viewCount}
-            </Text>
+        {/* 하단 메타 정보 & 좋아요/댓글 수 */}
+        <View style={styles.metaRow}>
+          <Text style={styles.metaText}>
+            {formatDate(post.createdAt)}  ·  조회수 {post.viewCount}
+          </Text>
+          <View style={styles.interactionRow}>
+            <TouchableOpacity onPress={handleLike} style={styles.statItem}>
+              <Ionicons name="thumbs-up-outline" size={16} color={post.isLiked ? "#FFB7C5" : "#888"} />
+              <Text style={[styles.statText, post.isLiked && { color: '#FFB7C5' }]}>{post.likeCount}</Text>
+            </TouchableOpacity>
+            <View style={styles.statItem}>
+              <Ionicons name="chatbubble-outline" size={16} color="#888" />
+              <Text style={styles.statText}>{comments.length}</Text>
+            </View>
           </View>
         </View>
 
-        <View style={styles.divider} />
-
-        {/* 본문 내용 */}
-        <Text style={[Typography.Pretendard_M_16, styles.content]}>{post.content}</Text>
-
-        {/* 하단 인터랙션 */}
-        <View style={styles.footer}>
-          <TouchableOpacity
-            style={styles.interactionItem}
-            onPress={handleLike}
-            activeOpacity={0.7}
-            disabled={likeMutation.isPending}
-          >
-            <Ionicons
-              name={post.isLiked ? 'thumbs-up' : 'thumbs-up-outline'}
-              size={22}
-              color={post.isLiked ? '#FFB7C5' : '#888'}
-            />
-            <Text
-              style={[
-                styles.interactionText,
-                post.isLiked && { color: '#FFB7C5', fontWeight: 'bold' },
-              ]}
-            >
-              {post.likeCount}
-            </Text>
-          </TouchableOpacity>
-
-          {/* 삭제 버튼: 작성자일 때만 노출 */}
-          {post.isAuthor && (
-            <TouchableOpacity
-              onPress={handleDelete}
-              style={styles.deleteButton}
-              disabled={deleteMutation.isPending}
-            >
-              <Ionicons name="trash-outline" size={18} color="#FF5252" />
-              <Text style={styles.deleteText}>삭제</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-
-        <View style={styles.divider} />
-
-        {/* 댓글 섹션 */}
+        {/* 댓글 섹션  */}
         <View style={styles.commentSection}>
-          <Text style={[Typography.Pretendard_B_16, styles.commentTitle]}>
-            댓글 {comments.length}
-          </Text>
+          <Text style={[Typography.Pretendard_B_16, styles.commentCountTitle]}>댓글 {comments.length}</Text>
 
-          {/* 댓글 목록 */}
-          {comments.length > 0 ? (
-            comments.map((comment: any) => (
-              <View key={comment.id} style={styles.commentItem}>
-                <View style={styles.commentHeader}>
-                  <View style={styles.commentProfileCircle} />
-                  <View style={styles.commentAuthorInfo}>
-                    <Text style={[Typography.Pretendard_B_16, styles.commentAuthorName]}>
-                      {comment.authorNickname}
-                    </Text>
-                    <Text style={[Typography.Pretendard_M_12, styles.commentDate]}>
-                      {new Date(comment.createdAt).toLocaleDateString()}
-                    </Text>
+          {comments.map((comment: any) => (
+            <View key={comment.id} style={styles.commentCard}>
+              <View style={styles.commentHeader}>
+                <View style={styles.authorInfoSmall}>
+                  <View style={styles.profilePlaceholderSmall}>
+                    <Ionicons name="person" size={10} color="#FFB7C5" />
                   </View>
-                  {/* 댓글 삭제 버튼: 작성자일 때만 노출 */}
-                  {comment.isAuthor && (
-                    <TouchableOpacity
-                      onPress={() => handleDeleteComment(comment.id)}
-                      style={styles.commentDeleteButton}
-                      disabled={deleteCommentMutation.isPending}
-                    >
-                      <Ionicons name="trash-outline" size={15} color="#FF5252" />
-                    </TouchableOpacity>
-                  )}
+                  <Text style={styles.commentAuthor}>{comment.authorNickname}</Text>
+                  <Text style={styles.commentTime}> · {formatTime(comment.createdAt)}</Text>
                 </View>
-                <Text style={[Typography.Pretendard_M_14, styles.commentContent]}>
-                  {comment.content}
-                </Text>
+
+                {/* 작성자일 때만 우측에 삭제 버튼 노출 */}
+                {comment.isAuthor && (
+                  <TouchableOpacity onPress={() => handleDeleteComment(comment.id)}>
+                    <Ionicons name="trash-outline" size={14} color="#FF5252" />
+                  </TouchableOpacity>
+                )}
               </View>
-            ))
-          ) : (
-            <Text style={[Typography.Pretendard_M_14, styles.emptyComment]}>
-              아직 댓글이 없습니다. 첫 댓글을 남겨보세요!
-            </Text>
-          )}
+
+              <Text style={styles.commentBody}>{comment.content}</Text>
+
+              <View style={styles.commentStats}>
+                <View style={styles.statItemSmall}>
+                  <Ionicons name="thumbs-up-outline" size={12} color="#888" />
+                  <Text style={styles.statTextSmall}>0</Text>
+                </View>
+                <View style={styles.statItemSmall}>
+                  <Ionicons name="chatbubble-outline" size={12} color="#888" />
+                  <Text style={styles.statTextSmall}>0</Text>
+                </View>
+              </View>
+            </View>
+          ))}
         </View>
       </ScrollView>
 
       {/* 댓글 입력창 */}
-      <View style={styles.commentInputContainer}>
-        <TextInput
-          style={styles.commentInput}
-          placeholder="댓글을 입력하세요..."
-          placeholderTextColor="#aaa"
-          value={commentText}
-          onChangeText={setCommentText}
-          multiline
-          maxLength={500}
-        />
-        <TouchableOpacity
-          style={[
-            styles.commentSubmitButton,
-            (!commentText.trim() || createCommentMutation.isPending) && styles.commentSubmitButtonDisabled,
-          ]}
-          onPress={handleCreateComment}
-          disabled={!commentText.trim() || createCommentMutation.isPending}
-          activeOpacity={0.7}
-        >
-          {createCommentMutation.isPending ? (
-            <ActivityIndicator size="small" color="#fff" />
-          ) : (
-            <Ionicons name="send" size={18} color="#fff" />
-          )}
-        </TouchableOpacity>
+      <View style={styles.inputWrapper}>
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.textInput}
+            placeholder="댓글을 입력하세요"
+            value={commentText}
+            onChangeText={setCommentText}
+          />
+          <TouchableOpacity onPress={handleCreateComment}>
+            <Ionicons name="send" size={20} color="#444" />
+          </TouchableOpacity>
+        </View>
       </View>
     </KeyboardAvoidingView>
   );
 }
+
+// 시간 포맷팅 헬퍼
+const formatTime = (dateString: string) => {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diff = (now.getTime() - date.getTime()) / 1000;
+  if (diff < 60) return '방금 전';
+  if (diff < 3600) return `${Math.floor(diff / 60)}분 전`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}시간 전`;
+  return `${date.getMonth() + 1}/${date.getDate()}`;
+};
+
+// 연/월/일 형식을 0000/00/00으로 맞춰주는 함수
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  // 월과 일은 10보다 작으면 앞에 0을 붙여줍니다 (padStart 이용)
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+
+  return `${year}/${month}/${day}`;
+};
