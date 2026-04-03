@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { ActivityIndicator, Alert, Image, KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Image, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { styles } from './CommunityDetail.styles';
 
 export default function CommunityDetailPage() {
@@ -13,6 +13,23 @@ export default function CommunityDetailPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [commentText, setCommentText] = useState('');
+
+  const [isMenuVisible, setIsMenuVisible] = useState(false);
+
+  // 수정 핸들러
+  const handleEdit = () => {
+    setIsMenuVisible(false); // 메뉴 닫기
+    router.push({
+      pathname: '/community_edit', // 수정 페이지 경로 (나중에 만드셔야 해요!)
+      params: { id: String(id) }
+    });
+  };
+
+  // 삭제 핸들러 (기존 handleDelete 활용)
+  const confirmDelete = () => {
+    setIsMenuVisible(false);
+    handleDelete();
+  };
 
   // 1. 상세 데이터 조회 부분
   const { data: post, isLoading } = useQuery({
@@ -164,11 +181,32 @@ export default function CommunityDetailPage() {
           <Ionicons name="chevron-back" size={28} color="black" />
         </TouchableOpacity>
         {post.isAuthor && (
-          <TouchableOpacity onPress={handleDelete}>
+          <TouchableOpacity onPress={() => setIsMenuVisible(true)}>
             <Ionicons name="ellipsis-vertical" size={20} color="black" />
           </TouchableOpacity>
         )}
       </View>
+      <Modal
+        visible={isMenuVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setIsMenuVisible(false)}
+      >
+        {/* 배경 클릭 시 닫기 */}
+        <Pressable style={styles.modalOverlay} onPress={() => setIsMenuVisible(false)}>
+          <View style={styles.menuBox}>
+            <TouchableOpacity style={styles.menuOption} onPress={handleEdit}>
+              <Text style={styles.menuOptionText}>수정</Text>
+            </TouchableOpacity>
+            
+            <View style={styles.menuSeparator} />
+            
+            <TouchableOpacity style={styles.menuOption} onPress={confirmDelete}>
+              <Text style={styles.menuOptionText}>삭제</Text>
+            </TouchableOpacity>
+          </View>
+        </Pressable>
+      </Modal>
 
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.postContentWrapper}>

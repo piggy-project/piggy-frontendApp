@@ -238,4 +238,39 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 8,
   },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.05)', // 아주 살짝 어두운 배경
+  },
+  menuBox: {
+    position: 'absolute',
+    top: 60,       // 헤더의 ... 버튼 바로 아래 위치하도록 조절
+    right: 20,     // 오른쪽 여백
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    width: 100,    // 메뉴 박스 가로 너비
+    overflow: 'hidden',
+    // 그림자 (iOS)
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    // 그림자 (Android)
+    elevation: 5,
+  },
+  menuOption: {
+    paddingVertical: 15,
+    alignItems: 'center', // 글자를 가로 중앙으로
+    justifyContent: 'center',
+  },
+  menuOptionText: {
+    fontSize: 16,
+    color: '#000000',
+    fontWeight: '500',
+  },
+  menuSeparator: {
+    height: 1,
+    backgroundColor: '#EEEEEE', // 사진 속 아주 연한 회색 선
+    marginHorizontal: 10,       // 선이 양 끝에 닿지 않게
+  },
 });

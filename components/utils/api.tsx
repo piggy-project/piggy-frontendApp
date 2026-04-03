@@ -331,6 +331,45 @@ export const communityApi = {
       method: 'GET'
     });
   },
+  // 10. 게시글 수정하기 (PATCH)
+  updatePost: (
+    postId: number, 
+    updateData: {
+      title: string;
+      content: string;
+      code?: string | null;
+      image?: any;
+      removeImage?: boolean;
+    }
+  ) => {
+    const formData = new FormData();
+
+    formData.append('title', updateData.title);
+    formData.append('content', updateData.content);
+    
+    if (updateData.code) {
+      formData.append('code', updateData.code);
+    }
+
+    // 기존 이미지를 삭제하고 싶을 때 true 전달
+    if (updateData.removeImage !== undefined) {
+      formData.append('removeImage', String(updateData.removeImage));
+    }
+
+    // 새로운 이미지 파일이 있는 경우 추가
+    if (updateData.image) {
+      formData.append('image', {
+        uri: updateData.image.uri,
+        name: 'update_image.jpg',
+        type: 'image/jpeg',
+      } as any);
+    }
+
+    return request(`/api/community/${postId}`, {
+      method: 'PATCH',
+      body: formData,
+    });
+  },
 };
 
 export const notificationApi = {

@@ -126,15 +126,15 @@ export const styles = StyleSheet.create({
     position: 'relative',
     width: 200,
     height: 150,
-},
-imagePreview: {
+  },
+  imagePreview: {
     width: '100%',
     height: '100%',
     borderRadius: 8,
-},
-imageDeleteBtn: {
+  },
+  imageDeleteBtn: {
     position: 'absolute',
     top: -10,
     right: -10,
-},
+  },
 });
