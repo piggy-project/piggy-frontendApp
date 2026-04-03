@@ -1,5 +1,5 @@
 import { communityApi } from '@/components/utils/api';
-import { getToken } from '@/components/utils/authStore';
+import { getAccessToken } from '@/components/utils/authStore';
 import { Typography } from '@/constants/Typography';
 import { Ionicons } from '@expo/vector-icons';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -62,7 +62,7 @@ const CommunityPost: React.FC<PostProps> = ({ id, user, category, time, code, ti
   };
 
   const onLikePress = async () => {
-    const token = await getToken();
+    const token = await getAccessToken();
     if (!token) {
       Alert.alert(
         '알림',

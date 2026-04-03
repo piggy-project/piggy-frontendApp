@@ -1,5 +1,5 @@
 import { communityApi } from '@/components/utils/api';
-import { getToken } from '@/components/utils/authStore';
+import { getAccessToken } from '@/components/utils/authStore';
 import { Typography } from '@/constants/Typography';
 import { Ionicons } from '@expo/vector-icons';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -53,7 +53,7 @@ export default function CommunityDetailPage() {
 
   // 좋아요 핸들러
   const handleLike = async () => {
-    const token = await getToken();
+    const token = await getAccessToken();
     if (!token) {
       Alert.alert(
         '알림',
@@ -109,7 +109,7 @@ export default function CommunityDetailPage() {
       Alert.alert('알림', '댓글 내용을 입력해주세요.');
       return;
     }
-    const token = await getToken();
+    const token = await getAccessToken();
     if (!token) {
       Alert.alert(
         '알림',

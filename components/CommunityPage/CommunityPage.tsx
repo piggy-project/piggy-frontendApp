@@ -1,4 +1,4 @@
-import { getToken } from '@/components/utils/authStore';
+import { getAccessToken } from '@/components/utils/authStore';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, Text, TouchableOpacity, View } from 'react-native';
@@ -20,7 +20,7 @@ export default function CommunityPage() {
   const [searchText, setSearchText] = useState('');
 
   const handleWritePress = async () => {
-    const token = await getToken();
+    const token = await getAccessToken();
 
     if (!token) {
       Alert.alert(

@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import { Alert } from 'react-native';
-import { getToken, removeToken } from './authStore';
+import { getAccessToken, removeTokens } from './authStore';
 
 // 1. 기본 서버 주소 설정
 const BASE_URL = 'https://piggys.mooo.com';
@@ -17,7 +17,7 @@ const request = async (endpoint: string, options: any = {}) => {
   // 토큰 가져오기
   let token = null;
   if (!skipAuth) {
-    token = await getToken();
+    token = await getAccessToken();
   }
 
   const headers: any = { ...customHeaders };
@@ -75,7 +75,7 @@ const request = async (endpoint: string, options: any = {}) => {
 
       if (status === 401 && !skipAuth) {
         console.warn(" 인증 만료: 금고를 비우고 로그아웃 처리를 유도합니다.");
-        await removeToken();
+        await removeTokens();
         Alert.alert(
           "세션 만료",
           "로그인 세션이 만료되어 자동으로 로그아웃되었습니다. 다시 로그인해주세요.",
@@ -171,6 +171,16 @@ export const authApi = {
     return request('/users/fcm-token', {
       method: 'POST',
       body: JSON.stringify({ token }),
+    });
+  },
+  // 토큰 재발급 (Refresh Token Rotation)
+  reissue: (refreshToken: string) => {
+    return request('/auth/refresh', {
+      method: 'POST',
+      body: JSON.stringify({ refreshToken }),
+      // 만료된 액세스 토큰을 헤더에 붙여서 에러가 나는 걸 방지하기 위해 
+      // skipAuth가 있다면 true로 주는 것이 좋습니다.
+      skipAuth: true, 
     });
   },
 };
