@@ -19,6 +19,13 @@ export const styles = StyleSheet.create({
     backgroundColor: '#fff',
     marginRight: 10,
   },
+  defaultProfile: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f0f0f0', // 아이콘일 때의 배경색
+    borderWidth: 1,
+    borderColor: '#eee',
+  },
   userName: {
     flex: 1,
   },

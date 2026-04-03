@@ -12,6 +12,7 @@ interface PostProps {
   id: number;
   category: string;
   user: string;
+  userProfileUrl?: string | null;
   code: string | null;
   time: string;
   title: string;
@@ -22,7 +23,7 @@ interface PostProps {
   imageUrl: string | null;
 }
 
-const CommunityPost: React.FC<PostProps> = ({ id, user, category, time, code, title, content, likes, comments, isLiked: serverIsLiked, imageUrl }) => {
+const CommunityPost: React.FC<PostProps> = ({ id, user, category, time, code, title, content, likes, comments, isLiked: serverIsLiked, imageUrl, userProfileUrl }) => {
   const router = useRouter();
   const queryClient = useQueryClient();
 
@@ -84,7 +85,16 @@ const CommunityPost: React.FC<PostProps> = ({ id, user, category, time, code, ti
       activeOpacity={0.7}
     >
       <View style={styles.header}>
-        <View style={styles.profileCircle} />
+        {userProfileUrl ? (
+          <Image 
+            source={{ uri: userProfileUrl }} 
+            style={styles.profileCircle} 
+          />
+        ) : (
+          <View style={[styles.profileCircle, styles.defaultProfile]}>
+            <Ionicons name="person" size={18} color="#ccc" />
+          </View>
+        )}
         <Text style={[styles.userName, Typography.Pretendard_M_14]}>{user}</Text>
         <Text style={[styles.timeText, Typography.Pretendard_M_11]}>{time}</Text>
       </View>

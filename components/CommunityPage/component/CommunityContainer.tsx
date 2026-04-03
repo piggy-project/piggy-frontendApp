@@ -17,6 +17,7 @@ interface PostData {
   isLiked: boolean;
   commentCount: number;
   imageUrl: string | null;
+  userProfileUrl?: string | null;
 }
 
 interface ContainerProps {
@@ -93,6 +94,7 @@ const CommunityContainer = ({ activeTab, activeCode, searchText }: ContainerProp
               comments={post.commentCount ?? 0}
               isLiked={post.isLiked}
               imageUrl={post.imageUrl}
+              userProfileUrl={post.userProfileUrl}
             />
           ))
         ) : (
