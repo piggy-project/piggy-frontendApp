@@ -1,37 +1,100 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import { Alert } from 'react-native';
-import { getAccessToken, removeTokens } from './authStore';
+import { getAccessToken, getRefreshToken, removeTokens, saveTokens } from './authStore';
 
-// 1. 기본 서버 주소 설정
 const BASE_URL = 'https://piggys.mooo.com';
 
-// 2. Axios 인스턴스 생성
 const api = axios.create({
   baseURL: BASE_URL,
 });
 
-// 3. 기존 fetch 방식과 동일한 시그니처를 유지하는 request 함수
+// 📍 [추가] 리프레시 토큰으로 새 토큰을 받는 중인지 확인하는 변수
+let isRefreshing = false;
+let failedQueue: any[] = [];
+
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) prom.reject(error);
+    else prom.resolve(token);
+  });
+  failedQueue = [];
+};
+
+// 📍 [핵심] Axios 응답 인터셉터 설정
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    // 401 에러이고, 리프레시 시도를 하지 않았던 요청이라면
+    if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.url?.includes('/users/login')) {
+      if (isRefreshing) {
+        // 이미 다른 요청이 리프레시 중이라면 큐에 담고 대기
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+          .then((token) => {
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+            return api(originalRequest);
+          })
+          .catch((err) => Promise.reject(err));
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      try {
+        const refreshToken = await getRefreshToken();
+        if (!refreshToken) throw new Error('No refresh token available');
+
+        // 서버에 토큰 재발급 요청 (인터셉터 무한 루프 방지를 위해 axios 직발신)
+        const res = await axios.post(`${BASE_URL}/auth/refresh`, { refreshToken });
+
+        const access = res.data.accessToken;
+        const refresh = res.data.refreshToken;
+
+        if (access && refresh) {
+          await saveTokens(access, refresh);
+          processQueue(null, access);
+
+          // 원래 실패했던 요청 다시 시도
+          originalRequest.headers.Authorization = `Bearer ${access}`;
+          return api(originalRequest);
+        }
+      } catch (refreshError: any) {
+        processQueue(refreshError, null);
+        console.error(" 리프레시 실패 상세 에러:", refreshError.response?.data || refreshError.message);
+        
+        await removeTokens();
+        
+        // 전역 이벤트 발생 (AuthContext에서 감지하여 setUser(null) 처리)
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('auth-session-expired'));
+        }
+
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 const request = async (endpoint: string, options: any = {}) => {
   const { method = 'GET', body, skipAuth = false, headers: customHeaders } = options;
 
-  // 토큰 가져오기
   let token = null;
   if (!skipAuth) {
     token = await getAccessToken();
   }
 
-  const headers: any = { ...customHeaders };
-
-  // Axios 요청 설정
   const config: AxiosRequestConfig = {
     url: endpoint,
     method: method,
-    headers: {
-      ...customHeaders,
-    },
+    headers: { ...customHeaders },
   };
 
-  // 토큰이 있으면 헤더에 추가
   if (token) {
     config.headers = {
       ...config.headers,
@@ -39,61 +102,20 @@ const request = async (endpoint: string, options: any = {}) => {
     };
   }
 
-  // 데이터 처리 (fetch의 body -> axios의 data)
   if (body) {
     if (body instanceof FormData) {
-      // formData일 경우: Content-Type을 명시하지 않아야 
-      // 브라우저/Expo가 자동으로 boundary를 포함한 헤더를 만듭니다.
-      // (axios.create에 기본값이 없으므로 안전합니다)
       config.data = body;
     } else {
-      // 일반 객체나 JSON 문자열일 경우: JSON 헤더 명시
-      config.headers = {
-        ...config.headers,
-        'Content-Type': 'application/json',
-      };
-
-      if (typeof body === 'string') {
-        try {
-          config.data = JSON.parse(body);
-        } catch (e) {
-          config.data = body;
-        }
-      } else {
-        config.data = body;
-      }
+      config.headers = { ...config.headers, 'Content-Type': 'application/json' };
+      config.data = typeof body === 'string' ? JSON.parse(body) : body;
     }
   }
 
   try {
     const response = await api(config);
-    return response.data; // Axios는 응답 데이터를 .data에 담아줍니다.
+    return response.data;
   } catch (error: any) {
-    // 에러 처리 (기존 401 로직 유지)
-    if (error.response) {
-      const { status, data } = error.response;
-
-      if (status === 401 && !skipAuth) {
-        console.warn(" 인증 만료: 금고를 비우고 로그아웃 처리를 유도합니다.");
-        await removeTokens();
-        Alert.alert(
-          "세션 만료",
-          "로그인 세션이 만료되어 자동으로 로그아웃되었습니다. 다시 로그인해주세요.",
-          [{ text: "확인" }]
-        );
-      }
-
-      // 기존 throw 형식 유지
-      throw {
-        status: status,
-        message: data?.message || '서버 오류 발생',
-        data: data
-      };
-    } else {
-      // 네트워크 에러 등
-      console.error('API Network Error:', error);
-      throw error;
-    }
+    throw error;
   }
 };
 
@@ -180,7 +202,7 @@ export const authApi = {
       body: JSON.stringify({ refreshToken }),
       // 만료된 액세스 토큰을 헤더에 붙여서 에러가 나는 걸 방지하기 위해 
       // skipAuth가 있다면 true로 주는 것이 좋습니다.
-      skipAuth: true, 
+      skipAuth: true,
     });
   },
 };
@@ -333,7 +355,7 @@ export const communityApi = {
   },
   // 10. 게시글 수정하기 (PATCH)
   updatePost: (
-    postId: number, 
+    postId: number,
     updateData: {
       title: string;
       content: string;
@@ -346,7 +368,7 @@ export const communityApi = {
 
     formData.append('title', updateData.title);
     formData.append('content', updateData.content);
-    
+
     if (updateData.code) {
       formData.append('code', updateData.code);
     }

@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { Alert } from 'react-native';
 import { authApi } from './api';
-import { getAccessToken, getRefreshToken, removeTokens, saveTokens } from './authStore';
+import { getAccessToken, removeTokens, saveTokens } from './authStore';
 
 interface User {
   id: number;
@@ -33,32 +34,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const accessToken = await getAccessToken();
 
         if (accessToken) {
-          try {
-            // 액세스 토큰으로 내 정보 가져오기
-            const userData = await authApi.getMyInfo();
+          // 인터셉터가 getMyInfo 호출 시 만료되었다면 알아서 갱신
+          const userData = await authApi.getMyInfo();
+          
+          // 데이터 유효성 검사 추가 (id나 email 등 필수 필드가 있어야 함)
+          if (userData && (userData.id || userData.email)) {
             setUser(userData);
-          } catch (error) {
-            // 토큰이 만료되었을 경우 리프레시 시도
-            const refreshToken = await getRefreshToken();
-            if (refreshToken) {
-              const newTokens = await authApi.reissue(refreshToken);
-              
-              // 새 토큰 추출 (API 응답 구조에 따라 safe하게 추출)
-              const nextAccess = newTokens.accessToken || newTokens.data?.accessToken;
-              const nextRefresh = newTokens.refreshToken || newTokens.data?.refreshToken;
-
-              if (nextAccess && nextRefresh) {
-                await saveTokens(nextAccess, nextRefresh);
-                const userData = await authApi.getMyInfo();
-                setUser(userData);
-              }
-            }
+          } else {
+            console.log('[Auth] 유효하지 않은 사용자 데이터:', userData);
+            throw new Error('Invalid user data');
           }
+        } else {
+          console.log('[Auth] 기기에 저장된 토큰이 없습니다.');
         }
       } catch (e) {
-        console.log('[Auth] 세션 만료 혹은 인증 실패');
+        console.log('[Auth] 세션 만료 (리프레시 토큰까지 만료됨)');
         await removeTokens();
         setUser(null);
+        Alert.alert('알림', '세션이 만료되었습니다. 다시 로그인해 주세요.');
       } finally {
         setIsLoading(false);
       }

@@ -53,9 +53,12 @@ function AppLayout() {
   useEffect(() => {
     if (isLoading) return;
 
-    const inAuthGroup = segments[0] === 'login' || segments[0] === 'signup';
+    // 현재 경로에 login이나 signup이 포함되어 있는지 확인
+    const isAuthPage = segments.some(segment => segment === 'login' || segment === 'signup');
 
-    if (user && inAuthGroup) {
+    if (user && isAuthPage) {
+      // 로그인이 되어 있는데 로그인/회원가입 페이지에 있다면 메인으로 이동
+      console.log('[AppLayout] 이미 로그인됨 - 메인으로 이동');
       router.replace('/(tabs)');
     }
   }, [user, isLoading, segments]);
