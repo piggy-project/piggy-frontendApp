@@ -83,8 +83,8 @@ export default function MainDashBoardPage() {
           <ChoiceCountry onSelect={handleCountrySelect} />
         </View>
         
-        {/* 선택된 국가 코드를 이미지 컨테이너로 전달 */}
-        <MainImageContainer />
+        {/* 선택된 국가의 타이밍 정보를 이미지 컨테이너로 전달 */}
+        <MainImageContainer timing={exchangeData?.timing} />
 
         <Animated.View
           style={[
