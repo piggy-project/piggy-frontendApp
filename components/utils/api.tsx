@@ -8,7 +8,7 @@ const api = axios.create({
   baseURL: BASE_URL,
 });
 
-// 📍 [추가] 리프레시 토큰으로 새 토큰을 받는 중인지 확인하는 변수
+// 리프레시 토큰으로 새 토큰을 받는 중인지 확인하는 변수
 let isRefreshing = false;
 let failedQueue: any[] = [];
 
@@ -20,7 +20,7 @@ const processQueue = (error: any, token: string | null = null) => {
   failedQueue = [];
 };
 
-// 📍 [핵심] Axios 응답 인터셉터 설정
+// Axios 응답 인터셉터 설정
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -223,6 +223,12 @@ export const exchangeApi = {
   // 3. 특정 통화의 과거 기록 가져오기
   getExchangeHistory: (code: string) => {
     return request(`/api/exchange/history?code=${code}`, { method: 'GET' });
+  },
+  // 4. 일일 시간별(09:00 ~ 22:00) 히스토리 조회
+  getDailyHourlyHistory: (code: string) => {
+    return request(`/api/exchange/history/daily/${code}`, { 
+      method: 'GET' 
+    });
   },
 };
 

@@ -2,10 +2,11 @@ import { exchangeApi } from '@/components/utils/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Text, View } from 'react-native';
+import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 import ExchangeHeader from '../Header/ExchangeHeader';
-import ExchangeGraph from './component/ExchangeGraph';
-import ExchangeInfo from './component/ExchangeInfo';
+import DailyPriceList from './component/DailyPriceList';
+import ExchangeGraph, { Period } from './component/ExchangeGraph';
+import PeriodSelector from './component/PeriodSelector';
 import { styles } from './ExchangeDetail.styles';
 
 interface ExchangeDetail {
@@ -16,47 +17,69 @@ interface ExchangeDetail {
   percentChange: number;
 }
 
+interface HistoryItem {
+  date: string;
+  rate: number;
+}
+
 export default function ExchangeDetailPage() {
   const params = useLocalSearchParams();
   const [detail, setDetail] = useState<ExchangeDetail | null>(null);
+  const [history, setHistory] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedPeriod, setSelectedPeriod] = useState<Period>('1D');
 
   const getCacheKey = (code: string) => `EXCHANGE_DETAIL_${code}`;
+  const getHistoryKey = (code: string) => `EXCHANGE_HISTORY_${code}`;
 
   useEffect(() => {
-    const fetchDetail = async () => {
+    const fetchData = async () => {
       const code = String(params.code);
-      const cacheKey = getCacheKey(code);
-
       try {
-        const cachedData = await AsyncStorage.getItem(cacheKey);
-        if (cachedData) {
-          setDetail(JSON.parse(cachedData));
-          setIsLoading(false);
-        } else {
-          setIsLoading(true);
-        }
-
-        const response = await exchangeApi.getExchangeDetail(code);
-        const freshData = response.data || response;
-
-        setDetail(freshData);
-        await AsyncStorage.setItem(cacheKey, JSON.stringify(freshData));
+        // 1. 상세 정보 (상단 요약용 - 필요시 유지하거나 정리)
+        const cachedDetail = await AsyncStorage.getItem(getCacheKey(code));
+        if (cachedDetail) setDetail(JSON.parse(cachedDetail));
         
+        const detailRes = await exchangeApi.getExchangeDetail(code);
+        setDetail(detailRes);
+        await AsyncStorage.setItem(getCacheKey(code), JSON.stringify(detailRes));
+
+        // 2. 히스토리 정보 (일일 시세용)
+        const cachedHistory = await AsyncStorage.getItem(getHistoryKey(code));
+        if (cachedHistory) processHistory(JSON.parse(cachedHistory));
+
+        const historyRes = await exchangeApi.getExchangeHistory(code);
+        processHistory(historyRes);
+        await AsyncStorage.setItem(getHistoryKey(code), JSON.stringify(historyRes));
+
       } catch (error) {
-        console.error('상세 정보 로드 실패:', error);
+        console.error('데이터 로드 실패:', error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    if (params.code) fetchDetail();
-  }, [params.code]);
+    const processHistory = (data: HistoryItem[]) => {
+      // 최근 10일치 추출 및 등락 계산
+      const latest10 = data.slice(-10).reverse();
+      const processed = latest10.map((item, index, array) => {
+        // 이전 날짜(배열상 다음 인덱스) 데이터 찾기
+        const prevItem = data[data.indexOf(item) - 1];
+        const change = prevItem ? item.rate - prevItem.rate : 0;
+        const percentChange = prevItem ? (change / prevItem.rate) * 100 : 0;
+        
+        return {
+          date: item.date,
+          rate: item.rate,
+          change,
+          percentChange
+        };
+      });
+      setHistory(processed);
+    };
 
-  // 렌더링을 위한 변수 가공
-  const changeValue = detail?.change ?? 0;
-  const percentValue = detail?.percentChange ?? 0;
-  const sign = changeValue > 0 ? '+' : '';
+    if (params.code) fetchData();
+  }, [params.code]);
 
   return (
     <View style={styles.container}>
@@ -66,27 +89,27 @@ export default function ExchangeDetailPage() {
         flag={String(params.flag)}
       />
       
-      <View style={[styles.sectionGap, { flex: 1 }]}>
-        <ExchangeGraph code={String(params.code)} />
-        
-        {/* isLoading이 false이면서 detail이 있을 때만 렌더링 */}
-        {isLoading && !detail ? (
-          <ActivityIndicator size="large" style={{ marginTop: 20 }} />
-        ) : detail ? (
-          <ExchangeInfo
-            currentRate={(detail?.currentRate ?? 0).toLocaleString()}
-            rateChange={`${sign}${changeValue.toFixed(2)} (${percentValue.toFixed(2)}%)`}
-            high={(detail?.high ?? 0).toLocaleString()}
-            low={(detail?.low ?? 0).toLocaleString()}
-            inflation="2.4" 
-            inflationChange="-0.1"
-          />
-        ) : (
-          <View style={{ alignItems: 'center', marginTop: 20 }}>
-            <Text>데이터를 불러올 수 없습니다.</Text>
+      <ScrollView 
+        style={{ flex: 1 }} 
+        contentContainerStyle={{ paddingBottom: 30 }}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.sectionGap}>
+          <View style={{ paddingHorizontal: 20 }}>
+            <ExchangeGraph code={String(params.code)} period={selectedPeriod} />
+            <PeriodSelector 
+              selectedPeriod={selectedPeriod} 
+              onPeriodChange={setSelectedPeriod} 
+            />
           </View>
-        )}
-      </View>
+          
+          {isLoading && history.length === 0 ? (
+            <ActivityIndicator size="large" color="#FF3B30" style={{ marginTop: 40 }} />
+          ) : (
+            <DailyPriceList data={history} />
+          )}
+        </View>
+      </ScrollView>
     </View>
   );
 }
