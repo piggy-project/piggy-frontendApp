@@ -1,4 +1,5 @@
 import { useAuth } from '@/components/utils/AuthContext';
+import { registerForPushNotificationsAsync } from '@/components/utils/NotificationHelper';
 import { useRouter } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import React from 'react';
@@ -60,11 +61,17 @@ export default function SocialLoginButtons() {
           if (url.includes('additional-info')) {
             router.push({
               pathname: '/oauth/additional-info',
-              params: { token }
+              params: { token, refreshToken }
             });
           } else {
-            await loginWithToken(token);
-            router.replace('/(tabs)');
+            if (refreshToken) {
+              await loginWithToken(token, refreshToken);
+              await registerForPushNotificationsAsync();
+              router.replace('/(tabs)');
+            } else {
+              console.error("❌ 서버 응답에 refreshToken이 누락되었습니다.");
+              Alert.alert('오류', '로그인 정보가 부족합니다. (Refresh Token 누락)');
+            }
           }
         } else {
           Alert.alert('오류', '토큰을 찾을 수 없습니다.');

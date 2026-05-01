@@ -11,8 +11,8 @@ export const styles = StyleSheet.create({
   imageWrapper: {
     width: 50,
     height: 50,
-    borderRadius: 25, // 📍 완벽한 원형
-    overflow: 'hidden', // 📍 영역 밖 이미지 잘라내기
+    borderRadius: 25, // 완벽한 원형
+    overflow: 'hidden', // 영역 밖 이미지 잘라내기
     backgroundColor: '#F5F5F5',
   },
   profileImage: {

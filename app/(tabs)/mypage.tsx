@@ -1,31 +1,14 @@
-// app/(tabs)/mypage.tsx
-import React, { useCallback, useState } from 'react';
-import { useFocusEffect } from 'expo-router';
+import React from 'react';
 import MyPage from '../../components/MyPage/MyPage';
+import { useAuth } from '../../components/utils/AuthContext';
 import SignupWelcome from '../signup/index';
-import { getToken, removeToken } from '../../components/utils/authStore';
 
 export default function My() {
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
+  const { user, isLoading } = useAuth();
 
-  useFocusEffect(
-    useCallback(() => {
-      const checkLoginStatus = async () => {
-        const token = await getToken();
-        setIsLoggedIn(!!token);
-      };
-      checkLoginStatus();
-    }, [])
-  );
+  if (isLoading) return null;
 
-  const handleLogout = async () => {
-    await removeToken();
-    setIsLoggedIn(false);
-  };
-
-  if (isLoggedIn === null) return null;
-
-  if (isLoggedIn === false) {
+  if (!user) {
     return <SignupWelcome />;
   }
 

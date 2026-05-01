@@ -1,34 +1,30 @@
 import * as SecureStore from 'expo-secure-store';
 
-const TOKEN_KEY = 'userToken';
+const ACCESS_TOKEN_KEY = 'accessToken';
+const REFRESH_TOKEN_KEY = 'refreshToken';
 
-// 토큰 저장 (암호화되어 저장됨)
-export const saveToken = async (token: string) => {
+// 액세스 토큰과 리프레시 토큰을 기기에 안전하게 저장합니다.
+export const saveTokens = async (accessToken: string, refreshToken: string) => {
   try {
-    // setItemAsync를 사용하여 비동기로 암호화 저장
-    await SecureStore.setItemAsync(TOKEN_KEY, token);
+    await SecureStore.setItemAsync(ACCESS_TOKEN_KEY, accessToken);
+    await SecureStore.setItemAsync(REFRESH_TOKEN_KEY, refreshToken);
   } catch (e) {
-    console.error('토큰 저장 실패 (SecureStore)', e);
+    console.error('[authStore] 토큰 저장 에러:', e);
   }
 };
 
-// 토큰 가져오기
-export const getToken = async () => {
-  try {
-    // getItemAsync로 안전하게 복호화해서 가져옴
-    return await SecureStore.getItemAsync(TOKEN_KEY);
-  } catch (e) {
-    console.error('토큰 불러오기 실패 (SecureStore)', e);
-    return null;
-  }
-};
+// 저장된 액세스 토큰을 가져옵니다.
+export const getAccessToken = () => SecureStore.getItemAsync(ACCESS_TOKEN_KEY);
 
-// 토큰 삭제
-export const removeToken = async () => {
+// 저장된 리프레시 토큰을 가져옵니다.
+export const getRefreshToken = () => SecureStore.getItemAsync(REFRESH_TOKEN_KEY);
+
+// 저장된 모든 토큰을 삭제합니다. (로그아웃 시 사용)
+export const removeTokens = async () => {
   try {
-    // deleteItemAsync로 키체인/키스토어에서 삭제
-    await SecureStore.deleteItemAsync(TOKEN_KEY);
+    await SecureStore.deleteItemAsync(ACCESS_TOKEN_KEY);
+    await SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY);
   } catch (e) {
-    console.error('토큰 삭제 실패 (SecureStore)', e);
+    console.error('[authStore] 토큰 삭제 에러:', e);
   }
 };

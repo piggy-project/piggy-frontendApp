@@ -1,3 +1,4 @@
+import { registerForPushNotificationsAsync } from '@/components/utils/NotificationHelper';
 import { Typography } from '@/constants/Typography';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
@@ -46,6 +47,7 @@ export default function LoginPage({ onBack, onLoginSuccess }: Props) {
       
       // 'replace'를 써야 뒤로가기 했을 때 로그인 화면으로 다시 안 돌아옴
       // RootLayout에서 설정한 메인 탭 경로 (보통 '(tabs)' 또는 'index')
+      await registerForPushNotificationsAsync();
       router.replace('/(tabs)'); 
 
     } catch (error: any) {
