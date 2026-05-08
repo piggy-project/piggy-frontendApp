@@ -1,5 +1,6 @@
 import { communityApi } from '@/components/utils/api';
 import { getAccessToken } from '@/components/utils/authStore';
+import { AVAILABLE_CURRENCIES } from '@/constants/Currency';
 import { Typography } from '@/constants/Typography';
 import { Ionicons } from '@expo/vector-icons';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -103,12 +104,21 @@ const CommunityPost: React.FC<PostProps> = ({ id, user, category, time, code, ti
       <View style={styles.bodyContainer}>
         {/* 왼쪽 텍스트 영역 */}
         <View style={styles.textContent}>
-          {/* 제목 */}
-          <Text style={[styles.content, Typography.Pretendard_M_14, { marginBottom: 4 }]} numberOfLines={1}>
-            {category === 'EXCHANGE' && code ? `(${code}) ` : ''}{title}
-          </Text>
+          {/* 제목 영역 (뱃지 + 제목) */}
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
+            {category === 'EXCHANGE' && code && (
+              <View style={styles.countryBadge}>
+                <Text style={[styles.countryBadgeText, Typography.Pretendard_M_11]}>
+                  {AVAILABLE_CURRENCIES.find(c => c.code === code)?.label || code}
+                </Text>
+              </View>
+            )}
+            <Text style={[styles.content, Typography.Pretendard_M_14, { flex: 1 }]} numberOfLines={1}>
+              {title}
+            </Text>
+          </View>
           
-          {/* 본문 미리보기 (이미지 옆에 위치하므로 2줄 정도로 조절 가능) */}
+          {/* 본문 미리보기 */}
           <Text
             style={[styles.contentPreview, Typography.Pretendard_M_14, { marginBottom: 0 }]}
             numberOfLines={imageUrl ? 2 : 1} // 이미지가 있으면 2줄, 없으면 1줄

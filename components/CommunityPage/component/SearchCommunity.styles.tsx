@@ -3,7 +3,6 @@ import { StyleSheet } from 'react-native';
 export const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 20,
-    paddingVertical: 5,
     backgroundColor: '#fff',
   },
   searchSection: {
@@ -13,8 +12,9 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E5E5E5',
     borderRadius: 25,
-    paddingHorizontal: 15,
-    height: 45,
+    paddingHorizontal: 10,
+    height: 40,
+    marginRight: 10
   },
   input: {
     flex: 1,
@@ -23,5 +23,6 @@ export const styles = StyleSheet.create({
   },
   searchIcon: {
     marginLeft: 10,
+    marginRight: 10
   },
 });

@@ -4,7 +4,7 @@ const { height, width } = Dimensions.get('window');
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#F5F5F5',
   },
   sectionGap: {
     gap: 0, // 아이템들 사이에 20px씩 간격 자동 생성

@@ -65,9 +65,9 @@ export default function CommunityPage() {
 
         {/* 4. 필터링된 리스트에도 activeCode를 넘겨야 백엔드에서 해당 국가 글만 가져옵니다. */}
         <CommunityContainer 
-          activeTab={activeTab} 
+          activeTab={activeTab}
           activeCode={activeCode}
-          searchText={searchText} 
+          searchText={searchText}
         />
       </View>
 

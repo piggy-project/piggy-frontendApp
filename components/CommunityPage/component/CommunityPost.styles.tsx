@@ -2,10 +2,16 @@ import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#D9D9D9', // 이미지와 같은 연회색 배경
+    backgroundColor: '#FFFFFF', // 회색에서 흰색으로 변경
     borderRadius: 15,
     padding: 15,
     marginBottom: 15,
+    // 그림자 추가 (선택사항, 가독성을 위해)
+    elevation: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
   },
   header: {
     flexDirection: 'row',
@@ -62,12 +68,25 @@ export const styles = StyleSheet.create({
     color: '#000',
     minHeight: 20,
   },
+  countryBadge: {
+    paddingHorizontal: 7,
+    paddingVertical: 1,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#DDD',
+    marginRight: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  countryBadgeText: {
+    color: '#999',
+  },
   footer: {
     alignItems: 'flex-end',
   },
   interactionBox: {
     flexDirection: 'row',
-    backgroundColor: '#fff',
+    backgroundColor: '#F5F5F5', // 카드가 흰색이 되었으므로, 박스는 연회색으로 변경
     borderRadius: 20,
     paddingHorizontal: 10,
     paddingVertical: 5,

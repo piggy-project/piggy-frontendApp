@@ -28,7 +28,7 @@ export default function CommunityHeader({ searchText, setSearchText }: Props) {
       // 3. 오른쪽(알림 아이콘) 공간 설정
       rightStyle={{ flex: 0 }}
       right={
-        <View style={{ marginRight: 0 }}>
+        <View style={{ marginBottom: 16 }}>
           <Notice />
         </View>
       }
