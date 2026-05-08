@@ -1,33 +1,45 @@
 import { Typography } from '@/constants/Typography';
+import { useQuery } from '@tanstack/react-query';
 import React from 'react';
-import { Image, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Image, ScrollView, Text, View } from 'react-native';
+import { exchangeApi } from '../../utils/api';
 import { styles } from './TodayTravelDestination.styles';
 
-// 가성비 국가 데이터 인터페이스
-interface Destination {
-  id: number;
-  name: string;
-  imageUrl?: string;
+// 가성비 국가 데이터 인터페이스 (백엔드 DTO 기준)
+interface TravelRecommendation {
+  destination: string;      // 국가
+  location: string;         // 도시
+  reason: string;           // 추천 이유
+  currencyCode: string;     // 통화 코드
+  currencyName: string;     // 통화명
+  exchangeRate: number;     // 현재 환율
+  percentChange: number;    // 변동률
+  imageUrl: string;         // 이미지 URL
 }
 
-interface TodayTravelDestinationProps {
-  destinations?: Destination[];
-}
+const TodayTravelDestination: React.FC = () => {
+  // API를 통해 추천 여행지 데이터 가져오기
+  const { data: recommendations, isLoading, isError } = useQuery<TravelRecommendation[]>({
+    queryKey: ['travelRecommendations'],
+    queryFn: exchangeApi.getTravelRecommendations,
+  });
 
-// 기본값(Mock Data) 설정
-const MOCK_DESTINATIONS: Destination[] = [
-  { id: 1, name: '' },
-  { id: 2, name: '' },
-  { id: 3, name: '' },
-];
+  if (isLoading) {
+    return (
+      <View style={[styles.container, { paddingVertical: 20, alignItems: 'center' }]}>
+        <ActivityIndicator size="small" color="#000" />
+      </View>
+    );
+  }
 
-const TodayTravelDestination: React.FC<TodayTravelDestinationProps> = ({ 
-  destinations = MOCK_DESTINATIONS 
-}) => {
+  if (isError || !recommendations) {
+    return null; // 에러 시 노출하지 않음
+  }
+
   return (
     <View style={styles.container}>
       {/* 섹션 타이틀 */}
-      <Text style={[styles.title, Typography.Pretendard_B_24]}>오늘의 TOP3 여행지</Text>
+      <Text style={[styles.title, Typography.Pretendard_B_24]}>추천 가성비 여행지</Text>
       
       {/* 가로 스크롤 카드 리스트 */}
       <ScrollView 
@@ -35,10 +47,10 @@ const TodayTravelDestination: React.FC<TodayTravelDestinationProps> = ({
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.cardContainer}
       >
-        {destinations.map((item) => (
-          <View key={item.id} style={styles.destinationCard}>
+        {recommendations.map((item, index) => (
+          <View key={`${item.destination}-${index}`} style={styles.destinationCard}>
             {/* 이미지 영역 */}
-            <View style={styles.imagePlaceholder}>
+            <View style={styles.imageWrapper}>
               {item.imageUrl ? (
                 <Image 
                   source={{ uri: item.imageUrl }} 
@@ -46,13 +58,26 @@ const TodayTravelDestination: React.FC<TodayTravelDestinationProps> = ({
                   resizeMode="cover"
                 />
               ) : (
-                // 이미지가 없을 때 보여줄 기본 배경(스타일 시트의 backgroundColor 적용됨)
-                <View style={{ flex: 1 }} />
+                <View style={{ flex: 1, backgroundColor: '#d9d9d9' }} />
               )}
             </View>
             
-            {/* 국가명 */}
-            <Text style={styles.destinationName}>{item.name}</Text>
+            {/* 정보 영역 */}
+            <View style={styles.infoWrapper}>
+              {/* 국가 - 도시 */}
+              <Text style={styles.destinationLocation}>
+                {item.destination} - {item.location}
+              </Text>
+              
+              {/* 간단한 설명 (이유) */}
+              <Text 
+                style={styles.reasonText} 
+                numberOfLines={3} 
+                ellipsizeMode="tail"
+              >
+                {item.reason}
+              </Text>
+            </View>
           </View>
         ))}
       </ScrollView>

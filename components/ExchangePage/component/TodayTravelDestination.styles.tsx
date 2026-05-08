@@ -11,25 +11,42 @@ export const styles = StyleSheet.create({
     letterSpacing: -0.5,
   },
   cardContainer: {
-    flexDirection: "row", // 가로 배치를 위해 필요
-    gap: 12,
+    flexDirection: "row",
+    gap: 16,
+    paddingBottom: 20,
   },
   destinationCard: {
-    width: 110, // 고정 너비 설정
+    width: 200, // 너비를 늘려 설명이 잘 보이게 함
     flexDirection: "column",
-    gap: 8,
+    gap: 10,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#f0f0f0',
+    elevation: 2, // 안드로이드 그림자
+    shadowColor: '#000', // iOS 그림자
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
-  imagePlaceholder: {
-    width: 110,
-    height: 140,
+  imageWrapper: {
+    width: '100%',
+    height: 120,
     backgroundColor: "#d9d9d9",
-    borderRadius: 8,
-    overflow: "hidden", // 이미지가 border-radius를 넘지 않도록 설정
   },
-  destinationName: {
-    fontSize: 14,
-    fontWeight: "500",
-    color: "#333333",
-    textAlign: "center",
+  infoWrapper: {
+    padding: 10,
+    gap: 4,
   },
-});
+  destinationLocation: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#000",
+  },
+  reasonText: {
+    fontSize: 12,
+    color: "#666",
+    lineHeight: 18,
+  },
+  });

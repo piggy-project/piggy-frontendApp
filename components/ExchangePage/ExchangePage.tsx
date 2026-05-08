@@ -5,7 +5,6 @@ import { useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import ExchangeHeader from '../Header/ExchangeHeader';
-import SearchCountry from './component/SearchCountry';
 import ShowCountry from './component/ShowCountry';
 import TodayTravelDestination from './component/TodayTravelDestination';
 import { styles } from './Exchange.styles';
@@ -175,7 +174,6 @@ export default function ExchangePage() {
       />
       <View style={[styles.sectionGap, { flex: 1 }]}>
         <TodayTravelDestination />
-        <SearchCountry value={searchText} onChangeText={setSearchText} />
         {isLoading ? (
           <View style={{ flex: 1, justifyContent: 'center' }}>
             <ActivityIndicator size="large" color="#4A90E2" />

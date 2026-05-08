@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { Alert } from 'react-native';
+import { Alert, DeviceEventEmitter } from 'react-native';
 import { authApi } from './api';
 import { getAccessToken, removeTokens, saveTokens } from './authStore';
 
@@ -27,31 +27,49 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // 1. 앱 기동 시 토큰 확인 및 자동 로그인
+  // 1. 세션 만료 이벤트 리스너 등록 (React Native DeviceEventEmitter 사용)
+  useEffect(() => {
+    const handleSessionExpired = async () => {
+      console.log('[Auth] 세션 만료 이벤트 수신, 로그아웃 처리 중...');
+      await removeTokens();
+      setUser(null);
+      Alert.alert('알림', '세션이 만료되었습니다. 다시 로그인해 주세요.');
+    };
+
+    const subscription = DeviceEventEmitter.addListener('auth-session-expired', handleSessionExpired);
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
+
+  // 2. 앱 기동 시 토큰 확인 및 자동 로그인
   useEffect(() => {
     const loadUser = async () => {
       try {
         const accessToken = await getAccessToken();
 
         if (accessToken) {
-          // 인터셉터가 getMyInfo 호출 시 만료되었다면 알아서 갱신
+          console.log('[Auth] 저장된 토큰 발견, 사용자 정보 조회 중...');
+          // 인터셉터가 getMyInfo 호출 시 만료되었다면 알아서 갱신 시도
           const userData = await authApi.getMyInfo();
           
-          // 데이터 유효성 검사 추가 (id나 email 등 필수 필드가 있어야 함)
           if (userData && (userData.id || userData.email)) {
+            console.log('[Auth] 자동 로그인 성공:', userData.email);
             setUser(userData);
           } else {
-            console.log('[Auth] 유효하지 않은 사용자 데이터:', userData);
             throw new Error('Invalid user data');
           }
         } else {
           console.log('[Auth] 기기에 저장된 토큰이 없습니다.');
         }
-      } catch (e) {
-        console.log('[Auth] 세션 만료 (리프레시 토큰까지 만료됨)');
+      } catch (e: any) {
+        // 인터셉터에서 갱신에 실패하면 여기로 에러가 전파됨
+        console.log('[Auth] 자동 로그인 실패:', e.message);
+        // 세션 만료 이벤트가 별도로 발생하므로 여기서 중복 처리는 지양하지만, 
+        // 혹시 모를 상황을 위해 토큰을 지워줍니다.
         await removeTokens();
         setUser(null);
-        Alert.alert('알림', '세션이 만료되었습니다. 다시 로그인해 주세요.');
       } finally {
         setIsLoading(false);
       }

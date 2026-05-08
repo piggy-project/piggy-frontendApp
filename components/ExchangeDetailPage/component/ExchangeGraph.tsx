@@ -1,7 +1,7 @@
 import { exchangeApi } from '@/components/utils/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Dimensions, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Dimensions, Text, View } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 import { styles } from './ExchangeGraph.styles';
 

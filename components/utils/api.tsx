@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from 'axios';
-import { Alert } from 'react-native';
+import { DeviceEventEmitter } from 'react-native';
 import { getAccessToken, getRefreshToken, removeTokens, saveTokens } from './authStore';
 
 const BASE_URL = 'https://piggys.mooo.com';
@@ -26,8 +26,13 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // 401 에러이고, 리프레시 시도를 하지 않았던 요청이라면
-    if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.url?.includes('/users/login')) {
+    // 401 에러이고, 리프레시 시도를 하지 않았던 요청이라면 (로그인 요청 제외)
+    if (
+      error.response?.status === 401 && 
+      !originalRequest._retry && 
+      !originalRequest.url?.includes('/users/login') &&
+      !originalRequest.url?.includes('/auth/refresh')
+    ) {
       if (isRefreshing) {
         // 이미 다른 요청이 리프레시 중이라면 큐에 담고 대기
         return new Promise((resolve, reject) => {
@@ -47,30 +52,31 @@ api.interceptors.response.use(
         const refreshToken = await getRefreshToken();
         if (!refreshToken) throw new Error('No refresh token available');
 
+        console.log('[API] 토큰 만료 발견, 재발급 시도 중...');
         // 서버에 토큰 재발급 요청 (인터셉터 무한 루프 방지를 위해 axios 직발신)
         const res = await axios.post(`${BASE_URL}/auth/refresh`, { refreshToken });
 
-        const access = res.data.accessToken;
-        const refresh = res.data.refreshToken;
+        const { accessToken: newAccess, refreshToken: newRefresh } = res.data;
 
-        if (access && refresh) {
-          await saveTokens(access, refresh);
-          processQueue(null, access);
+        if (newAccess && newRefresh) {
+          console.log('[API] 토큰 재발급 성공');
+          await saveTokens(newAccess, newRefresh);
+          processQueue(null, newAccess);
 
           // 원래 실패했던 요청 다시 시도
-          originalRequest.headers.Authorization = `Bearer ${access}`;
+          originalRequest.headers.Authorization = `Bearer ${newAccess}`;
           return api(originalRequest);
+        } else {
+          throw new Error('Invalid token response from server');
         }
       } catch (refreshError: any) {
+        console.error('[API] 리프레시 실패:', refreshError.response?.data || refreshError.message);
         processQueue(refreshError, null);
-        console.error(" 리프레시 실패 상세 에러:", refreshError.response?.data || refreshError.message);
         
         await removeTokens();
         
-        // 전역 이벤트 발생 (AuthContext에서 감지하여 setUser(null) 처리)
-        if (typeof window !== 'undefined') {
-          window.dispatchEvent(new CustomEvent('auth-session-expired'));
-        }
+        // 전역 세션 만료 알림 (AuthContext 등에서 감지)
+        DeviceEventEmitter.emit('auth-session-expired');
 
         return Promise.reject(refreshError);
       } finally {
@@ -84,22 +90,21 @@ api.interceptors.response.use(
 const request = async (endpoint: string, options: any = {}) => {
   const { method = 'GET', body, skipAuth = false, headers: customHeaders } = options;
 
-  let token = null;
-  if (!skipAuth) {
-    token = await getAccessToken();
-  }
-
   const config: AxiosRequestConfig = {
     url: endpoint,
     method: method,
     headers: { ...customHeaders },
   };
 
-  if (token) {
-    config.headers = {
-      ...config.headers,
-      Authorization: `Bearer ${token}`,
-    };
+  // 요청 직전에 최신 토큰을 가져옵니다.
+  if (!skipAuth) {
+    const token = await getAccessToken();
+    if (token) {
+      config.headers = {
+        ...config.headers,
+        Authorization: `Bearer ${token}`,
+      };
+    }
   }
 
   if (body) {
@@ -115,6 +120,7 @@ const request = async (endpoint: string, options: any = {}) => {
     const response = await api(config);
     return response.data;
   } catch (error: any) {
+    // 인터셉터에서 이미 처리된 401 에러는 여기서 다시 던져집니다.
     throw error;
   }
 };
@@ -229,6 +235,10 @@ export const exchangeApi = {
     return request(`/api/exchange/history/daily/${code}`, { 
       method: 'GET' 
     });
+  },
+  // 5. 가성비 여행지 추천 조회
+  getTravelRecommendations: () => {
+    return request('/api/exchange/travel-recommendations', { method: 'GET' });
   },
 };
 
