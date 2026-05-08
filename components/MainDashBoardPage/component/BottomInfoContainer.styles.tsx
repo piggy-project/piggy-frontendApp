@@ -44,7 +44,7 @@ export const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: '#DA251D', // 베트남 국기 배경색
+    backgroundColor: '#DA251D', // 기본 배경색
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -53,33 +53,5 @@ export const styles = StyleSheet.create({
   graphArea: {
     alignItems: 'center',
     justifyContent: 'center',
-  },
-
-  // 3. 내 저장 국가 리스트 스타일
-  savedListContainer: {
-    marginTop: 10,
-  },
-  savedListTitle: {
-    marginBottom: 10,
-    color: '#333',
-  },
-  scrollArea: {
-    flexDirection: 'row',
-  },
-  countryItem: {
-    alignItems: 'center',
-    marginRight: 15, // 아이템 간 간격
-  },
-  circleIcon: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#D9D9D9', // 회색 원
-    marginBottom: 5,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  countryLabel: {
-    color: '#555',
   },
 });

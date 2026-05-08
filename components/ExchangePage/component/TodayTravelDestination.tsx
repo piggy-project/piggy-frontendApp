@@ -39,7 +39,7 @@ const TodayTravelDestination: React.FC = () => {
   return (
     <View style={styles.container}>
       {/* 섹션 타이틀 */}
-      <Text style={[styles.title, Typography.Pretendard_B_24]}>추천 가성비 여행지</Text>
+      <Text style={[styles.title, Typography.Pretendard_B_24]}>오늘의 가성비 여행지</Text>
       
       {/* 가로 스크롤 카드 리스트 */}
       <ScrollView 

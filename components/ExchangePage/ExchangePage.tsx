@@ -24,7 +24,6 @@ export interface CountryData {
 
 export default function ExchangePage() {
   const router = useRouter();
-  const [searchText, setSearchText] = useState('');
   const [exchangeData, setExchangeData] = useState<CountryData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [updateTime, setUpdateTime] = useState('');
@@ -90,7 +89,6 @@ export default function ExchangePage() {
         setExchangeData(formatted);
         setUpdateTime(formatTimeForDisplay(serverTime));
 
-        // 조용히 업데이트될 때도 창고를 최신화해줍니다.
         await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(formatted));
         await AsyncStorage.setItem(TIME_KEY, formatTimeForDisplay(String(serverTime)));
       }
@@ -143,11 +141,6 @@ export default function ExchangePage() {
     };
   }, []);
 
-  const filteredData = exchangeData.filter((item) =>
-    item.name.includes(searchText) ||
-    item.code.toLowerCase().includes(searchText.toLowerCase())
-  );
-
   const handlePressItem = (item: CountryData) => {
     router.push({
       pathname: '/exchange_detail',
@@ -178,8 +171,14 @@ export default function ExchangePage() {
           <View style={{ flex: 1, justifyContent: 'center' }}>
             <ActivityIndicator size="large" color="#4A90E2" />
           </View>
+          
         ) : (
-          <ShowCountry data={filteredData} onPressItem={handlePressItem} onFilterChange={handleFilterChange} activeFilter={currentSort} />
+          <ShowCountry 
+            data={exchangeData} 
+            onPressItem={handlePressItem} 
+            onFilterChange={handleFilterChange} 
+            activeFilter={currentSort} 
+          />
         )}
       </View>
     </View>

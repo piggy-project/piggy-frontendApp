@@ -6,6 +6,13 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 20,
   },
+  headerWrapper: {
+    backgroundColor: '#fff',
+  },
+  title: {
+    color: "#000000",
+    letterSpacing: -0.5,
+  },
   filterWrapper: {
     flexDirection: 'row',
     paddingVertical: 12,

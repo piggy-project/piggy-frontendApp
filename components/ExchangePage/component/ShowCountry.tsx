@@ -32,24 +32,27 @@ export default function ShowCountry({ data, onPressItem, onFilterChange, activeF
   };
 
   const renderHeader = () => (
-    <View style={styles.filterWrapper}>
-      {FILTERS.map((filter) => (
-        <TouchableOpacity
-          key={filter.value}
-          style={[
-            styles.filterTab, 
-            activeFilter === filter.value && styles.activeTab // 부모가 준 값으로 비교
-          ]}
-          onPress={() => handleFilterPress(filter.value)}
-        >
-          <Text style={[
-            Typography.Pretendard_M_12,
-            activeFilter === filter.value ? styles.activeFilterText : styles.inactiveFilterText
-          ]}>
-            {filter.label}
-          </Text>
-        </TouchableOpacity>
-      ))}
+    <View style={styles.headerWrapper}>
+      <Text style={[styles.title, Typography.Pretendard_B_24]}>해시태그별 여행지</Text>
+      <View style={styles.filterWrapper}>
+        {FILTERS.map((filter) => (
+          <TouchableOpacity
+            key={filter.value}
+            style={[
+              styles.filterTab, 
+              activeFilter === filter.value && styles.activeTab // 부모가 준 값으로 비교
+            ]}
+            onPress={() => handleFilterPress(filter.value)}
+          >
+            <Text style={[
+              Typography.Pretendard_M_12,
+              activeFilter === filter.value ? styles.activeFilterText : styles.inactiveFilterText
+            ]}>
+              {filter.label}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
     </View>
   );
 
