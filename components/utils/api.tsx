@@ -330,52 +330,72 @@ export const communityApi = {
     );
   },
 
-  // 3. 게시글 상세 조회 (게시글 클릭 시 사용)
+  // 3. 내 커뮤니티 활동 전체 조회
+  getMyActivity: () => {
+    return request('/api/community/me', { method: 'GET' });
+  },
+
+  // 4. 내가 작성한 게시글 조회
+  getMyPosts: () => {
+    return request('/api/community/me/posts', { method: 'GET' });
+  },
+
+  // 5. 내가 작성한 댓글 조회
+  getMyComments: () => {
+    return request('/api/community/me/comments', { method: 'GET' });
+  },
+
+  // 6. 내가 좋아요한 게시글 조회
+  getMyLikedPosts: () => {
+    return request('/api/community/me/liked-posts', { method: 'GET' });
+  },
+
+  // 7. 게시글 상세 조회 (게시글 클릭 시 사용)
   getPostDetail: (postId: number) => {
     return request(`/api/community/${postId}`, {
       method: 'GET'
     });
   },
 
-  // 4. 게시글 삭제 (본인 글일 경우)
+  // 8. 게시글 삭제 (본인 글일 경우)
   deletePost: (postId: number) => {
     return request(`/api/community/${postId}`, {
       method: 'DELETE'
     });
   },
-  // 5. 좋아요
+  // 9. 좋아요
   toggleLike: (postId: number) => {
     return request(`/api/community/${postId}/like`, {
       method: 'POST',
       body: JSON.stringify({})
     });
   },
-  // 6. 댓글 쓰기
+  // 10. 댓글 쓰기
   createComment: (postId: number, content: string) => {
     return request(`/api/community/${postId}/comments`, {
       method: 'POST',
       body: JSON.stringify({ content }),
     });
   },
-  // 7. 댓글 삭제
+  // 11. 댓글 삭제
   deleteComment: (commentId: number) => {
     return request(`/api/community/comments/${commentId}`, {
       method: 'DELETE',
     });
   },
-  // 8. 댓글 목록 조회
+  // 12. 댓글 목록 조회
   getComments: (postId: number) => {
     return request(`/api/community/${postId}/comments`, {
       method: 'GET',
     });
   },
-  // 9. 실시간 핫 게시물(1위) 조회
+  // 13. 실시간 핫 게시물(1위) 조회
   getTopHotPost: () => {
     return request('/api/community/hot', {
       method: 'GET'
     });
   },
-  // 10. 게시글 수정하기 (PATCH)
+  // 14. 게시글 수정하기 (PATCH)
   updatePost: (
     postId: number,
     updateData: {
