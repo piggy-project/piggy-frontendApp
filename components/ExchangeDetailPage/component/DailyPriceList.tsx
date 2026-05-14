@@ -16,7 +16,7 @@ interface DailyPriceListProps {
 export default function DailyPriceList({ data }: DailyPriceListProps) {
   return (
     <View style={styles.container}>
-      <Text style={[styles.headerTitle, Typography.Pretendard_M_16]}>일일 시세</Text>
+      <Text style={[styles.headerTitle, Typography.Pretendard_M_16]}>일일 시세 (최근 10일)</Text>
       <View style={styles.tableCard}>
         <View style={styles.tableHeader}>
           <Text style={[styles.headerText, { flex: 1.5 }]}>날짜</Text>
@@ -73,7 +73,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#F2F2F7',
     paddingBottom: 10,
-    marginBottom: 10,
   },
   headerText: {
     fontSize: 12,

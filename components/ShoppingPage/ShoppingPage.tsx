@@ -72,7 +72,7 @@ export default function ShoppingPage() {
       // 프론트에서 변환한 국가 코드를 백엔드에 보냅니다.
       const countryCode = getCountryCode(currency);
       const data = await shoppingApi.getRegionalFoods(countryCode);
-      
+
       // 음식 데이터 매핑
       const formattedFood = data.map((food: any) => ({
         ...food,
@@ -163,12 +163,14 @@ export default function ShoppingPage() {
           ) : (
             <>
               <ProductSection
-                title={`🍱 ${selectedCurrency} 여행 시 꼭 먹어야 할 음식`}
+                //title={`🍱 =${selectedCurrency} 여행 시 꼭 먹어야 할 음식`}
+                title={`현지 추천 음식`}
                 data={foodItems}
                 type="food"
               />
               <ProductSection
-                title={`🔥 실시간 ${selectedCurrency} 인기템`}
+                //title={`🔥 실시간 ${selectedCurrency} 인기템`}
+                title={`실시간 인기템`}
                 data={recommendItems}
                 type="product"
               />

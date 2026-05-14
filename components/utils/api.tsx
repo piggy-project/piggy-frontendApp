@@ -240,6 +240,12 @@ export const exchangeApi = {
   getTravelRecommendations: () => {
     return request('/api/exchange/travel-recommendations', { method: 'GET' });
   },
+  // 6. 환율 즐겨찾기 등록/해제
+  toggleFavorite: (currencyCode: string) => {
+    return request(`/api/exchange/favorites/${currencyCode}`, {
+      method: 'POST',
+    });
+  },
 };
 
 export const shoppingApi = {

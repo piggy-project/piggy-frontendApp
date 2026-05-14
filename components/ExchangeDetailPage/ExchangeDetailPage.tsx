@@ -2,11 +2,12 @@ import { exchangeApi } from '@/components/utils/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, ScrollView, View } from 'react-native';
 import ExchangeHeader from '../Header/ExchangeHeader';
 import DailyPriceList from './component/DailyPriceList';
 import ExchangeGraph, { Period } from './component/ExchangeGraph';
 import PeriodSelector from './component/PeriodSelector';
+import TodayPriceCard from './component/TodayPriceCard';
 import { styles } from './ExchangeDetail.styles';
 
 interface ExchangeDetail {
@@ -15,6 +16,9 @@ interface ExchangeDetail {
   low: number;
   change: number;
   percentChange: number;
+  favorited?: boolean;
+  isFavorited?: boolean;
+  favorite?: boolean;
 }
 
 interface HistoryItem {
@@ -96,6 +100,13 @@ export default function ExchangeDetailPage() {
       >
         <View style={styles.sectionGap}>
           <View style={{ paddingHorizontal: 20 }}>
+            <TodayPriceCard
+              currencyCode={String(params.code)}
+              currentRate={detail?.currentRate}
+              change={detail?.change}
+              percentChange={detail?.percentChange}
+              initialFavorited={Boolean(detail?.favorited ?? detail?.isFavorited ?? detail?.favorite)}
+            />
             <ExchangeGraph code={String(params.code)} period={selectedPeriod} />
             <PeriodSelector 
               selectedPeriod={selectedPeriod} 
