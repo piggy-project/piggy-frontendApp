@@ -52,3 +52,7 @@ yarn-error.*
 
 # 3. 윈도우 시스템 파일
 Thumbs.db
+
+google-services.json
+GoogleService-Info.plist
+# iOS용도 나중에 생기면 같이 추가

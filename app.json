@@ -9,9 +9,12 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.yourcompany.piggy"
     },
     "android": {
+      "googleServicesFile": "./google-services.json",
+      "package": "com.yourcompany.piggy",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -33,6 +36,13 @@
         "expo-image-picker",
         {
           "photosPermission": "가격을 인식할 사진을 선택하기 위해 갤러리 권한이 필요합니다."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#ffffff"
         }
       ],
       "expo-router",
