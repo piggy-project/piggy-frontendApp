@@ -4,21 +4,37 @@ import { Typography } from '@/constants/Typography';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 export default function SocialBasicInfo() {
   const router = useRouter();
-  const { token } = useLocalSearchParams();
-  const { loginWithToken } = useAuth();
-  const { logout } = useAuth();
+  const { token, refreshToken } = useLocalSearchParams();
+  const { loginWithToken, logout } = useAuth();
   const navigation = useNavigation();
 
   const [birth, setBirth] = useState('');
   const [phoneNum, setPhoneNum] = useState('');
 
   useEffect(() => {
-    if (token) loginWithToken(token.toString());
-  }, [token]);
+    const handleSocialToken = async () => {
+      if (!token) return;
+
+      if (!refreshToken) {
+        Alert.alert('오류', '로그인 정보가 부족합니다. 다시 로그인해 주세요.');
+        router.replace('/login');
+        return;
+      }
+
+      try {
+        await loginWithToken(token.toString(), refreshToken.toString());
+      } catch {
+        Alert.alert('오류', '소셜 로그인 처리 중 오류가 발생했습니다.');
+        router.replace('/login');
+      }
+    };
+
+    handleSocialToken();
+  }, [loginWithToken, refreshToken, router, token]);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('beforeRemove', (e) => {

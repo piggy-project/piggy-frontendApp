@@ -20,7 +20,7 @@ export default function CommunityDetailPage() {
   const handleEdit = () => {
     setIsMenuVisible(false); // 메뉴 닫기
     router.push({
-      pathname: '/community_edit', // 수정 페이지 경로 (나중에 만드셔야 해요!)
+      pathname: '/community_edit',
       params: { id: String(id) }
     });
   };
