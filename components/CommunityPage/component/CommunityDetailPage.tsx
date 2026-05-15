@@ -228,9 +228,16 @@ export default function CommunityDetailPage() {
           {/* 작성자 정보 */}
           <View style={styles.authorSection}>
             <View style={styles.authorInfo}>
-              <View style={styles.profilePlaceholder}>
-                <Ionicons name="person" size={16} color="#FFB7C5" />
-              </View>
+              {post.userProfileUrl ? (
+                <Image
+                  source={{ uri: post.userProfileUrl }}
+                  style={styles.profilePlaceholder}
+                />
+              ) : (
+                <View style={styles.profilePlaceholder}>
+                  <Ionicons name="person" size={16} color="#FFB7C5" />
+                </View>
+              )}
               <Text style={[Typography.Pretendard_B_16, styles.authorNickname]}>
                 {post.authorNickname}
               </Text>
