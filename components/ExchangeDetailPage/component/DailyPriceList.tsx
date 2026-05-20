@@ -54,9 +54,10 @@ export default function DailyPriceList({ data }: DailyPriceListProps) {
 const styles = StyleSheet.create({
   container: {
     marginTop: 25,
-    paddingHorizontal: 20, // 그래프 카드와 동일한 좌우 여백 적용
+    paddingHorizontal: 10, // 그래프 카드와 동일한 좌우 여백 적용
   },
   headerTitle: {
+    paddingHorizontal: 10,
     marginBottom: 12,
     color: '#1C1C1E',
   },
