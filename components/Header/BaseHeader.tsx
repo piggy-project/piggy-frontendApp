@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleProp, View, ViewStyle } from 'react-native';
+import { Platform, StatusBar, StyleProp, View, ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { styles } from './BaseHeader.styles';
 
@@ -21,11 +21,15 @@ export default function BaseHeader({
   rightStyle 
 }: Props) {
   const insets = useSafeAreaInsets();
+  const androidStatusBarHeight = Platform.OS === 'android' ? StatusBar.currentHeight ?? 0 : 0;
+  const topInset = Platform.OS === 'android'
+    ? Math.max(insets.top, androidStatusBarHeight) * 0.72
+    : insets.top;
   
   return (
     <View style={[
       styles.container, 
-      { paddingTop: insets.top }
+      { paddingTop: topInset }
     ]}>
 
       {/* 왼쪽: 기본 스타일 + 외부 스타일(있을 경우) */}

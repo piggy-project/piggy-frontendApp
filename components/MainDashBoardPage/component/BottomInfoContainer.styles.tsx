@@ -1,21 +1,9 @@
-import { Dimensions, StyleSheet } from "react-native";
-const { height, width } = Dimensions.get('window');
+import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
   container: {
     backgroundColor: '#fff',
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
     padding: 20,
-    // 박스 자체가 화면 끝까지 길게 늘어나도록 설정
-    height: height, 
-    
-    // 그림자 강조
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: -10 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 25,
   },
   
   // 1. 환율 정보 바 스타일

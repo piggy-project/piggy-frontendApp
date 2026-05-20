@@ -2,17 +2,29 @@ import { Typography } from '@/constants/Typography';
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import { TextStyle } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function TabLayout() {
+    const insets = useSafeAreaInsets();
+    const bottomInset = Math.max(insets.bottom, 8);
+
     return (
         <Tabs
             screenOptions={{
                 tabBarActiveTintColor: 'black',
                 tabBarInactiveTintColor: 'gray',
                 headerShown: false,
+                tabBarStyle: {
+                    height: 58 + bottomInset,
+                    paddingTop: 6,
+                    paddingBottom: bottomInset,
+                    borderTopWidth: 0.5,
+                    borderTopColor: '#E5E5E5',
+                    backgroundColor: '#fff',
+                },
                 tabBarLabelStyle: {
                     ...(Typography.Pretendard_M_11 as TextStyle),
-                    marginTop: -3, // 아이콘와의 간격
+                    marginTop: -2, // 아이콘와의 간격
                 },
             }}
         >

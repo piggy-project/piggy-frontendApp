@@ -4,6 +4,7 @@ import { Stack, useRouter, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import React, { useEffect } from 'react';
 import { ActivityIndicator, StatusBar, Text, TextInput, View } from 'react-native';
+import { SafeAreaProvider, initialWindowMetrics } from 'react-native-safe-area-context';
 import { AuthProvider, useAuth } from '../components/utils/AuthContext';
 
 // 앱이 로드될 때까지 스플래시 화면 유지
@@ -37,9 +38,11 @@ export default function RootLayout() {
   return (
     // AuthProvider로 감싸고, 실제 로직은 AppLayout에서 처리
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <AppLayout />
-      </AuthProvider>
+      <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+        <AuthProvider>
+          <AppLayout />
+        </AuthProvider>
+      </SafeAreaProvider>
     </QueryClientProvider>
   );
 }

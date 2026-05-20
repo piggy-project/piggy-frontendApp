@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Alert, DeviceEventEmitter } from 'react-native';
 import { authApi } from './api';
-import { getAccessToken, removeTokens, saveTokens } from './authStore';
+import { getAccessToken, getRefreshToken, removeTokens, saveTokens } from './authStore';
 
 interface User {
   id: number;
@@ -47,28 +47,47 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const loadUser = async () => {
       try {
-        const accessToken = await getAccessToken();
+        let accessToken = await getAccessToken();
+        const refreshToken = await getRefreshToken();
 
-        if (accessToken) {
-          console.log('[Auth] 저장된 토큰 발견, 사용자 정보 조회 중...');
-          // 인터셉터가 getMyInfo 호출 시 만료되었다면 알아서 갱신 시도
-          const userData = await authApi.getMyInfo();
-          
-          if (userData && (userData.id || userData.email)) {
-            console.log('[Auth] 자동 로그인 성공:', userData.email);
-            setUser(userData);
-          } else {
-            throw new Error('Invalid user data');
+        if (!accessToken && refreshToken) {
+          console.log('[Auth] 액세스 토큰 없음, 리프레시 토큰으로 재발급 시도 중...');
+          const refreshed = await authApi.reissue(refreshToken);
+          const newAccess = refreshed?.accessToken || refreshed?.data?.accessToken;
+          const newRefresh = refreshed?.refreshToken || refreshed?.data?.refreshToken || refreshToken;
+
+          if (!newAccess) {
+            throw new Error('Invalid refresh response');
           }
-        } else {
+
+          await saveTokens(newAccess, newRefresh);
+          accessToken = newAccess;
+        }
+
+        if (!accessToken) {
           console.log('[Auth] 기기에 저장된 토큰이 없습니다.');
+          return;
+        }
+
+        console.log('[Auth] 저장된 토큰 발견, 사용자 정보 조회 중...');
+        // 인터셉터가 getMyInfo 호출 시 만료되었다면 알아서 갱신 시도
+        const userData = await authApi.getMyInfo();
+
+        if (userData && (userData.id || userData.email)) {
+          console.log('[Auth] 자동 로그인 성공:', userData.email);
+          setUser(userData);
+        } else {
+          throw new Error('Invalid user data');
         }
       } catch (e: any) {
         // 인터셉터에서 갱신에 실패하면 여기로 에러가 전파됨
         console.log('[Auth] 자동 로그인 실패:', e.message);
-        // 세션 만료 이벤트가 별도로 발생하므로 여기서 중복 처리는 지양하지만, 
-        // 혹시 모를 상황을 위해 토큰을 지워줍니다.
-        await removeTokens();
+        const status = e.response?.status;
+
+        if (status === 401 || status === 403 || e.message === 'Invalid refresh response') {
+          await removeTokens();
+        }
+
         setUser(null);
       } finally {
         setIsLoading(false);

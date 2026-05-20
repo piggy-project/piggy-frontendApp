@@ -56,15 +56,19 @@ api.interceptors.response.use(
         // 서버에 토큰 재발급 요청 (인터셉터 무한 루프 방지를 위해 axios 직발신)
         const res = await axios.post(`${BASE_URL}/auth/refresh`, { refreshToken });
 
-        const { accessToken: newAccess, refreshToken: newRefresh } = res.data;
+        const newAccess = res.data?.accessToken || res.data?.data?.accessToken;
+        const newRefresh = res.data?.refreshToken || res.data?.data?.refreshToken || refreshToken;
 
-        if (newAccess && newRefresh) {
+        if (newAccess) {
           console.log('[API] 토큰 재발급 성공');
           await saveTokens(newAccess, newRefresh);
           processQueue(null, newAccess);
 
           // 원래 실패했던 요청 다시 시도
-          originalRequest.headers.Authorization = `Bearer ${newAccess}`;
+          originalRequest.headers = {
+            ...originalRequest.headers,
+            Authorization: `Bearer ${newAccess}`,
+          };
           return api(originalRequest);
         } else {
           throw new Error('Invalid token response from server');
