@@ -71,7 +71,7 @@ const CommunityPost: React.FC<PostProps> = ({ id, user, category, time, code, ti
         '로그인이 필요한 서비스입니다.',
         [
           { text: '취소', style: 'cancel' },
-          { text: '로그인하러 가기', onPress: () => router.push('/login') }
+          { text: '로그인하러 가기', onPress: () => router.push('/(tabs)/mypage') }
         ]
       );
       return;

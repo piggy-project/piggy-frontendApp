@@ -55,7 +55,7 @@ export default function TodayPriceCard({
           { text: '취소', style: 'cancel' },
           {
             text: '로그인하러 가기',
-            onPress: () => router.push('/login')
+            onPress: () => router.push('/(tabs)/mypage')
           }
         ]
       );

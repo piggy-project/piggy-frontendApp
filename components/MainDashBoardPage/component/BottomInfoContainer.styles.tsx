@@ -42,4 +42,30 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  chatbotButton: {
+    minHeight: 72,
+    marginTop: 12,
+    marginHorizontal: -20,
+    borderRadius: 0,
+    backgroundColor: '#FFD3DD',
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  chatbotButtonLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexShrink: 1,
+  },
+  chatbotButtonImage: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    marginRight: 12,
+  },
+  chatbotButtonText: {
+    color: '#111',
+    flexShrink: 1,
+  },
 });

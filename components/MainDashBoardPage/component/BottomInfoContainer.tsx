@@ -3,7 +3,7 @@ import { Typography } from '@/constants/Typography';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
-import { ActivityIndicator, Dimensions, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Dimensions, Image, Text, TouchableOpacity, View } from 'react-native';
 import ExchangeGraph from '../../ExchangeDetailPage/component/ExchangeGraph';
 import { styles } from './BottomInfoContainer.styles';
 
@@ -44,6 +44,10 @@ export default function BottomInfoContainer({ data, isLoading }: BottomInfoConta
       pathname: '/exchange_detail',
       params: { ...target }
     });
+  };
+
+  const handleGoToChatbot = () => {
+    router.push('/chatbot');
   };
 
   return (
@@ -88,6 +92,23 @@ export default function BottomInfoContainer({ data, isLoading }: BottomInfoConta
         <Text style={[Typography.Pretendard_M_14, { color: '#888', textDecorationLine: 'underline' }]}>
           상세 정보 보러가기
         </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.chatbotButton}
+        activeOpacity={0.85}
+        onPress={handleGoToChatbot}
+      >
+        <View style={styles.chatbotButtonLeft}>
+          <Image
+            source={require('@/assets/images/piggyicon.png')}
+            style={styles.chatbotButtonImage}
+          />
+          <Text style={[styles.chatbotButtonText, Typography.Pretendard_B_16]}>
+            AI 챗봇 피기에게 물어보기
+          </Text>
+        </View>
+        <Ionicons name="chevron-forward" size={24} color="#111" />
       </TouchableOpacity>
 
     </View>

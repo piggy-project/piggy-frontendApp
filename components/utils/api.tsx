@@ -286,6 +286,16 @@ export const shoppingApi = {
     });
   }
 };
+
+export const chatbotApi = {
+  ask: (question: string) => {
+    return request(`/api/chatbot/ask?question=${encodeURIComponent(question)}`, {
+      method: 'GET',
+      skipAuth: true,
+    });
+  },
+};
+
 export const communityApi = {
   // 1. 게시글 등록하기
   // components/utils/api.ts 의 createPost 수정

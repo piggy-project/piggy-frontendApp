@@ -94,6 +94,7 @@ function AppLayout() {
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="signup" />
         <Stack.Screen name="login" />
+        <Stack.Screen name="chatbot" />
       </Stack>
     </>
   );
