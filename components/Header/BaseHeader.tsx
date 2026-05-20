@@ -10,6 +10,7 @@ interface Props {
   leftStyle?: StyleProp<ViewStyle>;
   centerStyle?: StyleProp<ViewStyle>;
   rightStyle?: StyleProp<ViewStyle>;
+  androidTopInsetScale?: number;
 }
 
 export default function BaseHeader({ 
@@ -18,12 +19,13 @@ export default function BaseHeader({
   right, 
   leftStyle, 
   centerStyle, 
-  rightStyle 
+  rightStyle,
+  androidTopInsetScale = 0.72,
 }: Props) {
   const insets = useSafeAreaInsets();
   const androidStatusBarHeight = Platform.OS === 'android' ? StatusBar.currentHeight ?? 0 : 0;
   const topInset = Platform.OS === 'android'
-    ? Math.max(insets.top, androidStatusBarHeight) * 0.72
+    ? Math.max(insets.top, androidStatusBarHeight) * androidTopInsetScale
     : insets.top;
   
   return (

@@ -13,6 +13,8 @@ interface DailyPriceListProps {
   data: DailyPrice[];
 }
 
+const formatDate = (date: string) => date.replace(/-/g, '.');
+
 export default function DailyPriceList({ data }: DailyPriceListProps) {
   return (
     <View style={styles.container}>
@@ -31,7 +33,7 @@ export default function DailyPriceList({ data }: DailyPriceListProps) {
 
           return (
             <View key={index} style={[styles.tableRow, index === data.length - 1 && { borderBottomWidth: 0 }]}>
-              <Text style={[styles.dateText, { flex: 1.5 }]}>{item.date}</Text>
+              <Text style={[styles.dateText, { flex: 1.5 }]}>{formatDate(item.date)}</Text>
               <Text style={[styles.rateText, { flex: 2, textAlign: 'center' }]}>{item.rate.toLocaleString()}원</Text>
               <View style={{ flex: 2.5, alignItems: 'flex-end' }}>
                 <Text style={[styles.changeText, { color }]}>
@@ -62,11 +64,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     borderRadius: 20,
     padding: 15,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
   },
   tableHeader: {
     flexDirection: 'row',

@@ -11,16 +11,16 @@ import { styles } from './OCRScanner.styles';
 
 // 통화별 설정 데이터
 const CURRENCIES = [
-  { label: '일본 엔화 (JPY)', value: 'JPY', type: 'short' },
-  { label: '중국 위안화 (CNY)', value: 'CNY', type: 'short' },
-  { label: '미국 달러 (USD)', value: 'USD', type: 'long' },
-  { label: '베트남 동 (VND)', value: 'VND', type: 'long' },
-  { label: '필리핀 페소 (PHP)', value: 'PHP', type: 'short' },
-  { label: '태국 바트 (THB)', value: 'THB', type: 'short' },
-  { label: '독일 유로 (EUR)', value: 'EUR', type: 'long' },
-  { label: '프랑스 유로 (EUR)', value: 'EUR', type: 'long' },
-  { label: '호주 달러 (AUD)', value: 'AUD', type: 'long' },
-  { label: '영국 파운드 (GBP)', value: 'GBP', type: 'long' },
+  { label: '일본 (JPY)', value: 'JPY', type: 'short' },
+  { label: '중국 (CNY)', value: 'CNY', type: 'short' },
+  { label: '미국 (USD)', value: 'USD', type: 'long' },
+  { label: '베트남 (VND)', value: 'VND', type: 'long' },
+  { label: '필리핀 (PHP)', value: 'PHP', type: 'short' },
+  { label: '태국 (THB)', value: 'THB', type: 'short' },
+  { label: '독일 (EUR)', value: 'EUR', type: 'long' },
+  { label: '프랑스 (EUR)', value: 'EUR', type: 'long' },
+  { label: '호주 (AUD)', value: 'AUD', type: 'long' },
+  { label: '영국 (GBP)', value: 'GBP', type: 'long' },
 ];
 const STORAGE_KEY = '@last_selected_currency';
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');

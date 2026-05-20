@@ -28,15 +28,15 @@ const categoryMap: Record<string, 'FREE' | 'EXCHANGE' | 'TRAVEL'> = {
 
 // 통화 리스트 (ALL 제외)
 const currencyList = [
-    { code: 'USD', name: '미국 달러' },
-    { code: 'JPY', name: '일본 엔' },
-    { code: 'CNY', name: '중국 위안' },
-    { code: 'EUR', name: '유럽연합 유로' },
-    { code: 'VND', name: '베트남 동' },
-    { code: 'PHP', name: '필리핀 페소' },
-    { code: 'THB', name: '태국 바트' },
-    { code: 'AUD', name: '호주 달러' },
-    { code: 'GBP', name: '영국 파운드' },
+    { code: 'USD', name: '미국' },
+    { code: 'JPY', name: '일본' },
+    { code: 'CNY', name: '중국' },
+    { code: 'EUR', name: '유럽연합' },
+    { code: 'VND', name: '베트남' },
+    { code: 'PHP', name: '필리핀' },
+    { code: 'THB', name: '태국' },
+    { code: 'AUD', name: '호주' },
+    { code: 'GBP', name: '영국' },
 ];
 
 export default function CommunityWrite() {

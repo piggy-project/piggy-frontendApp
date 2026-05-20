@@ -1,5 +1,4 @@
-import { Dimensions, StyleSheet } from "react-native";
-const { height, width } = Dimensions.get('window');
+import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
   listContainer: {
@@ -22,7 +21,7 @@ export const styles = StyleSheet.create({
   filterTab: {
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: 15,
+    borderRadius: 50,
     backgroundColor: '#F5F5F5',
     borderWidth: 1,
     borderColor: '#EEE',

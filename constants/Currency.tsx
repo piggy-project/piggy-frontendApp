@@ -34,14 +34,14 @@ export interface DetailedFlag {
 
 // 3. 상세 정보 맵 (유로존 국가별 색상 및 이름 분리)
 export const DETAILED_FLAG_MAP: Record<string, DetailedFlag> = {
-  JPY: { icon: 'disc', color: '#BC002D', name: '일본 엔' },
-  USD: { icon: 'logo-usd', color: '#85bb65', name: '미국 달러' },
-  CNY: { icon: 'flag', color: '#EE1C25', name: '중국 위안' },
-  VND: { icon: 'star', color: '#FFFF00', name: '베트남 동' },
-  THB: { icon: 'flag', color: '#ED1C24', name: '태국 바트' },
-  PHP: { icon: 'flag', color: '#0038A8', name: '필리핀 페소' },
-  DEU_EUR: { icon: 'logo-euro', color: '#FFCE00', name: '독일 유로' },
-  FRA_EUR: { icon: 'logo-euro', color: '#003399', name: '프랑스 유로' },
-  AUD: { icon: 'flag', color: '#012169', name: '호주 달러' },
-  GBP: { icon: 'flag', color: '#00247D', name: '영국 파운드' },
+  JPY: { icon: 'disc', color: '#BC002D', name: '일본' },
+  USD: { icon: 'logo-usd', color: '#85bb65', name: '미국' },
+  CNY: { icon: 'flag', color: '#EE1C25', name: '중국' },
+  VND: { icon: 'star', color: '#FFFF00', name: '베트남' },
+  THB: { icon: 'flag', color: '#ED1C24', name: '태국' },
+  PHP: { icon: 'flag', color: '#0038A8', name: '필리핀' },
+  DEU_EUR: { icon: 'logo-euro', color: '#FFCE00', name: '독일' },
+  FRA_EUR: { icon: 'logo-euro', color: '#003399', name: '프랑스' },
+  AUD: { icon: 'flag', color: '#012169', name: '호주' },
+  GBP: { icon: 'flag', color: '#00247D', name: '영국' },
 };

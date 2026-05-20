@@ -1,30 +1,30 @@
 import { Typography } from '@/constants/Typography';
 import React, { useState } from 'react';
 import {
-    FlatList,
-    Image,
-    Modal,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    TouchableWithoutFeedback,
-    View
+  FlatList,
+  Image,
+  Modal,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View
 } from 'react-native';
 
 // 통화 목록 데이터 (사진 참고)
 const CURRENCIES = [
-  { label: '대한민국 원', code: 'KRW' },
-  { label: '미국 달러', code: 'USD' },
-  { label: '일본 엔', code: 'JPY' },
-  { label: '중국 위안', code: 'CNY' },
-  { label: '뉴질랜드 달러', code: 'NZD' },
-  { label: '대만 달러', code: 'TWD' },
-  { label: '베트남 동', code: 'VND' },
-  { label: '싱가포르 달러', code: 'SGD' },
-  { label: '필리핀 페소', code: 'PHP' },
-  { label: '태국 바트', code: 'THB' },
-  { label: '호주 달러', code: 'AUD' },
-  { label: '홍콩 달러', code: 'HKD' },
+  { label: '대한민국', code: 'KRW' },
+  { label: '미국', code: 'USD' },
+  { label: '일본', code: 'JPY' },
+  { label: '중국', code: 'CNY' },
+  { label: '뉴질랜드', code: 'NZD' },
+  { label: '대만', code: 'TWD' },
+  { label: '베트남 ', code: 'VND' },
+  { label: '싱가포르', code: 'SGD' },
+  { label: '필리핀', code: 'PHP' },
+  { label: '태국', code: 'THB' },
+  { label: '호주', code: 'AUD' },
+  { label: '홍콩', code: 'HKD' },
 ];
 
 interface Props {

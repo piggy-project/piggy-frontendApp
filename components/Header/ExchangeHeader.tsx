@@ -2,6 +2,7 @@ import { Typography } from '@/constants/Typography';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import BaseHeader from './BaseHeader';
+import BackButton from './component/BackButton';
 import WonSign from './component/WonSign';
 
 interface Props {
@@ -10,14 +11,15 @@ interface Props {
     code?: string;
     flag?: string;
     time?: string;
+    showBackButton?: boolean;
 }
 
-export default function ExchangeHeader({ title, country, code, flag, time }: Props) {
+export default function ExchangeHeader({ title, country, code, flag, time, showBackButton = false }: Props) {
     return (
         <BaseHeader
             left={
                 <View style={styles.leftContainer}>
-                    <WonSign />
+                    {showBackButton ? <BackButton /> : <WonSign />}
                     {/* 1순위: title이 있으면 title 표시 */}
                     {title ? (
                         <Text style={[styles.title, Typography.Pretendard_M_16]}>

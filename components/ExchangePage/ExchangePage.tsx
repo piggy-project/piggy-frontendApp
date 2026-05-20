@@ -1,9 +1,9 @@
 import { exchangeApi } from '@/components/utils/api';
-import { FLAG_MAP } from '@/constants/Currency';
+import { DETAILED_FLAG_MAP, FLAG_MAP } from '@/constants/Currency';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, ScrollView, View } from 'react-native';
 import ExchangeHeader from '../Header/ExchangeHeader';
 import ShowCountry from './component/ShowCountry';
 import TodayTravelDestination from './component/TodayTravelDestination';
@@ -22,6 +22,10 @@ export interface CountryData {
   time?: string;
 }
 
+const getDisplayName = (code: string, fallbackName: string) => {
+  return DETAILED_FLAG_MAP[code]?.name || fallbackName.replace(/\s+\S+$/, '');
+};
+
 export default function ExchangePage() {
   const router = useRouter();
   const [exchangeData, setExchangeData] = useState<CountryData[]>([]);
@@ -37,12 +41,19 @@ export default function ExchangePage() {
   const formatData = (rawData: any[]): CountryData[] => {
     return rawData.map((item: any) => ({
       id: item.curUnit,
-      name: item.curNm,
+      name: getDisplayName(item.curUnit, item.curNm),
       code: item.curUnit,
       rate: `${item.rate?.toLocaleString(undefined, { minimumFractionDigits: 2 })} KRW`,
       percentChange: item.percentChange || 0,
       flag: FLAG_MAP[item.curUnit] || '🏳️',
       time: item.time,
+    }));
+  };
+
+  const normalizeCachedData = (cachedData: CountryData[]): CountryData[] => {
+    return cachedData.map((item) => ({
+      ...item,
+      name: getDisplayName(item.code, item.name),
     }));
   };
 
@@ -108,7 +119,7 @@ export default function ExchangePage() {
 
         if (cachedData) {
           // 2. 캐시 데이터가 있으면 즉시 보여주기
-          setExchangeData(JSON.parse(cachedData));
+          setExchangeData(normalizeCachedData(JSON.parse(cachedData)));
           setUpdateTime(cachedTime ? formatTimeForDisplay(cachedTime) : '');
           setIsLoading(false); // 캐시가 있으면 로딩 완료 처리
         }
@@ -165,22 +176,28 @@ export default function ExchangePage() {
         //title="환율 목록"
         time={updateTime}
       />
-      <View style={[styles.sectionGap, { flex: 1 }]}>
-        <TodayTravelDestination />
-        {isLoading ? (
-          <View style={{ flex: 1, justifyContent: 'center' }}>
-            <ActivityIndicator size="large" color="#4A90E2" />
-          </View>
-          
-        ) : (
-          <ShowCountry 
-            data={exchangeData} 
-            onPressItem={handlePressItem} 
-            onFilterChange={handleFilterChange} 
-            activeFilter={currentSort} 
-          />
-        )}
-      </View>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.sectionGap}>
+          <TodayTravelDestination />
+          {isLoading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color="#4A90E2" />
+            </View>
+
+          ) : (
+            <ShowCountry
+              data={exchangeData}
+              onPressItem={handlePressItem}
+              onFilterChange={handleFilterChange}
+              activeFilter={currentSort}
+            />
+          )}
+        </View>
+      </ScrollView>
     </View>
   );
 }

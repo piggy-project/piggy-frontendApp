@@ -1,6 +1,6 @@
 import { Typography } from '@/constants/Typography';
 import React from 'react';
-import { FlatList, Text, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import { styles } from './ShowCountry.styles';
 
 // 국가 데이터 타입 정의
@@ -57,14 +57,14 @@ export default function ShowCountry({ data, onPressItem, onFilterChange, activeF
   );
 
   return (
-    <FlatList
-      data={data}
-      keyExtractor={(item) => item.id}
-      contentContainerStyle={styles.listContainer}
-      ListHeaderComponent={renderHeader}
-      stickyHeaderIndices={[0]} // 필터 상단 고정
-      renderItem={({ item }) => (
-        <TouchableOpacity style={styles.itemContainer} onPress={() => onPressItem(item)}>
+    <View style={styles.listContainer}>
+      {renderHeader()}
+      {data.map((item) => (
+        <TouchableOpacity
+          key={item.id}
+          style={styles.itemContainer}
+          onPress={() => onPressItem(item)}
+        >
           <View style={styles.leftSection}>
             <View style={styles.flagContainer}>
               <Text style={styles.flag}>{item.flag}</Text>
@@ -90,7 +90,7 @@ export default function ShowCountry({ data, onPressItem, onFilterChange, activeF
             </Text>
           </View>
         </TouchableOpacity>
-      )}
-    />
+      ))}
+    </View>
   );
 }

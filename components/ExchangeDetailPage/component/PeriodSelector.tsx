@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
   periodTab: {
     flexDirection: 'row',
     backgroundColor: '#F2F2F7',
-    borderRadius: 12,
+    borderRadius: 50,
     padding: 2,
     marginTop: 15, // 그래프 아래로 가므로 상단 여백 추가
     width: '100%',
@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 8,
     alignItems: 'center',
-    borderRadius: 10,
+    borderRadius: 50,
   },
   activePeriodButton: {
     backgroundColor: '#ffffff',

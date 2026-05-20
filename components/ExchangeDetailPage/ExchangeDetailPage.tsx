@@ -91,6 +91,7 @@ export default function ExchangeDetailPage() {
         country={String(params.name)} 
         code={String(params.code)}
         flag={String(params.flag)}
+        showBackButton
       />
       
       <ScrollView 

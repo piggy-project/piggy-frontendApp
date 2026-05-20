@@ -80,7 +80,7 @@ export default function BottomInfoContainer({ data, isLoading }: BottomInfoConta
         <ExchangeGraph
           code={data.code}
           height={160}
-          width={screenWidth - 80}
+          width={screenWidth - 45}
         />
       </View>
 

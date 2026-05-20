@@ -45,8 +45,8 @@ export const styles = StyleSheet.create({
   chatbotButton: {
     minHeight: 72,
     marginTop: 12,
-    marginHorizontal: -20,
-    borderRadius: 0,
+    marginHorizontal: 5,
+    borderRadius: 10,
     backgroundColor: '#FFD3DD',
     paddingHorizontal: 20,
     flexDirection: 'row',
