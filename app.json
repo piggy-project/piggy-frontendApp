@@ -10,11 +10,11 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.yourcompany.piggy"
+      "bundleIdentifier": "com.piggy"
     },
     "android": {
       "googleServicesFile": "./google-services.json",
-      "package": "com.yourcompany.piggy",
+      "package": "com.piggy",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",

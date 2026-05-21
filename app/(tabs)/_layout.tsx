@@ -1,5 +1,9 @@
+import CommunityIcon from '@/assets/icons/communityIcon.svg';
+import FindIcon from '@/assets/icons/findIcon.svg';
+import HomeIcon from '@/assets/icons/homeIcon.svg';
+import MypageIcon from '@/assets/icons/mypageIcon.svg';
+import ShoppingIcon from '@/assets/icons/shoppingIcon.svg';
 import { Typography } from '@/constants/Typography';
-import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import { TextStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -24,7 +28,7 @@ export default function TabLayout() {
                 },
                 tabBarLabelStyle: {
                     ...(Typography.Pretendard_M_11 as TextStyle),
-                    marginTop: -2, // 아이콘와의 간격
+                    marginTop: -2,
                 },
             }}
         >
@@ -32,35 +36,37 @@ export default function TabLayout() {
                 name="exchange"
                 options={{
                     title: '탐색',
-                    tabBarIcon: ({ color }) => <Ionicons name="cash-outline" size={24} color={color} />,
+                    tabBarIcon: ({ color }) => (
+                        <FindIcon width={24} height={24} fill={color} />
+                    ),
                 }}
             />
             <Tabs.Screen
                 name="shopping"
                 options={{
                     title: '쇼핑',
-                    tabBarIcon: ({ color }) => <Ionicons name="star-outline" size={24} color={color} />,
+                    tabBarIcon: ({ color }) => <ShoppingIcon width={24} height={24} fill={color} />,
                 }}
             />
             <Tabs.Screen
                 name="index"
                 options={{
                     title: '홈',
-                    tabBarIcon: ({ color }) => <Ionicons name="home-outline" size={24} color={color} />,
+                    tabBarIcon: ({ color }) => <HomeIcon width={24} height={24} fill={color} />,
                 }}
             />
             <Tabs.Screen
                 name="community"
                 options={{
                     title: '커뮤니티',
-                    tabBarIcon: ({ color }) => <Ionicons name="chatbubbles-outline" size={24} color={color} />,
+                    tabBarIcon: ({ color }) => <CommunityIcon width={24} height={24} fill={color} />,
                 }}
             />
             <Tabs.Screen
                 name="mypage"
                 options={{
                     title: '마이페이지',
-                    tabBarIcon: ({ color }) => <Ionicons name="person-outline" size={24} color={color} />,
+                    tabBarIcon: ({ color }) => <MypageIcon width={24} height={24} fill={color} />,
                 }}
             />
         </Tabs>

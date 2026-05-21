@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+import NoticeIcon from '@/assets/icons/noticeIcon.svg';
 import { useRouter } from 'expo-router';
 import React from 'react';
 import { TouchableOpacity } from 'react-native';
@@ -12,7 +12,7 @@ export default function Notice() {
 
   return (
     <TouchableOpacity onPress={openNotification}>
-      <Ionicons name="notifications-outline" size={28} color="gray" />
+      <NoticeIcon width={28} height={28} />
     </TouchableOpacity>
   );
 }
