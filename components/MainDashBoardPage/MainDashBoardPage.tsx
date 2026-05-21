@@ -27,7 +27,6 @@ export default function MainDashBoardPage() {
       if (cached) {
         setExchangeData(JSON.parse(cached));
       }
-
       const response = await exchangeApi.getExchangeDetail(apiCode);
       const freshData = {
         ...(response.data || response),
