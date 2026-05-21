@@ -1,8 +1,8 @@
+import { Typography } from '@/constants/Typography';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { ImageBackground, Text, TouchableOpacity, View } from 'react-native';
 import { styles } from './MainImageContainer.styles';
-import { Typography } from '@/constants/Typography';
 
 interface MainImageContainerProps {
   timing?: number;
@@ -38,8 +38,9 @@ export default function MainImageContainer({ timing }: MainImageContainerProps) 
         
         {/* 1. 상단 타이틀 */}
         <View style={styles.textContainer}>
-          <Text style={[styles.title, Typography.Pretendard_E_24]}>{text[0]}</Text>
-          <Text style={[styles.title, Typography.Pretendard_E_24]}>{text[1]}</Text>
+          <Text style={[styles.title, Typography.Pretendard_B_24]}>{text[0]}</Text>
+          <Text style={[styles.title, Typography.Pretendard_B_24]}>{text[1]}</Text>
+          <Text style={[styles.titletext, Typography.Pretendard_M_11]}>최근 3개월 기준으로 계산된 값이에요.</Text>
         </View>
 
         {/* 2. 하단 목표 환율 버튼 */}

@@ -1,4 +1,4 @@
-import { DETAILED_FLAG_MAP, FLAG_MAP } from '@/constants/Currency'; // 상세 맵 추가 임포트
+import { CURRENCY_INFO_MAP, getCurrencyApiCode } from '@/constants/Currency';
 import { Typography } from '@/constants/Typography';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -12,9 +12,10 @@ const screenWidth = Dimensions.get('window').width;
 interface BottomInfoContainerProps {
   data: any;
   isLoading?: boolean;
+  displayCode?: string;
 }
 
-export default function BottomInfoContainer({ data, isLoading }: BottomInfoContainerProps) {
+export default function BottomInfoContainer({ data, isLoading, displayCode }: BottomInfoContainerProps) {
 
   if (isLoading) {
     return (
@@ -26,18 +27,17 @@ export default function BottomInfoContainer({ data, isLoading }: BottomInfoConta
 
   if (!data) return null;
 
-  const currentFlag = DETAILED_FLAG_MAP[data.code] || {
-    icon: 'help-circle',
-    color: '#ccc',
-    name: '알 수 없음'
-  };
+  const visualCode = displayCode || data.displayCode || data.code;
+  const apiCode = getCurrencyApiCode(visualCode);
+  const currentCurrency = CURRENCY_INFO_MAP[visualCode];
+  const FlagIcon = currentCurrency?.FlagIcon;
+  const countryName = currentCurrency?.label || '알 수 없음';
 
   const handleGoToDetail = () => {
-    // 상세 페이지 헤더는 이모지(string)를 기대하므로 FLAG_MAP에서 가져옵니다.
     const target = {
-      name: currentFlag.name,
-      code: data.code,
-      flag: FLAG_MAP[data.code] || '🏳️', 
+      name: countryName,
+      code: apiCode,
+      displayCode: visualCode,
     };
 
     router.push({
@@ -61,9 +61,9 @@ export default function BottomInfoContainer({ data, isLoading }: BottomInfoConta
         </View>
 
         <View style={styles.countryInfo}>
-          <Text style={[styles.countryName, Typography.Pretendard_M_14]}>{currentFlag.name}</Text>
-          <View style={[styles.flagIcon, { backgroundColor: '#f0f0f0', borderRadius: 10, padding: 2 }]}>
-            <Ionicons name={currentFlag.icon as any} size={14} color={currentFlag.color} />
+          <Text style={[styles.countryName, Typography.Pretendard_M_14]}>{countryName}</Text>
+          <View style={styles.flagIcon}>
+            {FlagIcon && <FlagIcon width={30} height={30} />}
           </View>
         </View>
       </View>
@@ -78,7 +78,7 @@ export default function BottomInfoContainer({ data, isLoading }: BottomInfoConta
       {/* 2. 환율 그래프 영역 */}
       <View style={styles.graphArea}>
         <ExchangeGraph
-          code={data.code}
+          code={apiCode}
           height={160}
           width={screenWidth - 45}
         />

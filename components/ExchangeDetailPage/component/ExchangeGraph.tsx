@@ -196,6 +196,7 @@ export default function ExchangeGraph({
   return (
     <View style={[styles.chartCard, { width }]}>
       <View style={{ overflow: 'visible', width: '100%' }}>
+        {/*
         <View pointerEvents="none" style={styles.yAxisOverlay}>
           <View style={styles.yAxisLine} />
           {yAxisLabels.map((value, index) => (
@@ -215,6 +216,7 @@ export default function ExchangeGraph({
             </View>
           ))}
         </View>
+        */}
 
         <View style={{ marginLeft: Y_AXIS_WIDTH + CHART_AXIS_GAP, overflow: 'visible', width: chartWidth }}>
           <LineChart

@@ -1,47 +1,48 @@
-// 1. 깃발 이모지 맵 (10개국 최적화)
-export const FLAG_MAP: Record<string, string> = {
-  JPY: '🇯🇵',
-  USD: '🇺🇸',
-  CNY: '🇨🇳',
-  VND: '🇻🇳',
-  THB: '🇹🇭',
-  PHP: '🇵🇭',
-  DEU_EUR: '🇩🇪', // 독일
-  FRA_EUR: '🇫🇷', // 프랑스
-  AUD: '🇦🇺',
-  GBP: '🇬🇧',
-};
+import type React from 'react';
+import { SvgProps } from 'react-native-svg';
+import AmericaFlag from '@/assets/icons/americaflag.svg';
+import AustraliaFlag from '@/assets/icons/australiaflag.svg';
+import ChinaFlag from '@/assets/icons/chinaflag.svg';
+import FrenchFlag from '@/assets/icons/frenchflag.svg';
+import GermanyFlag from '@/assets/icons/germanyflag.svg';
+import JapanFlag from '@/assets/icons/japanflag.svg';
+import PhilippinesFlag from '@/assets/icons/philippinesflag.svg';
+import ThailandFlag from '@/assets/icons/thailandflag.svg';
+import UkFlag from '@/assets/icons/ukflag.svg';
+import VietnamFlag from '@/assets/icons/vietnamflag.svg';
 
-// 2. 지원 국가/통화 정보 (ChoiceCountry 등에서 사용)
-export const AVAILABLE_CURRENCIES = [
-  { label: '일본', code: 'JPY' },
-  { label: '미국', code: 'USD' },
-  { label: '중국', code: 'CNY' },
-  { label: '베트남', code: 'VND' },
-  { label: '태국', code: 'THB' },
-  { label: '필리핀', code: 'PHP' },
-  { label: '독일', code: 'DEU_EUR' },
-  { label: '프랑스', code: 'FRA_EUR' },
-  { label: '호주', code: 'AUD' },
-  { label: '영국', code: 'GBP' },
-];
-
-export interface DetailedFlag {
-  icon: string;
-  color: string;
-  name: string;
+export interface CurrencyInfo {
+  code: string;
+  apiCode: string;
+  label: string;
+  FlagIcon: React.FC<SvgProps>;
 }
 
-// 3. 상세 정보 맵 (유로존 국가별 색상 및 이름 분리)
-export const DETAILED_FLAG_MAP: Record<string, DetailedFlag> = {
-  JPY: { icon: 'disc', color: '#BC002D', name: '일본' },
-  USD: { icon: 'logo-usd', color: '#85bb65', name: '미국' },
-  CNY: { icon: 'flag', color: '#EE1C25', name: '중국' },
-  VND: { icon: 'star', color: '#FFFF00', name: '베트남' },
-  THB: { icon: 'flag', color: '#ED1C24', name: '태국' },
-  PHP: { icon: 'flag', color: '#0038A8', name: '필리핀' },
-  DEU_EUR: { icon: 'logo-euro', color: '#FFCE00', name: '독일' },
-  FRA_EUR: { icon: 'logo-euro', color: '#003399', name: '프랑스' },
-  AUD: { icon: 'flag', color: '#012169', name: '호주' },
-  GBP: { icon: 'flag', color: '#00247D', name: '영국' },
+// 1. 국가별 통화/국기 정보
+export const CURRENCY_INFO_MAP: Record<string, CurrencyInfo> = {
+  JPY: { code: 'JPY', apiCode: 'JPY', label: '일본', FlagIcon: JapanFlag },
+  USD: { code: 'USD', apiCode: 'USD', label: '미국', FlagIcon: AmericaFlag },
+  CNY: { code: 'CNY', apiCode: 'CNY', label: '중국', FlagIcon: ChinaFlag },
+  VND: { code: 'VND', apiCode: 'VND', label: '베트남', FlagIcon: VietnamFlag },
+  THB: { code: 'THB', apiCode: 'THB', label: '태국', FlagIcon: ThailandFlag },
+  PHP: { code: 'PHP', apiCode: 'PHP', label: '필리핀', FlagIcon: PhilippinesFlag },
+  DEU_EUR: { code: 'DEU_EUR', apiCode: 'EUR', label: '독일', FlagIcon: GermanyFlag },
+  FRA_EUR: { code: 'FRA_EUR', apiCode: 'EUR', label: '프랑스', FlagIcon: FrenchFlag },
+  AUD: { code: 'AUD', apiCode: 'AUD', label: '호주', FlagIcon: AustraliaFlag },
+  GBP: { code: 'GBP', apiCode: 'GBP', label: '영국', FlagIcon: UkFlag },
 };
+
+// 2. 국가별 국기 SVG 아이콘 맵
+export const FLAG_ICON_MAP: Record<string, React.FC<SvgProps>> = Object.fromEntries(
+  Object.entries(CURRENCY_INFO_MAP).map(([code, info]) => [code, info.FlagIcon])
+);
+
+// 3. 지원 국가/통화 정보 (ChoiceCountry 등에서 사용)
+export const AVAILABLE_CURRENCIES = Object.values(CURRENCY_INFO_MAP).map(({ label, code }) => ({
+  label,
+  code,
+}));
+
+export const getCurrencyApiCode = (code: string) => CURRENCY_INFO_MAP[code]?.apiCode || code;
+
+export const getCurrencyLabel = (code: string) => CURRENCY_INFO_MAP[code]?.label;

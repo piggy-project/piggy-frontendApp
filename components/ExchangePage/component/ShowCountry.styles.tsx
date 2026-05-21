@@ -15,27 +15,27 @@ export const styles = StyleSheet.create({
   filterWrapper: {
     flexDirection: 'row',
     paddingVertical: 12,
-    backgroundColor: '#fff', // 스티키 효과를 위해 배경색 필수
+    backgroundColor: '#fff',
     gap: 8,
   },
   filterTab: {
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 50,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#F3F3F3',
     borderWidth: 1,
     borderColor: '#EEE',
   },
   activeTab: {
-    backgroundColor: '#FFD700', // Piggys 포인트 컬러
-    borderColor: '#FFD700',
+    backgroundColor: '#3D3D3D',
+    borderColor: '#3D3D3D',
   },
   activeFilterText: {
-    color: '#000',
+    color: '#FFFFFF',
     fontWeight: 'bold',
   },
   inactiveFilterText: {
-    color: '#888',
+    color: '#1B1B1B',
   },
   itemContainer: {
     flexDirection: 'row',
@@ -43,7 +43,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0', // 리스트 구분선
+    borderBottomColor: '#f0f0f0',
   },
   leftSection: {
     flexDirection: 'row',
@@ -53,25 +53,21 @@ export const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#f5f5f5',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 15,
   },
-  flag: {
-    fontSize: 24,
-  },
   nameText: {
-    color: '#333',
+    color: '#868686',
   },
   codeText: {
-    color: '#666',
+    color: '#868686',
   },
   subText: {
     color: '#999',
     marginTop: 2,
   },
   rateText: {
-    color: '#333',
+    color: '#1B1B1B',
   },
 });

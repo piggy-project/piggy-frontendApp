@@ -32,7 +32,6 @@ export const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: '#DA251D', // 기본 배경색
     justifyContent: 'center',
     alignItems: 'center',
   },

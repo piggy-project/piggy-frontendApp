@@ -1,3 +1,4 @@
+import { FLAG_ICON_MAP } from '@/constants/Currency';
 import { Typography } from '@/constants/Typography';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
@@ -8,9 +9,9 @@ export interface CountryData {
   id: string;
   name: string; // 예: 미국
   code: string; // 예: USD
+  apiCode: string;
   rate: string; // 예: 1,460.10 KRW
   percentChange: number;
-  flag: string; // 이모지 사용 (나중에 이미지로 교체 가능)
 }
 interface ShowCountryProps {
   data: CountryData[];
@@ -33,13 +34,13 @@ export default function ShowCountry({ data, onPressItem, onFilterChange, activeF
 
   const renderHeader = () => (
     <View style={styles.headerWrapper}>
-      <Text style={[styles.title, Typography.Pretendard_B_24]}>해시태그별 여행지</Text>
+      <Text style={[styles.title, Typography.Pretendard_M_16]}>해시태그별 여행지</Text>
       <View style={styles.filterWrapper}>
         {FILTERS.map((filter) => (
           <TouchableOpacity
             key={filter.value}
             style={[
-              styles.filterTab, 
+              styles.filterTab,
               activeFilter === filter.value && styles.activeTab // 부모가 준 값으로 비교
             ]}
             onPress={() => handleFilterPress(filter.value)}
@@ -59,38 +60,67 @@ export default function ShowCountry({ data, onPressItem, onFilterChange, activeF
   return (
     <View style={styles.listContainer}>
       {renderHeader()}
-      {data.map((item) => (
-        <TouchableOpacity
-          key={item.id}
-          style={styles.itemContainer}
-          onPress={() => onPressItem(item)}
-        >
-          <View style={styles.leftSection}>
-            <View style={styles.flagContainer}>
-              <Text style={styles.flag}>{item.flag}</Text>
-            </View>
-            <View>
-              <Text style={[styles.nameText, Typography.Pretendard_M_14]}>
-                {item.name} <Text style={styles.codeText}>({item.code})</Text>
-              </Text>
-              <Text style={[styles.subText, Typography.Pretendard_M_12]}>
-                {item.code === 'JPY' ? '100' : '1'} {item.code}
-              </Text>
-            </View>
-          </View>
+      {data.map((item) => {
+        const FlagIcon = FLAG_ICON_MAP[item.code];
 
-          <View style={{ alignItems: 'flex-end' }}>
-            <Text style={[styles.rateText, Typography.Pretendard_M_14]}>{item.rate}</Text>
-            {/* 변동률 표시 섹션 */}
-            <Text style={[
-              Typography.Pretendard_M_12, 
-              { color: item.percentChange >= 0 ? '#FF4500' : '#007AFF', marginTop: 2 }
-            ]}>
-              {item.percentChange >= 0 ? '▲' : '▼'} {Math.abs(item.percentChange).toFixed(2)}%
-            </Text>
-          </View>
-        </TouchableOpacity>
-      ))}
+        const numericRate = parseFloat(item.rate.replace(/,/g, ''));
+        const calculatedChange = isNaN(numericRate)
+          ? 0
+          : numericRate * (item.percentChange / (100 + item.percentChange));
+
+        const isUp = item.percentChange > 0;
+        const isDown = item.percentChange < 0;
+
+        const statusColor = isUp ? '#FF3B30' : isDown ? '#007AFF' : '#8E8E93';
+        const statusSign = isUp ? '+' : isDown ? '-' : '';
+        return (
+          <TouchableOpacity
+            key={item.id}
+            style={styles.itemContainer}
+            onPress={() => onPressItem(item)}
+          >
+            <View style={styles.leftSection}>
+              <View style={styles.flagContainer}>
+                {FlagIcon && <FlagIcon width={40} height={40} />}
+              </View>
+              <View>
+                <Text style={[styles.nameText, Typography.Pretendard_M_14]}>
+                  {item.name} <Text style={styles.codeText}>({item.code})</Text>
+                </Text>
+                <Text style={[styles.rateText, Typography.Pretendard_M_14]}>{item.rate} 원</Text>
+
+                {/* 환율 단위 표시 (예: 1 USD, 100 JPY) 주석처리 */}
+
+                {/* <Text style={[styles.subText, Typography.Pretendard_M_12]}>
+                  {item.code === 'JPY' ? '100' : '1'} {item.code}
+                </Text> */}
+              </View>
+            </View>
+
+            <View style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'flex-end'
+            }}>
+              <Text style={[
+                Typography.Pretendard_M_12,
+                { color: statusColor }
+              ]}>
+                {statusSign}{Math.abs(calculatedChange).toFixed(2)}원
+              </Text>
+
+              <View style={{ width: 2 }} />
+
+              <Text style={[
+                Typography.Pretendard_M_12,
+                { color: statusColor }
+              ]}>
+                ({statusSign}{Math.abs(item.percentChange).toFixed(2)}%)
+              </Text>
+            </View>
+          </TouchableOpacity>
+        );
+      })}
     </View>
   );
 }

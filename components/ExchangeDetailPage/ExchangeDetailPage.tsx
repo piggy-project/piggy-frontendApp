@@ -28,6 +28,8 @@ interface HistoryItem {
 
 export default function ExchangeDetailPage() {
   const params = useLocalSearchParams();
+  const apiCode = String(params.code);
+  const displayCode = params.displayCode ? String(params.displayCode) : apiCode;
   const [detail, setDetail] = useState<ExchangeDetail | null>(null);
   const [history, setHistory] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -38,23 +40,22 @@ export default function ExchangeDetailPage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const code = String(params.code);
       try {
         // 1. 상세 정보 (상단 요약용 - 필요시 유지하거나 정리)
-        const cachedDetail = await AsyncStorage.getItem(getCacheKey(code));
+        const cachedDetail = await AsyncStorage.getItem(getCacheKey(apiCode));
         if (cachedDetail) setDetail(JSON.parse(cachedDetail));
         
-        const detailRes = await exchangeApi.getExchangeDetail(code);
+        const detailRes = await exchangeApi.getExchangeDetail(apiCode);
         setDetail(detailRes);
-        await AsyncStorage.setItem(getCacheKey(code), JSON.stringify(detailRes));
+        await AsyncStorage.setItem(getCacheKey(apiCode), JSON.stringify(detailRes));
 
         // 2. 히스토리 정보 (일일 시세용)
-        const cachedHistory = await AsyncStorage.getItem(getHistoryKey(code));
+        const cachedHistory = await AsyncStorage.getItem(getHistoryKey(apiCode));
         if (cachedHistory) processHistory(JSON.parse(cachedHistory));
 
-        const historyRes = await exchangeApi.getExchangeHistory(code);
+        const historyRes = await exchangeApi.getExchangeHistory(apiCode);
         processHistory(historyRes);
-        await AsyncStorage.setItem(getHistoryKey(code), JSON.stringify(historyRes));
+        await AsyncStorage.setItem(getHistoryKey(apiCode), JSON.stringify(historyRes));
 
       } catch (error) {
         console.error('데이터 로드 실패:', error);
@@ -82,15 +83,15 @@ export default function ExchangeDetailPage() {
       setHistory(processed);
     };
 
-    if (params.code) fetchData();
-  }, [params.code]);
+    if (apiCode) fetchData();
+  }, [apiCode]);
 
   return (
     <View style={styles.container}>
       <ExchangeHeader 
         country={String(params.name)} 
-        code={String(params.code)}
-        flag={String(params.flag)}
+        code={apiCode}
+        displayCode={displayCode}
         showBackButton
       />
       
@@ -102,13 +103,13 @@ export default function ExchangeDetailPage() {
         <View style={styles.sectionGap}>
           <View style={{ paddingHorizontal: 20 }}>
             <TodayPriceCard
-              currencyCode={String(params.code)}
+              currencyCode={apiCode}
               currentRate={detail?.currentRate}
               change={detail?.change}
               percentChange={detail?.percentChange}
               initialFavorited={Boolean(detail?.favorited ?? detail?.isFavorited ?? detail?.favorite)}
             />
-            <ExchangeGraph code={String(params.code)} period={selectedPeriod} />
+            <ExchangeGraph code={apiCode} period={selectedPeriod} />
             <PeriodSelector 
               selectedPeriod={selectedPeriod} 
               onPeriodChange={setSelectedPeriod} 

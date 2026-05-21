@@ -1,3 +1,4 @@
+import { FLAG_ICON_MAP } from '@/constants/Currency';
 import { Typography } from '@/constants/Typography';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
@@ -9,12 +10,16 @@ interface Props {
     title?: string;
     country?: string;
     code?: string;
+    displayCode?: string;
     flag?: string;
     time?: string;
     showBackButton?: boolean;
 }
 
-export default function ExchangeHeader({ title, country, code, flag, time, showBackButton = false }: Props) {
+export default function ExchangeHeader({ title, country, code, displayCode, flag, time, showBackButton = false }: Props) {
+    const iconCode = displayCode || code;
+    const FlagIcon = iconCode ? FLAG_ICON_MAP[iconCode] : null;
+
     return (
         <BaseHeader
             left={
@@ -48,7 +53,9 @@ export default function ExchangeHeader({ title, country, code, flag, time, showB
                         </Text>
                     )}
                     {/* 국기가 있으면 국기 표시 */}
-                    {flag ? (
+                    {FlagIcon ? (
+                        <FlagIcon width={26} height={26} />
+                    ) : flag ? (
                         <Text style={styles.flagText}>{flag}</Text>
                     ) : (
                         // 시간도 국기도 없으면 간격 유지용 빈 뷰

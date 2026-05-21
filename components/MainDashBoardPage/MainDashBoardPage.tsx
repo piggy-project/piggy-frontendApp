@@ -1,4 +1,5 @@
 import { exchangeApi } from '@/components/utils/api'; // API 함수 임포트
+import { getCurrencyApiCode } from '@/constants/Currency';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect, useState } from 'react';
 import { ScrollView, View } from 'react-native';
@@ -10,13 +11,16 @@ import MainImageContainer from './component/MainImageContainer';
 
 export default function MainDashBoardPage() {
   const [exchangeData, setExchangeData] = useState<any>(null); // 선택된 환율 정보를 담을 상태
+  const [selectedCurrencyCode, setSelectedCurrencyCode] = useState('JPY');
 
   const getCacheKey = (code: string) => `DASHBOARD_CACHE_${code}`;
 
   // 국가 선택 시 데이터를 가져오는 함수
   const handleCountrySelect = async (code: string) => {
     if (!code) return;
+    const apiCode = getCurrencyApiCode(code);
     const cacheKey = getCacheKey(code);
+    setSelectedCurrencyCode(code);
 
     try {
       const cached = await AsyncStorage.getItem(cacheKey);
@@ -24,8 +28,12 @@ export default function MainDashBoardPage() {
         setExchangeData(JSON.parse(cached));
       }
 
-      const response = await exchangeApi.getExchangeDetail(code);
-      const freshData = response.data || response;
+      const response = await exchangeApi.getExchangeDetail(apiCode);
+      const freshData = {
+        ...(response.data || response),
+        code: apiCode,
+        displayCode: code,
+      };
       
       setExchangeData(freshData);
       await AsyncStorage.setItem(cacheKey, JSON.stringify(freshData));
@@ -51,7 +59,7 @@ export default function MainDashBoardPage() {
         <View style={styles.sectionGap}>
           <ChoiceCountry onSelect={handleCountrySelect} />
           <MainImageContainer timing={exchangeData?.timing} />
-          <BottomInfoContainer data={exchangeData} />
+          <BottomInfoContainer data={exchangeData} displayCode={selectedCurrencyCode} />
         </View>
       </ScrollView>
     </View>

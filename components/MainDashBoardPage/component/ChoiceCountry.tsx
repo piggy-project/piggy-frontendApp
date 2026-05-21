@@ -1,3 +1,4 @@
+import { AVAILABLE_CURRENCIES } from '@/constants/Currency';
 import { Typography } from '@/constants/Typography';
 import React, { useState } from 'react';
 import {
@@ -11,32 +12,10 @@ import {
 } from 'react-native';
 import { styles } from './ChoiceCountry.style';
 
-// 모든 지원 국가 및 코드 매핑
-const COUNTRY_MAP: { [key: string]: string } = {
-    '일본': 'JPY',
-    '중국': 'CNY',
-    '미국': 'USD',
-    '베트남': 'VND',
-    '필리핀': 'PHP',
-    '태국': 'THB',
-    '독일': 'DEU_EUR',
-    '프랑스': 'FRA_EUR',
-    '호주': 'AUD',
-    '영국': 'GBP',
-};
-
-const AVAILABLE_CURRENCIES = [
-    { label: '일본', code: 'JPY' },
-    { label: '중국', code: 'CNY' },
-    { label: '미국', code: 'USD' },
-    { label: '베트남', code: 'VND' },
-    { label: '필리핀', code: 'PHP' },
-    { label: '태국', code: 'THB' },
-    { label: '독일', code: 'DEU_EUR' },
-    { label: '프랑스', code: 'FRA_EUR' },
-    { label: '호주', code: 'AUD' },
-    { label: '영국', code: 'GBP' },
-];
+// 모든 지원 국가 및 프론트 표시용 코드 매핑
+const COUNTRY_MAP = Object.fromEntries(
+    AVAILABLE_CURRENCIES.map((currency) => [currency.label, currency.code])
+);
 
 interface Props {
     // 이제 부모에게 'JPY', 'USD' 같은 코드를 넘겨줍니다.

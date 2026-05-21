@@ -1,5 +1,5 @@
 import { exchangeApi } from '@/components/utils/api';
-import { DETAILED_FLAG_MAP, FLAG_MAP } from '@/constants/Currency';
+import { CURRENCY_INFO_MAP, getCurrencyApiCode } from '@/constants/Currency';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
@@ -16,14 +16,14 @@ export interface CountryData {
   id: string;
   name: string;
   code: string;
+  apiCode: string;
   rate: string;
   percentChange: number;
-  flag: string;
   time?: string;
 }
 
 const getDisplayName = (code: string, fallbackName: string) => {
-  return DETAILED_FLAG_MAP[code]?.name || fallbackName.replace(/\s+\S+$/, '');
+  return CURRENCY_INFO_MAP[code]?.label || fallbackName.replace(/\s+\S+$/, '');
 };
 
 export default function ExchangePage() {
@@ -39,21 +39,26 @@ export default function ExchangePage() {
   }, [currentSort]);
 
   const formatData = (rawData: any[]): CountryData[] => {
-    return rawData.map((item: any) => ({
-      id: item.curUnit,
-      name: getDisplayName(item.curUnit, item.curNm),
-      code: item.curUnit,
-      rate: `${item.rate?.toLocaleString(undefined, { minimumFractionDigits: 2 })} KRW`,
-      percentChange: item.percentChange || 0,
-      flag: FLAG_MAP[item.curUnit] || '🏳️',
-      time: item.time,
-    }));
+    return rawData.flatMap((item: any) => {
+      const displayCodes = item.curUnit === 'EUR' ? ['DEU_EUR', 'FRA_EUR'] : [item.curUnit];
+
+      return displayCodes.map((displayCode) => ({
+        id: displayCode,
+        name: getDisplayName(displayCode, item.curNm),
+        code: displayCode,
+        apiCode: item.curUnit,
+        rate: `${item.rate?.toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
+        percentChange: item.percentChange || 0,
+        time: item.time,
+      }));
+    });
   };
 
   const normalizeCachedData = (cachedData: CountryData[]): CountryData[] => {
     return cachedData.map((item) => ({
       ...item,
       name: getDisplayName(item.code, item.name),
+      apiCode: item.apiCode || getCurrencyApiCode(item.code),
     }));
   };
 
@@ -155,7 +160,11 @@ export default function ExchangePage() {
   const handlePressItem = (item: CountryData) => {
     router.push({
       pathname: '/exchange_detail',
-      params: { ...item }
+      params: {
+        ...item,
+        code: item.apiCode,
+        displayCode: item.code,
+      }
     });
   };
 

@@ -15,7 +15,11 @@ export const styles = StyleSheet.create({
     marginLeft: 20,
   },
   title: {
-    color: '#000',
+    color: '#1B1B1B',
+  },
+  titletext: {
+    color: '#868686',
+    marginTop: 5,
   },
   targetRateButton: {
     alignSelf: 'flex-start', // 왼쪽 정렬 (flex-start) 또는 글자 크기에 맞춤
@@ -36,6 +40,6 @@ export const styles = StyleSheet.create({
     elevation: 3,
   },
   targetRateText: {
-    color: '#333',
+    color: '#000000',
   },
 });
