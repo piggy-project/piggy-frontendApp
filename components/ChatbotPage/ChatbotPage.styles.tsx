@@ -5,27 +5,11 @@ export const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F4F4F4',
   },
-  header: {
-    minHeight: 76,
-    paddingHorizontal: 20,
-    paddingBottom: 14,
-    backgroundColor: '#fff',
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    justifyContent: 'space-between',
-  },
   backButton: {
     width: 36,
     height: 36,
     justifyContent: 'center',
     alignItems: 'flex-start',
-  },
-  headerTitle: {
-    color: '#111',
-    marginBottom: 5,
-  },
-  headerRight: {
-    width: 36,
   },
   messageList: {
     flex: 1,

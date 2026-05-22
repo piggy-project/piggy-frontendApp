@@ -6,7 +6,6 @@ export default function MyPageHeader() {
 
   return (
     <BaseHeader
-      androidTopInsetScale={0.42}
       left={
         null
       }

@@ -10,7 +10,6 @@ interface Props {
   leftStyle?: StyleProp<ViewStyle>;
   centerStyle?: StyleProp<ViewStyle>;
   rightStyle?: StyleProp<ViewStyle>;
-  androidTopInsetScale?: number;
 }
 
 export default function BaseHeader({ 

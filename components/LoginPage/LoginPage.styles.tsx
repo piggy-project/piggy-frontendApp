@@ -37,6 +37,5 @@ export const styles = StyleSheet.create({
   },
   bottomContainer: {
     // marginTop: 'auto'
-    paddingBottom: 20,   // 하단 여백
   },
 });

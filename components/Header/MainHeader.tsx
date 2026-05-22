@@ -1,7 +1,6 @@
 import React from 'react';
-import { View } from 'react-native';
 import BaseHeader from './BaseHeader';
-import Notion from './component/Notice';
+import Notice from './component/Notice';
 import WonSign from './component/WonSign';
 
 interface Props {
@@ -21,18 +20,16 @@ export default function MainHeader({
   return (
     <BaseHeader
       left={
-        <View style={{ marginLeft: 10 }}> 
-          {showCurrencySelector && (
-            <WonSign onSelect={handleCurrencySelect} />
-          )}
-        </View>
+        showCurrencySelector && (
+          <WonSign onSelect={handleCurrencySelect} />
+        )
       }
       center={
         null
       }
       right={
         <>
-          <Notion />
+          <Notice />
         </>
       }
     />

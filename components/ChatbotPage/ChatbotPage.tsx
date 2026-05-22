@@ -1,3 +1,5 @@
+import BaseHeader from '../Header/BaseHeader';
+import { styles as baseStyles } from '../Header/BaseHeader.styles';
 import { chatbotApi } from '@/components/utils/api';
 import { Typography } from '@/constants/Typography';
 import { Ionicons } from '@expo/vector-icons';
@@ -139,13 +141,18 @@ export default function ChatbotPage() {
       behavior="padding"
       keyboardVerticalOffset={Platform.OS === 'ios' ? 18 : -18}
     >
-      <View style={[styles.header, { paddingTop: insets.top }]}>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <Ionicons name="chevron-back" size={28} color="#555" />
-        </TouchableOpacity>
-        <Text style={[styles.headerTitle, Typography.Pretendard_B_16]}>AI 챗봇 피기</Text>
-        <View style={styles.headerRight} />
-      </View>
+      <BaseHeader
+        left={
+          <>
+            <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+              <Ionicons name="chevron-back" size={28} color="#555" />
+            </TouchableOpacity>
+            <Text style={baseStyles.title}>AI 챗봇 피기</Text>
+          </>
+        }
+        center={null}
+        right={null}
+      />
 
       <ScrollView
         ref={scrollRef}

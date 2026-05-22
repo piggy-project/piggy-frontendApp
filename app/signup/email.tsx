@@ -7,8 +7,11 @@ import { useSignupData } from '../../components/utils/SignupContext';
 import { authApi } from '../../components/utils/api';
 import { Typography } from '@/constants/Typography';
 
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 export default function SignupEmail() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { updateData } = useSignupData();
   
   const [email, setEmail] = useState('');
@@ -154,43 +157,47 @@ export default function SignupEmail() {
       </View>
 
       <TouchableOpacity 
-        style={[styles.button, !isFormatValid && styles.disabledButton]} 
+        style={[
+          styles.button, 
+          !isFormatValid && styles.disabledButton,
+          { marginBottom: Math.max(insets.bottom, 20) }
+        ]} 
         onPress={handleNext}
         disabled={!isFormatValid}
       >
         <Text style={[styles.buttonText, Typography.Pretendard_M_16]}>다음</Text>
       </TouchableOpacity>
-    </View>
-  );
-}
+      </View>
+      );
+      }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, justifyContent: 'space-between', backgroundColor: '#fff', paddingTop: 60 },
-  content: { marginTop: 50 },
-  title: { marginBottom: 30 },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-  },
-  input: { 
-    flex: 1,
-    paddingVertical: 10 
-  },
-  iconArea: {
-    marginLeft: 10,
-    justifyContent: 'center',
-    width: 30,
-    alignItems: 'center',
-  },
-  checkIcon: {
-    width: 28,
-    height: 28,
-  },
-  errorText: { color: 'red', marginTop: 10 },
-  successText: { color: '#03C75A', marginTop: 10 },
-  button: { backgroundColor: '#333', padding: 16, borderRadius: 8, alignItems: 'center', marginBottom: 20 },
-  disabledButton: { backgroundColor: '#ddd' },
-  buttonText: { color: '#fff' },
-});
+      const styles = StyleSheet.create({
+      container: { flex: 1, padding: 20, justifyContent: 'space-between', backgroundColor: '#fff', paddingTop: 60 },
+      content: { marginTop: 50 },
+      title: { marginBottom: 30 },
+      inputContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      borderBottomWidth: 1,
+      borderBottomColor: '#ccc',
+      },
+      input: { 
+      flex: 1,
+      paddingVertical: 10 
+      },
+      iconArea: {
+      marginLeft: 10,
+      justifyContent: 'center',
+      width: 30,
+      alignItems: 'center',
+      },
+      checkIcon: {
+      width: 28,
+      height: 28,
+      },
+      errorText: { color: 'red', marginTop: 10 },
+      successText: { color: '#03C75A', marginTop: 10 },
+      button: { backgroundColor: '#333', padding: 16, borderRadius: 8, alignItems: 'center' },
+      disabledButton: { backgroundColor: '#ddd' },
+      buttonText: { color: '#fff' },
+      });

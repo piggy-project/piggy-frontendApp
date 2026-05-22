@@ -1,11 +1,13 @@
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSignupData } from '../../components/utils/SignupContext';
 import { Typography } from '@/constants/Typography';
 
 export default function SignupTerms() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { updateData } = useSignupData();
 
   const [allAgreed, setAllAgreed] = useState(false);
@@ -66,7 +68,11 @@ export default function SignupTerms() {
       </View>
 
       <TouchableOpacity 
-        style={[styles.button, (!term1 || !term2) && styles.disabledButton]} 
+        style={[
+          styles.button, 
+          (!term1 || !term2) && styles.disabledButton,
+          { marginBottom: Math.max(insets.bottom, 20) }
+        ]} 
         onPress={handleNext}
         disabled={!term1 || !term2}
       >
@@ -88,7 +94,7 @@ const styles = StyleSheet.create({
   activeText: { color: '#333' },
   checkboxLabel: { color: '#555' },
   divider: { height: 1, backgroundColor: '#eee', marginBottom: 20 },
-  button: { backgroundColor: '#333', padding: 16, borderRadius: 8, alignItems: 'center', marginBottom: 20 },
+  button: { backgroundColor: '#333', padding: 16, borderRadius: 8, alignItems: 'center' },
   disabledButton: { backgroundColor: '#ddd' },
   buttonText: { color: '#fff' },
 });

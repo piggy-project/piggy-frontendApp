@@ -3,11 +3,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { ActivityIndicator, Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'; // Image 제거
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSignupData } from '../../components/utils/SignupContext';
 import { authApi } from '../../components/utils/api';
 
 export default function SignupNickname() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { data, updateData } = useSignupData(); // updateData 추가 (필요시 사용)
   
   const [nickname, setNickname] = useState('');
@@ -190,7 +192,11 @@ export default function SignupNickname() {
       </View>
 
       <TouchableOpacity 
-        style={[styles.button, !isFormatValid && styles.disabledButton]} 
+        style={[
+          styles.button, 
+          !isFormatValid && styles.disabledButton,
+          { marginBottom: Math.max(insets.bottom, 20) }
+        ]} 
         onPress={handleSignUp}
         disabled={!isFormatValid}
       >
@@ -223,7 +229,7 @@ const styles = StyleSheet.create({
   helperText: { marginTop: 5, color: '#888' },
   errorText: { color: 'red', marginTop: 10 },
   successText: { color: '#03C75A', marginTop: 10, fontSize: 14 },
-  button: { backgroundColor: '#333', padding: 16, borderRadius: 8, alignItems: 'center', marginBottom: 20 },
+  button: { backgroundColor: '#333', padding: 16, borderRadius: 8, alignItems: 'center' },
   disabledButton: { backgroundColor: '#ddd' },
   buttonText: { color: '#fff' },
 });

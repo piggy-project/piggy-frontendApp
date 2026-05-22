@@ -2,10 +2,12 @@ import { Typography } from '@/constants/Typography';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSignupData } from '../../components/utils/SignupContext';
 
 export default function SignupPassword() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { updateData } = useSignupData();
   const [password, setPassword] = useState('');
   const [confirmPw, setConfirmPw] = useState('');
@@ -61,7 +63,11 @@ export default function SignupPassword() {
       </View>
 
       <TouchableOpacity 
-        style={[styles.button, !isValid && styles.disabledButton]} 
+        style={[
+          styles.button, 
+          !isValid && styles.disabledButton,
+          { marginBottom: Math.max(insets.bottom, 20) }
+        ]} 
         onPress={handleNext}
         disabled={!isValid}
       >
@@ -78,7 +84,7 @@ const styles = StyleSheet.create({
   input: { borderBottomWidth: 1, borderBottomColor: '#ccc', paddingVertical: 10 },
   helperText: { marginTop: 5, color: '#888' },
   errorText: { color: '#FF3B30', marginTop: 5 }, // 조금 더 선명한 iOS 스타일 레드로 변경
-  button: { backgroundColor: '#333', padding: 16, borderRadius: 8, alignItems: 'center', marginBottom: 20 },
+  button: { backgroundColor: '#333', padding: 16, borderRadius: 8, alignItems: 'center' },
   disabledButton: { backgroundColor: '#ddd' },
   buttonText: { color: '#fff' },
 });

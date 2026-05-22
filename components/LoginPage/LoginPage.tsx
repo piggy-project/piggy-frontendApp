@@ -5,12 +5,12 @@ import React, { useState } from 'react';
 import {
   Alert,
   Keyboard,
-  KeyboardAvoidingView,
   Platform,
   Text,
   TouchableWithoutFeedback,
   View
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import LoginHeader from '../Header/LoginHeader';
 import { useAuth } from '../utils/AuthContext';
 import { styles } from './LoginPage.styles';
@@ -26,6 +26,7 @@ type Props = {
 export default function LoginPage({ onBack, onLoginSuccess }: Props) {
   const router = useRouter();
   const { login } = useAuth();
+  const insets = useSafeAreaInsets();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -39,17 +40,10 @@ export default function LoginPage({ onBack, onLoginSuccess }: Props) {
 
     setLoading(true);
     try {
-      // 5. Context의 login 함수 호출
       await login({ email, password });
-
-      // 6. 성공 시 메인 화면으로 이동
-      if (onLoginSuccess) onLoginSuccess(); // 부모 콜백이 있다면 실행
-      
-      // 'replace'를 써야 뒤로가기 했을 때 로그인 화면으로 다시 안 돌아옴
-      // RootLayout에서 설정한 메인 탭 경로 (보통 '(tabs)' 또는 'index')
+      if (onLoginSuccess) onLoginSuccess();
       await registerForPushNotificationsAsync();
       router.replace('/(tabs)'); 
-
     } catch (error: any) {
       console.error('로그인 에러:', error);
       Alert.alert('로그인 실패', error.message || '이메일이나 비밀번호를 확인해주세요.');
@@ -59,10 +53,7 @@ export default function LoginPage({ onBack, onLoginSuccess }: Props) {
   };
 
   return (
-    <KeyboardAvoidingView 
-      style={styles.container} 
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
+    <View style={styles.container}>
       <LoginHeader onBack={onBack} />
       
       <View style={styles.contentContainer}>
@@ -92,13 +83,13 @@ export default function LoginPage({ onBack, onLoginSuccess }: Props) {
           </View>
         </TouchableWithoutFeedback>
 
-        <View style={styles.bottomContainer}>
+        <View style={[styles.bottomContainer, { paddingBottom: Math.max(insets.bottom, 20) }]}>
           <LoginButton 
             onPress={handleLogin} 
-            disabled={!email || !password || loading} // 로딩 중 클릭 방지
+            disabled={!email || !password || loading} 
           />
         </View>
       </View>
-    </KeyboardAvoidingView>
+    </View>
   );
 }

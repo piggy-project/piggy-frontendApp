@@ -3,10 +3,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSignupData } from '../../components/utils/SignupContext';
 
 export default function SignupPersonalInfo() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { updateData } = useSignupData();
   
   const [name, setName] = useState('');
@@ -85,7 +87,11 @@ export default function SignupPersonalInfo() {
       </View>
 
       <TouchableOpacity 
-        style={[styles.button, !isValid && styles.disabledButton]} 
+        style={[
+          styles.button, 
+          !isValid && styles.disabledButton,
+          { marginBottom: Math.max(insets.bottom, 20) }
+        ]} 
         onPress={handleNext}
         disabled={!isValid}
       >
@@ -105,7 +111,7 @@ const styles = StyleSheet.create({
   dateInputContainer: { flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: '#ccc' },
   dateInput: { flex: 1, paddingVertical: 10 },
   icon: { marginLeft: 10 },
-  button: { backgroundColor: '#333', padding: 16, borderRadius: 8, alignItems: 'center', marginBottom: 20 },
+  button: { backgroundColor: '#333', padding: 16, borderRadius: 8, alignItems: 'center' },
   disabledButton: { backgroundColor: '#ddd' },
   buttonText: { color: '#fff' },
 });

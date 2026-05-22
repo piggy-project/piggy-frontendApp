@@ -1,20 +1,22 @@
 import { StyleSheet } from 'react-native';
+import { Typography } from '@/constants/Typography';
 
 export const styles = StyleSheet.create({
-
   container: {
     minHeight: 60,
     paddingBottom: 12,
-    backgroundColor: '#fff', // 헤더 흰색 유지
+    backgroundColor: '#fff',
     flexDirection: 'row',
     alignItems: 'flex-end',
-    paddingHorizontal: 20, 
+    paddingHorizontal: 20,
   },
 
   leftArea: {
     flex: 1,
-    justifyContent: 'flex-end',
-    alignItems: 'flex-start',
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'flex-end',
+    gap: 8,
   },
 
   centerArea: {
@@ -27,8 +29,22 @@ export const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    alignItems: 'center',
-    gap: 10,
+    alignItems: 'flex-end',
+    gap: 12,
   },
 
+  title: {
+    color: '#000',
+    ...Typography.Pretendard_M_16,
+  },
+
+  // For cases like CommunityHeader that needs a wider center
+  wideCenterArea: {
+    flex: 3,
+    alignItems: 'stretch',
+  },
+  
+  shrinkSideArea: {
+    flex: 0,
+  }
 });
