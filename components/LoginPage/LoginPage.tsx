@@ -5,7 +5,6 @@ import React, { useState } from 'react';
 import {
   Alert,
   Keyboard,
-  Platform,
   Text,
   TouchableWithoutFeedback,
   View
