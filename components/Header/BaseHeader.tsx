@@ -20,18 +20,17 @@ export default function BaseHeader({
   leftStyle, 
   centerStyle, 
   rightStyle,
-  androidTopInsetScale = 0.72,
 }: Props) {
   const insets = useSafeAreaInsets();
   const androidStatusBarHeight = Platform.OS === 'android' ? StatusBar.currentHeight ?? 0 : 0;
   const topInset = Platform.OS === 'android'
-    ? Math.max(insets.top, androidStatusBarHeight) * androidTopInsetScale
+    ? Math.max(insets.top, androidStatusBarHeight)
     : insets.top;
   
   return (
     <View style={[
       styles.container, 
-      { paddingTop: topInset }
+      { paddingTop: topInset + (Platform.OS === 'android' ? 8 : 0) }
     ]}>
 
       {/* 왼쪽: 기본 스타일 + 외부 스타일(있을 경우) */}

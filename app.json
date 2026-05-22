@@ -7,7 +7,7 @@
     "icon": "./assets/images/piggyicon.png",
     "scheme": "piggy",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.piggy"
@@ -63,6 +63,11 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "statusBar": {
+      "barStyle": "dark-content",
+      "translucent": true,
+      "backgroundColor": "transparent"
     },
     "extra": {
       "router": {},

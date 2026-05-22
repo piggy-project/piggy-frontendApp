@@ -1,5 +1,6 @@
 import { useAuth } from '@/components/utils/AuthContext';
 import { registerForPushNotificationsAsync } from '@/components/utils/NotificationHelper';
+import * as Linking from 'expo-linking';
 import { useRouter } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import React from 'react';
@@ -18,18 +19,14 @@ export default function SocialLoginButtons() {
   // 3. 소셜 로그인 처리 함수
   const handleSocialLogin = async (provider: 'kakao' | 'google' | 'naver') => {
     try {
-      const authUrl = `${BACKEND_URL}/oauth2/authorization/${provider}?target=app`;
-      // 백엔드가 리다이렉트할 베이스 주소
-      const returnUrl = 'exp://localhost:8081';
-
-      const result = await WebBrowser.openAuthSessionAsync(authUrl, returnUrl);
+      const dynamicRedirectUrl = Linking.createURL('');
+      const authUrl = `${BACKEND_URL}/oauth2/authorization/${provider}?target=app&currentRedirectUrl=${encodeURIComponent(dynamicRedirectUrl)}`;
+      const result = await WebBrowser.openAuthSessionAsync(authUrl, dynamicRedirectUrl);
 
       if (result.type === 'success' && result.url) {
         const url = result.url;
         const params = new URLSearchParams(url.split('?')[1]);
 
-        // 1. 에러 처리 로직 (oauth/error 경로 확인)
-        // 1. 에러 처리 로직 (oauth/error 경로 확인)
         if (url.includes('/oauth/error')) {
           const rawErrorMessage = params.get('message');
 
@@ -44,7 +41,7 @@ export default function SocialLoginButtons() {
             } else if (decodedMsg.includes('네이버')) {
               finalMessage = "이미 네이버 계정으로 가입되어 있네요!\n네이버 로그인을 이용해 주세요.";
             } else if (decodedMsg.includes('구글')) {
-              finalMessage = "이미 네이버 계정으로 가입되어 있네요!\n구글 로그인을 이용해 주세요.";
+              finalMessage = "이미 구글 계정으로 가입되어 있네요!\n구글 로그인을 이용해 주세요.";
             } else if (decodedMsg.includes('일반 이메일')) {
               finalMessage = "이미 일반 계정으로 가입되어 있네요!!\n이메일 계정 로그인을 이용해 주세요.";
             }
