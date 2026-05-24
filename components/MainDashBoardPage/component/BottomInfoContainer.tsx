@@ -101,7 +101,7 @@ export default function BottomInfoContainer({ data, isLoading, displayCode }: Bo
       >
         <View style={styles.chatbotButtonLeft}>
           <Image
-            source={require('@/assets/images/piggyicon.png')}
+            source={require('@/assets/images/piggysplash.png')}
             style={styles.chatbotButtonImage}
           />
           <Text style={[styles.chatbotButtonText, Typography.Pretendard_B_16]}>

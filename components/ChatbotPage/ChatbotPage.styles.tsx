@@ -6,8 +6,8 @@ export const styles = StyleSheet.create({
     backgroundColor: '#F4F4F4',
   },
   backButton: {
-    width: 36,
-    height: 36,
+    width: 26,
+    height: 26,
     justifyContent: 'center',
     alignItems: 'flex-start',
   },
@@ -44,11 +44,10 @@ export const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   avatar: {
-    width: 44,
-    height: 44,
+    width: 50,
+    height: 50,
     borderRadius: 22,
     marginRight: 10,
-    backgroundColor: '#fff',
   },
   messageBlock: {
     maxWidth: '82%',

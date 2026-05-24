@@ -1,5 +1,5 @@
-import { StyleSheet } from 'react-native';
 import { Typography } from '@/constants/Typography';
+import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
   container: {
@@ -38,7 +38,6 @@ export const styles = StyleSheet.create({
     ...Typography.Pretendard_M_16,
   },
 
-  // For cases like CommunityHeader that needs a wider center
   wideCenterArea: {
     flex: 3,
     alignItems: 'stretch',

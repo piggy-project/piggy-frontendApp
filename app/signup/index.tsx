@@ -3,8 +3,7 @@ import { Typography } from '@/constants/Typography';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 export default function SignupWelcome() {
   const router = useRouter();
 
@@ -17,9 +16,14 @@ export default function SignupWelcome() {
         <Ionicons name="close" size={30} color="#333" />
       </TouchableOpacity>
       <View style={styles.topContent}>
+        <Image 
+          source={require('@/assets/images/signupPiggy.png')} 
+          style={styles.piggyImage} 
+          resizeMode="contain"
+        />
         <Text style={[styles.title, Typography.Pretendard_B_32]}>환율로 떠나는{'\n'}똑똑한 여행</Text>
         <Text style={[styles.subTitle, Typography.Pretendard_M_14]}>PIGGY에 오신것을 환영해요!</Text>
-        <View style={styles.circlePlaceholder}></View>
+        
       </View>
 
       <View style={styles.footer}>
@@ -60,6 +64,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 50,
   },
+  piggyImage: {
+    width: 200,
+    height: 200,
+    marginBottom: 20,
+  },
   title: {
     textAlign: 'center',
     marginBottom: 10,
@@ -69,14 +78,6 @@ const styles = StyleSheet.create({
     color: '#666',
     textAlign: 'center',
     marginBottom: 50,
-  },
-  circlePlaceholder: {
-    width: 200,
-    height: 200,
-    borderRadius: 100,
-    backgroundColor: '#E0E0E0',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   footer: {
     alignItems: 'center',

@@ -1,5 +1,3 @@
-import BaseHeader from '../Header/BaseHeader';
-import { styles as baseStyles } from '../Header/BaseHeader.styles';
 import { chatbotApi } from '@/components/utils/api';
 import { Typography } from '@/constants/Typography';
 import { Ionicons } from '@expo/vector-icons';
@@ -18,6 +16,8 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import BaseHeader from '../Header/BaseHeader';
+import { styles as baseStyles } from '../Header/BaseHeader.styles';
 import { styles } from './ChatbotPage.styles';
 
 type ChatMessage = {
@@ -176,7 +176,7 @@ export default function ChatbotPage() {
             ]}
           >
             {message.role === 'bot' && (
-              <Image source={require('@/assets/images/piggyicon.png')} style={styles.avatar} />
+              <Image source={require('@/assets/images/piggychatbot.png')} style={styles.avatar} />
             )}
 
             <View style={styles.messageBlock}>
@@ -242,7 +242,7 @@ export default function ChatbotPage() {
 
         {isLoading && (
           <View style={[styles.messageRow, styles.botMessageRow]}>
-            <Image source={require('@/assets/images/piggyicon.png')} style={styles.avatar} />
+            <Image source={require('@/assets/images/piggysplash.png')} style={styles.avatar} />
             <View style={styles.messageBlock}>
               <Text style={[styles.botName, Typography.Pretendard_B_16]}>피기</Text>
               <View style={[styles.bubble, styles.botBubble, styles.loadingBubble]}>

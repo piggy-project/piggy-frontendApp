@@ -1,7 +1,7 @@
 import { Typography } from '@/constants/Typography';
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function SignupSuccess() {
   const router = useRouter();
@@ -16,7 +16,11 @@ export default function SignupSuccess() {
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.emoji}>🎉</Text>
+        <Image 
+                  source={require('@/assets/images/signupPiggy.png')} 
+                  style={styles.piggyImage} 
+                  resizeMode="contain"
+                />
         <Text style={[styles.title, Typography.Pretendard_B_32]}>가입을 축하합니다!</Text>
         <Text style={[styles.subTitle, Typography.Pretendard_M_14]}>이제 PIGGY와 함께 똑똑한 여행을 시작해보세요.</Text>
       </View>
@@ -36,4 +40,9 @@ const styles = StyleSheet.create({
   subTitle: { color: '#666', textAlign: 'center', },
   button: { backgroundColor: '#333', paddingHorizontal: 40, paddingVertical: 16, borderRadius: 8, position: 'absolute', bottom: 40, width: '100%', alignItems: 'center' },
   buttonText: { color: '#fff' },
+  piggyImage: {
+    width: 200,
+    height: 200,
+    marginBottom: 20,
+  },
 });

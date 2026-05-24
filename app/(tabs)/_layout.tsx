@@ -15,8 +15,8 @@ export default function TabLayout() {
     return (
         <Tabs
             screenOptions={{
-                tabBarActiveTintColor: 'black',
-                tabBarInactiveTintColor: 'gray',
+                tabBarActiveTintColor: '#3D3D3D',
+                tabBarInactiveTintColor: '#C9C9C9',
                 headerShown: false,
                 tabBarStyle: {
                     height: 58 + bottomInset,
@@ -36,37 +36,35 @@ export default function TabLayout() {
                 name="exchange"
                 options={{
                     title: '탐색',
-                    tabBarIcon: ({ color }) => (
-                        <FindIcon width={24} height={24} fill={color} />
-                    ),
+                    tabBarIcon: ({ color }) => <FindIcon width={24} height={24} color={color} />,
                 }}
             />
             <Tabs.Screen
                 name="shopping"
                 options={{
                     title: '쇼핑',
-                    tabBarIcon: ({ color }) => <ShoppingIcon width={24} height={24} fill={color} />,
+                    tabBarIcon: ({ color }) => <ShoppingIcon width={24} height={24} color={color} />,
                 }}
             />
             <Tabs.Screen
                 name="index"
                 options={{
                     title: '홈',
-                    tabBarIcon: ({ color }) => <HomeIcon width={24} height={24} fill={color} />,
+                    tabBarIcon: ({ color }) => <HomeIcon width={24} height={24} color={color} />,
                 }}
             />
             <Tabs.Screen
                 name="community"
                 options={{
                     title: '커뮤니티',
-                    tabBarIcon: ({ color }) => <CommunityIcon width={24} height={24} fill={color} />,
+                    tabBarIcon: ({ color }) => <CommunityIcon width={24} height={24} color={color} />,
                 }}
             />
             <Tabs.Screen
                 name="mypage"
                 options={{
                     title: '마이페이지',
-                    tabBarIcon: ({ color }) => <MypageIcon width={24} height={24} fill={color} />,
+                    tabBarIcon: ({ color }) => <MypageIcon width={24} height={24} color={color} />,
                 }}
             />
         </Tabs>
