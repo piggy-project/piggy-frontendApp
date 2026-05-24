@@ -95,12 +95,12 @@ export default function SocialLoginButtons() {
 
       {/* 2. 구글 */}
       <TouchableOpacity
-        style={[styles.circle, styles.googleCircle]}
+        style={[styles.circle, styles.circle]}
         onPress={() => handleSocialLogin('google')}
       >
         <Image
           source={require('@/assets/images/googlelogo.png')}
-          style={styles.logoIcon}
+          style={styles.googlelogoIcon}
         />
       </TouchableOpacity>
 
@@ -137,12 +137,10 @@ const styles = StyleSheet.create({
     height: 50,
     resizeMode: 'contain',
   },
-  googleCircle: {
-    backgroundColor: '#FFFFFF',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 2,
+  googlelogoIcon: {
+    width: 65,
+    height: 65,
+    resizeMode: 'contain',
   },
+
 });
