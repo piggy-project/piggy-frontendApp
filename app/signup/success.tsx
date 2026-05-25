@@ -17,7 +17,7 @@ export default function SignupSuccess() {
     <View style={styles.container}>
       <View style={styles.content}>
         <Image 
-                  source={require('@/assets/images/signupPiggy.png')} 
+                  source={require('@/assets/images/signupgood.png')} 
                   style={styles.piggyImage} 
                   resizeMode="contain"
                 />

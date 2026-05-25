@@ -4,7 +4,7 @@
     "slug": "piggy",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/piggysplash.png",
+    "icon": "./assets/images/icon.png",
     "scheme": "piggy",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": false,
