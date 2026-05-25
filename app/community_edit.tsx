@@ -1,4 +1,6 @@
 import { communityApi } from '@/components/utils/api';
+import BaseHeader from '@/components/Header/BaseHeader';
+import BackButton from '@/components/Header/component/BackButton';
 import { Typography } from '@/constants/Typography';
 import { Ionicons } from '@expo/vector-icons';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -101,20 +103,19 @@ export default function CommunityEditPage() {
             style={styles.container}
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         >
-            {/* 헤더 */}
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => router.back()}>
-                    <Ionicons name="chevron-back" size={28} color="black" />
-                </TouchableOpacity>
-                <Text style={Typography.Pretendard_B_16}>글 수정하기</Text>
-                <TouchableOpacity onPress={handleUpdate} disabled={updateMutation.isPending}>
+            <BaseHeader
+                left={<BackButton />}
+                center={<Text style={Typography.Pretendard_B_16}>글 수정하기</Text>}
+                right={
+                  <TouchableOpacity onPress={handleUpdate} disabled={updateMutation.isPending}>
                     {updateMutation.isPending ? (
                         <ActivityIndicator size="small" color="#000" />
                     ) : (
                         <Text style={[Typography.Pretendard_B_16, styles.completeText]}>완료</Text>
                     )}
-                </TouchableOpacity>
-            </View>
+                  </TouchableOpacity>
+                }
+            />
 
             <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
                 {/* 제목 */}

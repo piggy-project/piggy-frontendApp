@@ -3,6 +3,8 @@ import { Platform, StatusBar, StyleProp, View, ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { styles } from './BaseHeader.styles';
 
+const HEADER_CONTENT_HEIGHT = 40;
+
 interface Props {
   left?: React.ReactNode;
   center?: React.ReactNode;
@@ -29,7 +31,10 @@ export default function BaseHeader({
   return (
     <View style={[
       styles.container, 
-      { paddingTop: topInset + (Platform.OS === 'android' ? 8 : 0) }
+      {
+        height: topInset + HEADER_CONTENT_HEIGHT,
+        paddingTop: topInset,
+      }
     ]}>
 
       {/* 왼쪽: 기본 스타일 + 외부 스타일(있을 경우) */}

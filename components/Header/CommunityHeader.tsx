@@ -1,6 +1,5 @@
 import SearchCommunity from '@/components/CommunityPage/component/SearchCommunity';
 import React from 'react';
-import { View } from 'react-native';
 import BaseHeader from './BaseHeader';
 import Notice from './component/Notice';
 import { styles as baseStyles } from './BaseHeader.styles';

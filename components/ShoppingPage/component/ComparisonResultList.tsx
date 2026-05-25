@@ -1,8 +1,13 @@
+import { shoppingApi } from '@/components/utils/api';
+import { getAccessToken } from '@/components/utils/authStore';
 import { Typography } from '@/constants/Typography';
+import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import React from 'react';
-import { Alert, Image, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, DeviceEventEmitter, Image, Linking, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function ComparisonResultList({ data }: { data: any }) {
+  const [favoriteMap, setFavoriteMap] = React.useState<Record<string, boolean>>({});
   const hasRakutenData = data?.rakutenResults?.Items?.length > 0;
   const hasSerpData = data?.serpResults?.length > 0;
 
@@ -17,6 +22,20 @@ export default function ComparisonResultList({ data }: { data: any }) {
 
   const { naverResults, rakutenResults, serpResults, exchangeRate, currencyCode } = data;
   const naverBestPrice = naverResults?.items?.[0]?.lprice || 0;
+
+  const showLoginRequiredAlert = () => {
+    Alert.alert(
+      '알림',
+      '로그인이 필요한 서비스입니다.',
+      [
+        { text: '취소', style: 'cancel' },
+        {
+          text: '로그인하러 가기',
+          onPress: () => router.push('/(tabs)/mypage'),
+        },
+      ]
+    );
+  };
 
   const calculateKrw = (localPrice: number) => {
     const isHundredUnit = ['JPY', 'VND'].includes(currencyCode);
@@ -37,10 +56,46 @@ export default function ComparisonResultList({ data }: { data: any }) {
     }
   };
 
+  const toggleFavorite = async (item: any, link: string, source: string) => {
+    const token = await getAccessToken();
+    if (!token) {
+      showLoginRequiredAlert();
+      return;
+    }
+
+    const externalProductId = String(item.externalProductId || item.itemCode || link || item.name);
+
+    try {
+      const result = await shoppingApi.toggleFavorite({
+        source,
+        externalProductId,
+        name: item.name,
+        price: Number(item.price) || 0,
+        imageUrl: item.image,
+        productUrl: link,
+        shopName: item.shopName,
+        currencyCode,
+        exchangeRate,
+      });
+      const nextFavorite = Boolean(result?.favorite ?? result?.data?.favorite);
+      setFavoriteMap((prev) => ({ ...prev, [`${source}-${externalProductId}`]: nextFavorite }));
+      DeviceEventEmitter.emit('shopping-favorites-updated');
+    } catch (error: any) {
+      console.error('검색 상품 즐겨찾기 실패:', error.response?.data || error.message);
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        showLoginRequiredAlert();
+        return;
+      }
+      Alert.alert('오류', '관심 상품 처리 중 문제가 발생했습니다.');
+    }
+  };
+
   // 공통 카드 렌더링 함수 (link 인자 추가)
-  const renderItemCard = (item: any, key: string, link: string) => {
+  const renderItemCard = (item: any, key: string, link: string, source: string) => {
     const priceInKrw = calculateKrw(item.price);
     const diff = naverBestPrice - priceInKrw;
+    const externalProductId = String(item.externalProductId || item.itemCode || link || item.name);
+    const favoriteKey = `${source}-${externalProductId}`;
 
     return (
       <TouchableOpacity 
@@ -50,10 +105,25 @@ export default function ComparisonResultList({ data }: { data: any }) {
         activeOpacity={0.8}
       >
         <View style={styles.row}>
-          <Image 
-            source={{ uri: item.image || 'https://via.placeholder.com/80' }} 
-            style={styles.image} 
-          />
+          <View style={styles.imageWrapper}>
+            <Image
+              source={{ uri: item.image || 'https://via.placeholder.com/80' }}
+              style={styles.image}
+            />
+            <Pressable
+              style={styles.favoriteButton}
+              onPress={(event) => {
+                event.stopPropagation();
+                toggleFavorite(item, link, source);
+              }}
+            >
+              <Ionicons
+                name={favoriteMap[favoriteKey] ? 'heart' : 'heart-outline'}
+                size={18}
+                color={favoriteMap[favoriteKey] ? '#FF6B8A' : '#555'}
+              />
+            </Pressable>
+          </View>
           <View style={styles.info}>
             <Text numberOfLines={2} style={[styles.itemName, Typography.Pretendard_M_14]}>
               {item.name}
@@ -92,9 +162,11 @@ export default function ComparisonResultList({ data }: { data: any }) {
         const item = itemObj.Item;
         return renderItemCard({
           name: item.itemName,
+          itemCode: item.itemCode,
           price: item.itemPrice,
           image: item.mediumImageUrls?.[0]?.imageUrl,
-        }, `rakuten-${index}`, item.itemUrl);
+          shopName: item.shopName,
+        }, `rakuten-${index}`, item.itemUrl, 'RAKUTEN');
       })}
 
       {/* 5. 동남아/미국/유럽 (SERP/eBay 리스트): item.link 사용 */}
@@ -103,7 +175,8 @@ export default function ComparisonResultList({ data }: { data: any }) {
           name: item.title,
           price: item.price,
           image: item.thumbnail,
-        }, `serp-${index}`, item.link);
+          shopName: item.source,
+        }, `serp-${index}`, item.link, 'SERP');
       })}
     </View>
   );
@@ -125,7 +198,19 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
   },
   row: { flexDirection: 'row' },
-  image: { width: 80, height: 80, borderRadius: 8, marginRight: 12, backgroundColor: '#f9f9f9' },
+  imageWrapper: { width: 80, height: 80, marginRight: 12, position: 'relative' },
+  image: { width: 80, height: 80, borderRadius: 8, backgroundColor: '#f9f9f9' },
+  favoriteButton: {
+    position: 'absolute',
+    right: 5,
+    bottom: 5,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: 'rgba(255,255,255,0.92)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   info: { flex: 1, justifyContent: 'space-between' },
   itemName: { color: '#333', marginBottom: 5 },
   priceRow: { flexDirection: 'row', alignItems: 'baseline' },

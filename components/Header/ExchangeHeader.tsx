@@ -73,7 +73,6 @@ const styles = StyleSheet.create({
     },
     timeText: {
         color: '#888',
-        marginRight: 8, // 국기와의 간격 (이건 gap으로 처리 안되는 미세조정일 수 있음)
     },
     flagText: {
         fontSize: 20,

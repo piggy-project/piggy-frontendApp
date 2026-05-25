@@ -54,9 +54,16 @@ export default function ShoppingPage() {
 
         return {
           ...item,
+          id: item.productUrl || item.url || item.link || item.externalProductId || item.id,
+          source: item.source || 'POPULAR',
+          externalProductId: String(item.externalProductId || item.productId || item.id || item.productUrl || item.url || item.link || item.itemName || item.title || item.name),
           image: item.imageUrl,
+          price,
           localPrice: `${price.toLocaleString()} ${itemCurrency}`,
           priceKrw: `${krwValue.toLocaleString()}원`,
+          shopName: item.shopName,
+          currencyCode: itemCurrency,
+          exchangeRate: rate,
         };
       });
       setRecommendItems(formattedData);

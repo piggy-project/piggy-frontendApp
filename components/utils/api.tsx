@@ -284,7 +284,45 @@ export const shoppingApi = {
     return request(`/food?currencyCode=${currencyCode}`, {
       method: 'GET'
     });
-  }
+  },
+  getFavorites: () => {
+    return request('/api/v1/shopping/favorites', {
+      method: 'GET',
+    });
+  },
+  toggleFavorite: (favoriteData: {
+    source: string;
+    externalProductId: string;
+    name?: string;
+    imageUrl?: string;
+    productUrl?: string;
+    price?: number;
+    shopName?: string;
+    currencyCode?: string;
+    exchangeRate?: number;
+  }) => {
+    return request('/api/v1/shopping/favorites/toggle', {
+      method: 'POST',
+      body: JSON.stringify(favoriteData),
+    });
+  },
+  checkFavorite: (source: string, externalProductId: string) => {
+    return request(
+      `/api/v1/shopping/favorites/check?source=${encodeURIComponent(source)}&externalProductId=${encodeURIComponent(externalProductId)}`,
+      { method: 'GET' }
+    );
+  },
+  deleteFavorite: (favoriteId: number) => {
+    return request(`/api/v1/shopping/favorites/${favoriteId}`, {
+      method: 'DELETE',
+    });
+  },
+  deleteFavoriteByProduct: (source: string, externalProductId: string) => {
+    return request(
+      `/api/v1/shopping/favorites?source=${encodeURIComponent(source)}&externalProductId=${encodeURIComponent(externalProductId)}`,
+      { method: 'DELETE' }
+    );
+  },
 };
 
 export const chatbotApi = {

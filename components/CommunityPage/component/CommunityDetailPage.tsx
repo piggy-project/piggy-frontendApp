@@ -1,5 +1,7 @@
 import { communityApi } from '@/components/utils/api';
 import { getAccessToken } from '@/components/utils/authStore';
+import BaseHeader from '@/components/Header/BaseHeader';
+import BackButton from '@/components/Header/component/BackButton';
 import { Typography } from '@/constants/Typography';
 import { Ionicons } from '@expo/vector-icons';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -62,6 +64,7 @@ export default function CommunityDetailPage() {
     onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ['posts'] });
       queryClient.invalidateQueries({ queryKey: ['post', Number(id)] });
+      queryClient.invalidateQueries({ queryKey: ['myCommunityActivity'] });
     },
     onError: (error: any) => {
       Alert.alert('오류', error.message || '좋아요 처리 중 오류가 발생했습니다.');
@@ -114,6 +117,7 @@ export default function CommunityDetailPage() {
       queryClient.invalidateQueries({ queryKey: ['post', Number(id)] });
       queryClient.invalidateQueries({ queryKey: ['hotPost'] });
       queryClient.invalidateQueries({ queryKey: ['posts'] });
+      queryClient.invalidateQueries({ queryKey: ['myCommunityActivity'] });
     },
     onError: (error: any) => {
       Alert.alert('오류', error.message || '댓글 작성 중 오류가 발생했습니다.');
@@ -149,6 +153,7 @@ export default function CommunityDetailPage() {
       queryClient.invalidateQueries({ queryKey: ['post', Number(id)] });
       queryClient.invalidateQueries({ queryKey: ['hotPost'] });
       queryClient.invalidateQueries({ queryKey: ['posts'] });
+      queryClient.invalidateQueries({ queryKey: ['myCommunityActivity'] });
     },
     onError: (error: any) => {
       Alert.alert('오류', error.message || '댓글 삭제 중 오류가 발생했습니다.');
@@ -176,16 +181,17 @@ export default function CommunityDetailPage() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
     >
-      <View style={styles.customHeader}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Ionicons name="chevron-back" size={28} color="black" />
-        </TouchableOpacity>
-        {post.isAuthor && (
-          <TouchableOpacity onPress={() => setIsMenuVisible(true)}>
-            <Ionicons name="ellipsis-vertical" size={20} color="black" />
-          </TouchableOpacity>
-        )}
-      </View>
+      <BaseHeader
+        left={<BackButton />}
+        center={null}
+        right={
+          post.isAuthor ? (
+            <TouchableOpacity onPress={() => setIsMenuVisible(true)}>
+              <Ionicons name="ellipsis-vertical" size={20} color="black" />
+            </TouchableOpacity>
+          ) : null
+        }
+      />
       <Modal
         visible={isMenuVisible}
         transparent={true}

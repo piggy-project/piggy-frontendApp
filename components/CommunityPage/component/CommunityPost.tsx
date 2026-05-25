@@ -49,6 +49,7 @@ const CommunityPost: React.FC<PostProps> = ({ id, user, category, time, code, ti
       queryClient.invalidateQueries({ queryKey: ['posts'] });
       queryClient.invalidateQueries({ queryKey: ['post', id] });
       queryClient.invalidateQueries({ queryKey: ['hotPost'] });
+      queryClient.invalidateQueries({ queryKey: ['myCommunityActivity'] });
     },
     onError: (error: any) => {
       const errorMsg = error.message || '좋아요 처리 중 오류가 발생했습니다.';

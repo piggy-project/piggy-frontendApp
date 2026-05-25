@@ -46,7 +46,7 @@ export default function WonSign({ onSelect }: Props) {
   return (
     <View>
       {/* 1. 헤더에 보일 원화 아이콘 버튼 */}
-      <TouchableOpacity onPress={() => setVisible(true)}>
+      <TouchableOpacity style={styles.button} onPress={() => setVisible(true)}>
         <Image
           source={require('@/assets/images/WonSign.png')} // 경로 확인해주세요
           style={styles.wonsign}
@@ -94,6 +94,12 @@ export default function WonSign({ onSelect }: Props) {
 }
 
 const styles = StyleSheet.create({
+  button: {
+    width: 36,
+    height: 36,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   wonsign: {
     width: 24,  // 아이콘 크기 조절
     height: 24,

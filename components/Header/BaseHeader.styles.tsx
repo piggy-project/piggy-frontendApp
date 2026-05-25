@@ -3,11 +3,9 @@ import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
   container: {
-    minHeight: 60,
-    paddingBottom: 12,
     backgroundColor: '#fff',
     flexDirection: 'row',
-    alignItems: 'flex-end',
+    alignItems: 'center',
     paddingHorizontal: 20,
   },
 
@@ -15,22 +13,22 @@ export const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'flex-start',
-    alignItems: 'flex-end',
+    alignItems: 'center',
     gap: 8,
   },
 
   centerArea: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
   },
 
   rightArea: {
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    alignItems: 'flex-end',
-    gap: 12,
+    alignItems: 'center',
+    gap: 8,
   },
 
   title: {
@@ -41,6 +39,7 @@ export const styles = StyleSheet.create({
   wideCenterArea: {
     flex: 3,
     alignItems: 'stretch',
+    justifyContent: 'center',
   },
   
   shrinkSideArea: {

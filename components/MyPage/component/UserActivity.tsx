@@ -2,8 +2,8 @@ import { communityApi } from '@/components/utils/api';
 import { Typography } from '@/constants/Typography';
 import { Ionicons } from '@expo/vector-icons';
 import { useQuery } from '@tanstack/react-query';
-import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import { useFocusEffect, useRouter } from 'expo-router';
+import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 type ActivityTab = '게시물' | '댓글' | '좋아요';
@@ -60,12 +60,25 @@ export default function UserActivity() {
   const {
     data,
     isLoading,
+    isFetching,
     isError,
+    refetch,
   } = useQuery<MyActivityResponse>({
     queryKey: ['myCommunityActivity'],
     queryFn: communityApi.getMyActivity,
-    staleTime: 1000 * 60,
+    staleTime: 0,
+    refetchOnMount: 'always',
   });
+
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [refetch])
+  );
+
+  useEffect(() => {
+    refetch();
+  }, [activeTab, refetch]);
 
   const posts = normalizePosts(data);
   const comments = normalizeComments(data);
@@ -77,7 +90,7 @@ export default function UserActivity() {
   };
 
   const renderContent = () => {
-    if (isLoading) {
+    if (isLoading && !data) {
       return (
         <View style={styles.centerContent}>
           <ActivityIndicator size="small" color="#FFB7C5" />
@@ -149,6 +162,11 @@ export default function UserActivity() {
         ))}
       </View>
 
+      {isFetching && data ? (
+        <View style={styles.refreshIndicator}>
+          <ActivityIndicator size="small" color="#FFB7C5" />
+        </View>
+      ) : null}
       {renderContent()}
     </View>
   );
@@ -268,6 +286,10 @@ const styles = StyleSheet.create({
   },
   list: {
     paddingHorizontal: 16,
+  },
+  refreshIndicator: {
+    paddingTop: 8,
+    alignItems: 'center',
   },
   postRow: {
     minHeight: 62,

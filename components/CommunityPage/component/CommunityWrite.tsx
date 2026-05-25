@@ -1,4 +1,6 @@
 import { communityApi } from '@/components/utils/api';
+import BaseHeader from '@/components/Header/BaseHeader';
+import BackButton from '@/components/Header/component/BackButton';
 import { Typography } from '@/constants/Typography';
 import { Ionicons } from '@expo/vector-icons';
 import { useQueryClient } from '@tanstack/react-query';
@@ -121,19 +123,19 @@ export default function CommunityWrite() {
             style={styles.container}
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         >
-            {/* 상단 헤더 커스텀 (사진처럼 뒤로가기 + 완료) */}
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => router.back()}>
-                    <Ionicons name="chevron-back" size={28} color="black" />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={handleSubmit} disabled={isSubmitting}>
+            <BaseHeader
+                left={<BackButton />}
+                center={null}
+                right={
+                  <TouchableOpacity onPress={handleSubmit} disabled={isSubmitting}>
                     {isSubmitting ? (
                         <ActivityIndicator size="small" color="#000" />
                     ) : (
                         <Text style={[Typography.Pretendard_B_16, styles.completeText]}>완료</Text>
                     )}
-                </TouchableOpacity>
-            </View>
+                  </TouchableOpacity>
+                }
+            />
 
             <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
                 {/* 1. 게시판 선택 칩 (사진 스타일) */}

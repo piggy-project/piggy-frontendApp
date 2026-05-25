@@ -19,6 +19,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BaseHeader from '../Header/BaseHeader';
 import { styles as baseStyles } from '../Header/BaseHeader.styles';
+import BackButton from '../Header/component/BackButton';
 import { styles } from './ChatbotPage.styles';
 
 type ChatMessage = {
@@ -155,9 +156,7 @@ export default function ChatbotPage() {
       <BaseHeader
         left={
           <>
-            <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-              <Ionicons name="chevron-back" size={28} color="#555" />
-            </TouchableOpacity>
+            <BackButton onPress={() => router.back()} />
             <Text style={baseStyles.title}>AI 챗봇 피기</Text>
           </>
         }

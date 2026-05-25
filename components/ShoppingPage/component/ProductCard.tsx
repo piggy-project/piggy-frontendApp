@@ -1,6 +1,10 @@
+import { shoppingApi } from '@/components/utils/api';
+import { getAccessToken } from '@/components/utils/authStore';
 import { Typography } from '@/constants/Typography';
-import React from 'react';
-import { Alert, Image, Linking, Text, TouchableOpacity, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
+import React, { useState } from 'react';
+import { Alert, DeviceEventEmitter, Image, Linking, Pressable, Text, TouchableOpacity, View } from 'react-native';
 import { styles } from './ProductCard.styles';
 
 interface ProductCardProps {
@@ -11,6 +15,18 @@ interface ProductCardProps {
   priceKrw: string;
   localPrice: string;
   originalPrice?: string;
+  price?: number;
+  source?: string;
+  externalProductId?: string;
+  productUrl?: string;
+  url?: string;
+  link?: string;
+  shopName?: string;
+  currencyCode?: string;
+  exchangeRate?: number;
+  favorited?: boolean;
+  favorite?: boolean;
+  isFavorite?: boolean;
 }
 
 export default function ProductCard({ 
@@ -20,20 +36,53 @@ export default function ProductCard({
   discount, 
   priceKrw, 
   localPrice, 
-  originalPrice 
+  originalPrice,
+  price,
+  source,
+  externalProductId,
+  productUrl,
+  url,
+  link,
+  shopName,
+  currencyCode,
+  exchangeRate,
+  favorited,
+  favorite,
+  isFavorite,
 }: ProductCardProps) {
+  const [isFavorited, setIsFavorited] = useState(Boolean(favorited ?? favorite ?? isFavorite));
+  const productLink = productUrl || url || link || id;
+  const favoriteSource = source || 'POPULAR';
+  const favoriteExternalId = String(externalProductId || id || productLink || name);
+  const favoritePrice = typeof price === 'number'
+    ? price
+    : Number(String(localPrice).replace(/[^0-9.-]/g, '')) || 0;
+
+  const showLoginRequiredAlert = () => {
+    Alert.alert(
+      '알림',
+      '로그인이 필요한 서비스입니다.',
+      [
+        { text: '취소', style: 'cancel' },
+        {
+          text: '로그인하러 가기',
+          onPress: () => router.push('/(tabs)/mypage'),
+        },
+      ]
+    );
+  };
 
   // 클릭 시 링크로 이동하는 핸들러
   const handlePress = async () => {
-    if (!id || !id.startsWith('http')) {
+    if (!productLink || !productLink.startsWith('http')) {
       Alert.alert("알림", "연결 가능한 상품 페이지가 없습니다.");
       return;
     }
 
     try {
-      const supported = await Linking.canOpenURL(id);
+      const supported = await Linking.canOpenURL(productLink);
       if (supported) {
-        await Linking.openURL(id);
+        await Linking.openURL(productLink);
       } else {
         Alert.alert("알림", "이 링크를 열 수 있는 앱이 없습니다.");
       }
@@ -43,17 +92,64 @@ export default function ProductCard({
     }
   };
 
+  const handleToggleFavorite = async () => {
+    const token = await getAccessToken();
+    if (!token) {
+      showLoginRequiredAlert();
+      return;
+    }
+
+    try {
+      const result = await shoppingApi.toggleFavorite({
+        source: favoriteSource,
+        externalProductId: favoriteExternalId,
+        name,
+        price: favoritePrice,
+        imageUrl: image,
+        productUrl: productLink,
+        shopName,
+        currencyCode,
+        exchangeRate,
+      });
+      const nextFavorite = Boolean(result?.favorite ?? result?.favorited ?? result?.isFavorite ?? result?.data?.favorite);
+      setIsFavorited(nextFavorite);
+      DeviceEventEmitter.emit('shopping-favorites-updated');
+    } catch (error: any) {
+      console.error('상품 즐겨찾기 실패:', error.response?.data || error.message);
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        showLoginRequiredAlert();
+        return;
+      }
+      Alert.alert('오류', '관심 상품 처리 중 문제가 발생했습니다.');
+    }
+  };
+
   return (
     <TouchableOpacity 
       style={styles.container} 
       onPress={handlePress} 
       activeOpacity={0.8}
     >
-      {image ? (
-        <Image source={{ uri: image }} style={styles.image} resizeMode="cover" />
-      ) : (
-        <View style={styles.imagePlaceholder} />
-      )}
+      <View style={styles.imageWrapper}>
+        {image ? (
+          <Image source={{ uri: image }} style={styles.image} resizeMode="cover" />
+        ) : (
+          <View style={styles.imagePlaceholder} />
+        )}
+        <Pressable
+          style={styles.favoriteButton}
+          onPress={(event) => {
+            event.stopPropagation();
+            handleToggleFavorite();
+          }}
+        >
+          <Ionicons
+            name={isFavorited ? 'heart' : 'heart-outline'}
+            size={20}
+            color={isFavorited ? '#FF6B8A' : '#555'}
+          />
+        </Pressable>
+      </View>
       
       <Text style={[styles.name, Typography.Pretendard_M_12]} numberOfLines={2}>
         {name}
