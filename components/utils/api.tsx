@@ -76,11 +76,20 @@ api.interceptors.response.use(
       } catch (refreshError: any) {
         console.error('[API] 리프레시 실패:', refreshError.response?.data || refreshError.message);
         processQueue(refreshError, null);
-        
-        await removeTokens();
-        
-        // 전역 세션 만료 알림 (AuthContext 등에서 감지)
-        DeviceEventEmitter.emit('auth-session-expired');
+
+        const status = refreshError.response?.status;
+        const shouldExpireSession =
+          status === 401 ||
+          status === 403 ||
+          refreshError.message === 'No refresh token available' ||
+          refreshError.message === 'Invalid token response from server';
+
+        if (shouldExpireSession) {
+          await removeTokens();
+
+          // 전역 세션 만료 알림 (AuthContext 등에서 감지)
+          DeviceEventEmitter.emit('auth-session-expired');
+        }
 
         return Promise.reject(refreshError);
       } finally {

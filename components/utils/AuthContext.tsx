@@ -50,18 +50,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         let accessToken = await getAccessToken();
         const refreshToken = await getRefreshToken();
 
-        if (!accessToken && refreshToken) {
-          console.log('[Auth] 액세스 토큰 없음, 리프레시 토큰으로 재발급 시도 중...');
-          const refreshed = await authApi.reissue(refreshToken);
-          const newAccess = refreshed?.accessToken || refreshed?.data?.accessToken;
-          const newRefresh = refreshed?.refreshToken || refreshed?.data?.refreshToken || refreshToken;
+        if (refreshToken) {
+          try {
+            console.log('[Auth] 리프레시 토큰으로 액세스 토큰 재발급 시도 중...');
+            const refreshed = await authApi.reissue(refreshToken);
+            const newAccess = refreshed?.accessToken || refreshed?.data?.accessToken;
+            const newRefresh = refreshed?.refreshToken || refreshed?.data?.refreshToken || refreshToken;
 
-          if (!newAccess) {
-            throw new Error('Invalid refresh response');
+            if (!newAccess) {
+              throw new Error('Invalid refresh response');
+            }
+
+            await saveTokens(newAccess, newRefresh);
+            accessToken = newAccess;
+          } catch (refreshError: any) {
+            const status = refreshError.response?.status;
+
+            if (status === 401 || status === 403 || refreshError.message === 'Invalid refresh response') {
+              throw refreshError;
+            }
+
+            console.log('[Auth] 액세스 토큰 재발급 보류, 기존 토큰으로 사용자 정보 조회 시도:', refreshError.message);
           }
-
-          await saveTokens(newAccess, newRefresh);
-          accessToken = newAccess;
         }
 
         if (!accessToken) {
@@ -86,6 +96,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         if (status === 401 || status === 403 || e.message === 'Invalid refresh response') {
           await removeTokens();
+          if (e.config?.url?.includes('/auth/refresh') || e.message === 'Invalid refresh response') {
+            Alert.alert('알림', '세션이 만료되었습니다. 다시 로그인해 주세요.');
+          }
         }
 
         setUser(null);
