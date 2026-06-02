@@ -67,6 +67,12 @@ export default function TabLayout() {
                     tabBarIcon: ({ color }) => <MypageIcon width={24} height={24} color={color} />,
                 }}
             />
+            <Tabs.Screen
+                name="shopping-bookmarks"
+                options={{
+                    href: null,
+                }}
+            />
         </Tabs>
     );
 }

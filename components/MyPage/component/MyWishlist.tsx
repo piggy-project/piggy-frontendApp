@@ -1,7 +1,7 @@
 import { shoppingApi } from '@/components/utils/api';
 import { Typography } from '@/constants/Typography';
 import { Ionicons } from '@expo/vector-icons';
-import { useFocusEffect } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
@@ -101,7 +101,16 @@ export default function MyWishlist() {
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.title, Typography.Pretendard_B_16]}>내 관심 상품 목록</Text>
+      <View style={styles.titleRow}>
+        <Text style={[styles.title, Typography.Pretendard_B_16]}>내 관심 상품 목록</Text>
+        <TouchableOpacity
+          style={styles.moreButton}
+          onPress={() => router.push('/(tabs)/shopping-bookmarks' as any)}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="chevron-forward" size={22} color="#777" />
+        </TouchableOpacity>
+      </View>
 
       {isLoading ? (
         <View style={styles.loadingBox}>
@@ -153,7 +162,19 @@ export default function MyWishlist() {
 
 const styles = StyleSheet.create({
   container: { paddingHorizontal: 20, paddingVertical: 15, backgroundColor: '#fff' },
-  title: { marginBottom: 16 },
+  titleRow: {
+    marginBottom: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  title: { color: '#111' },
+  moreButton: {
+    width: 32,
+    height: 32,
+    justifyContent: 'center',
+    alignItems: 'flex-end',
+  },
   card: { width: 120, marginRight: 12 },
   imageBox: {
     width: 120,
