@@ -83,8 +83,16 @@ export default function MyWishlist() {
       } else {
         await shoppingApi.deleteFavoriteByProduct(item.source, item.externalProductId);
       }
-      setItems((prev) => prev.filter((favorite) => favorite.id !== item.id));
-      DeviceEventEmitter.emit('shopping-favorites-updated');
+      setItems((prev) => prev.filter((favorite) => (
+        item.id
+          ? favorite.id !== item.id
+          : !(favorite.source === item.source && favorite.externalProductId === item.externalProductId)
+      )));
+      DeviceEventEmitter.emit('shopping-favorites-updated', {
+        source: item.source,
+        externalProductId: item.externalProductId,
+        favorite: false,
+      });
     } catch (error: any) {
       console.error('관심 상품 삭제 실패:', error.response?.data || error.message);
       Alert.alert('오류', '관심 상품 삭제 중 문제가 발생했습니다.');
@@ -119,7 +127,7 @@ export default function MyWishlist() {
                   <View style={styles.imagePlaceholder} />
                 )}
                 <TouchableOpacity style={styles.bookmark} onPress={() => handleDelete(item)}>
-                  <Ionicons name="heart" size={18} color="#FF6B8A" />
+                  <Ionicons name="bookmark" size={18} color="#FF6B8A" />
                 </TouchableOpacity>
               </View>
               <Text style={[styles.pName, Typography.Pretendard_M_12]} numberOfLines={2}>

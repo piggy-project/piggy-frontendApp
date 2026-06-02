@@ -10,5 +10,9 @@ export const styles = StyleSheet.create({
   // 위젯들 사이의 간격을 벌려주는 역할
   sectionGap: {
     gap: 0, // 아이템들 사이에 20px씩 간격 자동 생성
+  },
+  searchModeScreen: {
+    flex: 1,
+    backgroundColor: '#fff',
   }
 });

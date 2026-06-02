@@ -2,6 +2,7 @@ import { chatbotApi } from '@/components/utils/api';
 import { useAuth } from '@/components/utils/AuthContext';
 import { Typography } from '@/constants/Typography';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -40,15 +41,34 @@ type SuggestedQuestion = {
   question: string;
 };
 
+const CHATBOT_CACHE_KEY = 'piggy-chatbot-messages';
+const CHATBOT_CACHE_TTL_MS = 5 * 60 * 1000;
+
 const getTimeText = (date: Date) => {
   const hours = date.getHours();
   const minutes = date.getMinutes().toString().padStart(2, '0');
   return `${hours < 12 ? '오전' : '오후'} ${hours % 12 || 12}:${minutes}`;
 };
 
+const createWelcomeMessage = (name: string): ChatMessage => ({
+  id: 'welcome',
+  role: 'bot',
+  text: `안녕하세요. ${name}님!\nAI 챗봇 피기예요.\n\n무엇을 도와드릴까요?`,
+  createdAt: new Date(),
+});
+
+const parseCachedMessages = (messages: any[]): ChatMessage[] => {
+  return messages.map((message) => ({
+    ...message,
+    createdAt: new Date(message.createdAt),
+  }));
+};
+
 export default function ChatbotPage() {
   const insets = useSafeAreaInsets();
   const scrollRef = useRef<ScrollView>(null);
+  const messagesRef = useRef<ChatMessage[]>([]);
+  const hasHydratedRef = useRef(false);
   const [question, setQuestion] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
@@ -56,6 +76,8 @@ export default function ChatbotPage() {
   const { user } = useAuth();
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const currentName = user?.nickname || '회원';
+  const currentNameRef = useRef(currentName);
 
   const dateText = useMemo(() => {
     const now = new Date();
@@ -66,18 +88,68 @@ export default function ChatbotPage() {
   }, []);
 
   useEffect(() => {
-    const currentName = user?.nickname || '회원';
-    
-    setMessages([
-      {
-        id: 'welcome',
-        role: 'bot',
-        // 백틱(``) 기호와 ${} 표준 템플릿 리터럴 문법을 사용하여 변수를 동적으로 매핑합니다.
-        text: `안녕하세요. ${currentName}님!\nAI 챗봇 피기예요.\n\n무엇을 도와드릴까요?`,
-        createdAt: new Date(),
-      },
-    ]);
-  }, [user]);
+    messagesRef.current = messages;
+  }, [messages]);
+
+  useEffect(() => {
+    currentNameRef.current = currentName;
+  }, [currentName]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const restoreMessages = async () => {
+      try {
+        const cached = await AsyncStorage.getItem(CHATBOT_CACHE_KEY);
+        const parsed = cached ? JSON.parse(cached) : null;
+        const leftAt = Number(parsed?.leftAt);
+        const cachedMessages = Array.isArray(parsed?.messages) ? parsed.messages : [];
+        const isCacheValid = leftAt && Date.now() - leftAt <= CHATBOT_CACHE_TTL_MS;
+
+        if (!isMounted) return;
+
+        if (isCacheValid && cachedMessages.length > 0) {
+          const restoredMessages = parseCachedMessages(cachedMessages);
+          messagesRef.current = restoredMessages;
+          setMessages(restoredMessages);
+        } else {
+          await AsyncStorage.removeItem(CHATBOT_CACHE_KEY);
+          const welcomeMessages = [createWelcomeMessage(currentNameRef.current)];
+          messagesRef.current = welcomeMessages;
+          setMessages(welcomeMessages);
+        }
+      } catch (error) {
+        console.error('챗봇 대화 복원 실패:', error);
+        if (isMounted) {
+          const welcomeMessages = [createWelcomeMessage(currentNameRef.current)];
+          messagesRef.current = welcomeMessages;
+          setMessages(welcomeMessages);
+        }
+      } finally {
+        hasHydratedRef.current = true;
+      }
+    };
+
+    restoreMessages();
+
+    return () => {
+      isMounted = false;
+
+      if (!hasHydratedRef.current) {
+        return;
+      }
+
+      AsyncStorage.setItem(
+        CHATBOT_CACHE_KEY,
+        JSON.stringify({
+          leftAt: Date.now(),
+          messages: messagesRef.current,
+        })
+      ).catch((error) => {
+        console.error('챗봇 대화 저장 실패:', error);
+      });
+    };
+  }, []);
 
   useEffect(() => {
     const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
@@ -110,7 +182,11 @@ export default function ChatbotPage() {
     };
 
     setQuestion('');
-    setMessages((prev) => [...prev, userMessage]);
+    setMessages((prev) => {
+      const nextMessages = [...prev, userMessage];
+      messagesRef.current = nextMessages;
+      return nextMessages;
+    });
     setIsLoading(true);
     scrollToBottom();
 
@@ -125,18 +201,27 @@ export default function ChatbotPage() {
         navigationLinks: payload?.navigationLinks || [],
         suggestedQuestions: payload?.suggestedQuestions || [],
       };
-      setMessages((prev) => [...prev, botMessage]);
+      setMessages((prev) => {
+        const nextMessages = [...prev, botMessage];
+        messagesRef.current = nextMessages;
+        return nextMessages;
+      });
     } catch (error) {
       console.error('챗봇 응답 에러:', error);
-      setMessages((prev) => [
-        ...prev,
-        {
+      setMessages((prev) => {
+        const errorMessage: ChatMessage = {
           id: `bot-error-${Date.now()}`,
           role: 'bot',
           text: '지금은 답변을 불러오지 못했어요. 네트워크 상태를 확인한 뒤 다시 시도해 주세요.',
           createdAt: new Date(),
-        },
-      ]);
+        };
+        const nextMessages = [
+          ...prev,
+          errorMessage,
+        ];
+        messagesRef.current = nextMessages;
+        return nextMessages;
+      });
     } finally {
       setIsLoading(false);
       scrollToBottom();

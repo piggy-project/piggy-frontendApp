@@ -3,7 +3,7 @@ import { getAccessToken } from '@/components/utils/authStore';
 import { Typography } from '@/constants/Typography';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Alert, DeviceEventEmitter, Image, Linking, Pressable, Text, TouchableOpacity, View } from 'react-native';
 import { styles } from './ProductCard.styles';
 
@@ -57,6 +57,28 @@ export default function ProductCard({
   const favoritePrice = typeof price === 'number'
     ? price
     : Number(String(localPrice).replace(/[^0-9.-]/g, '')) || 0;
+
+  useEffect(() => {
+    setIsFavorited(Boolean(favorited ?? favorite ?? isFavorite));
+  }, [favorite, favorited, isFavorite]);
+
+  useEffect(() => {
+    const subscription = DeviceEventEmitter.addListener('shopping-favorites-updated', (payload?: {
+      source?: string;
+      externalProductId?: string;
+      favorite?: boolean;
+    }) => {
+      if (!payload?.source || !payload?.externalProductId || typeof payload.favorite !== 'boolean') {
+        return;
+      }
+
+      if (payload.source === favoriteSource && String(payload.externalProductId) === favoriteExternalId) {
+        setIsFavorited(payload.favorite);
+      }
+    });
+
+    return () => subscription.remove();
+  }, [favoriteExternalId, favoriteSource]);
 
   const showLoginRequiredAlert = () => {
     Alert.alert(
@@ -113,7 +135,11 @@ export default function ProductCard({
       });
       const nextFavorite = Boolean(result?.favorite ?? result?.favorited ?? result?.isFavorite ?? result?.data?.favorite);
       setIsFavorited(nextFavorite);
-      DeviceEventEmitter.emit('shopping-favorites-updated');
+      DeviceEventEmitter.emit('shopping-favorites-updated', {
+        source: favoriteSource,
+        externalProductId: favoriteExternalId,
+        favorite: nextFavorite,
+      });
     } catch (error: any) {
       console.error('상품 즐겨찾기 실패:', error.response?.data || error.message);
       if (error.response?.status === 401 || error.response?.status === 403) {
@@ -144,9 +170,9 @@ export default function ProductCard({
           }}
         >
           <Ionicons
-            name={isFavorited ? 'heart' : 'heart-outline'}
+            name={isFavorited ? 'bookmark' : 'bookmark-outline'}
             size={20}
-            color={isFavorited ? '#FF6B8A' : '#555'}
+            color={isFavorited ? '#FF6B8A' : '#C9C9C9'}
           />
         </Pressable>
       </View>

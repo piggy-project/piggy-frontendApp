@@ -1,6 +1,7 @@
 import { shoppingApi } from '@/components/utils/api';
 import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, RefreshControl, ScrollView, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MainHeader from '../Header/MainHeader';
 import ChoiceCountry from '../MainDashBoardPage/component/ChoiceCountry';
 import ComparisonResultList from './component/ComparisonResultList';
@@ -26,11 +27,13 @@ const getCountryCode = (currencyCode: string): string => {
 };
 
 export default function ShoppingPage() {
+  const insets = useSafeAreaInsets();
   const [searchResult, setSearchResult] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [recommendItems, setRecommendItems] = useState([]);
   const [foodItems, setFoodItems] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [isSearchMode, setIsSearchMode] = useState(false);
 
   // 현재 선택된 통화 코드 상태 추가 (기본값: JPY)
   const [selectedCurrency, setSelectedCurrency] = useState('JPY');
@@ -119,6 +122,7 @@ export default function ShoppingPage() {
     }
 
     setLastQuery(query); // 최근 검색어 저장
+    setIsSearchMode(false);
 
     try {
       setIsLoading(true);
@@ -137,55 +141,76 @@ export default function ShoppingPage() {
     setLastQuery('');
   };
 
+  const handleExitSearchMode = () => {
+    setIsSearchMode(false);
+    handleReset();
+  };
+
   const onRefresh = async () => {
     setRefreshing(true);
-    await fetchRecommendations(selectedCurrency), fetchFoodItems(selectedCurrency);;
+    await fetchRecommendations(selectedCurrency);
+    await fetchFoodItems(selectedCurrency);
     setRefreshing(false);
   };
 
   return (
     <View style={styles.container}>
-      <MainHeader />
-      <View style={[styles.sectionGap, { flex: 1 }]}>
-        <ChoiceCountry onSelect={handleCountrySelect} />
-        <SearchProduct
-          onSearch={(q) => handleSearch(q)}
-          onClear={handleReset}
-        />
-        <ScrollView
-          style={{ flex: 1, backgroundColor: '#fff' }}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              colors={['#FFD700']}
-              tintColor="#FFD700"
+      {isSearchMode ? (
+        <View style={[styles.searchModeScreen, { paddingTop: Math.max(insets.top, 8) }]}>
+          <SearchProduct
+            variant="search"
+            autoFocus
+            onBack={handleExitSearchMode}
+            onSearch={(q) => handleSearch(q)}
+            onClear={handleReset}
+          />
+        </View>
+      ) : (
+        <>
+          <MainHeader />
+          <View style={[styles.sectionGap, { flex: 1 }]}>
+            <ChoiceCountry onSelect={handleCountrySelect} />
+            <SearchProduct
+              onFocus={() => setIsSearchMode(true)}
+              onSearch={(q) => handleSearch(q)}
+              onClear={handleReset}
             />
-          }
-        >
-          {isLoading ? (
-            <ActivityIndicator size="large" color="#FFD700" style={{ marginTop: 50 }} />
-          ) : searchResult ? (
-            <ComparisonResultList data={searchResult} />
-          ) : (
-            <>
-              <ProductSection
-                //title={`🍱 =${selectedCurrency} 여행 시 꼭 먹어야 할 음식`}
-                title={`현지 추천 음식`}
-                data={foodItems}
-                type="food"
-              />
-              <ProductSection
-                //title={`🔥 실시간 ${selectedCurrency} 인기템`}
-                title={`실시간 인기템`}
-                data={recommendItems}
-                type="product"
-              />
-            </>
-          )}
-        </ScrollView>
-        <ShoppingUtility />
-      </View>
+            <ScrollView
+              style={{ flex: 1, backgroundColor: '#fff' }}
+              refreshControl={
+                <RefreshControl
+                  refreshing={refreshing}
+                  onRefresh={onRefresh}
+                  colors={['#FFD700']}
+                  tintColor="#FFD700"
+                />
+              }
+            >
+              {isLoading ? (
+                <ActivityIndicator size="large" color="#FFD700" style={{ marginTop: 50 }} />
+              ) : searchResult ? (
+                <ComparisonResultList data={searchResult} />
+              ) : (
+                <>
+                  <ProductSection
+                    //title={`🍱 =${selectedCurrency} 여행 시 꼭 먹어야 할 음식`}
+                    title={`현지 추천 음식`}
+                    data={foodItems}
+                    type="food"
+                  />
+                  <ProductSection
+                    //title={`🔥 실시간 ${selectedCurrency} 인기템`}
+                    title={`실시간 인기템`}
+                    data={recommendItems}
+                    type="product"
+                  />
+                </>
+              )}
+            </ScrollView>
+            <ShoppingUtility />
+          </View>
+        </>
+      )}
     </View>
   );
 }
