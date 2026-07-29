@@ -5,10 +5,20 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 20,
     backgroundColor: "#ffffff",
   },
+  titleRow: {
+    marginBottom: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
   title: {
     color: "#000000",
-    marginBottom: 10,
+    flexShrink: 1,
     letterSpacing: -0.5,
+  },
+  timeText: {
+    color: '#888',
+    marginLeft: 10,
   },
   cardContainer: {
     flexDirection: "row",

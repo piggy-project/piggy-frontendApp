@@ -7,6 +7,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { ActivityIndicator, Alert, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import NotificationSettings from './NotificationSettings';
 import { styles } from './ProfileDetail.styles';
 
 export default function ProfileDetail() {
@@ -183,6 +184,8 @@ export default function ProfileDetail() {
         </View>
 
       </View>
+
+      <NotificationSettings />
 
       <TouchableOpacity style={styles.logoutContainer} onPress={handleLogout}>
         <Text style={styles.logoutText}>로그아웃</Text>

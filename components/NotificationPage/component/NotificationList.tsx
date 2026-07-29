@@ -1,54 +1,54 @@
-import { Ionicons } from '@expo/vector-icons';
-import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, Text, TouchableOpacity, View } from 'react-native';
-import { styles } from './NotificationList.styles';
+import { NOTIFICATION_STORAGE_KEY, StoredNotification } from '@/components/utils/NotificationHelper';
 import { Typography } from '@/constants/Typography';
+import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, DeviceEventEmitter, FlatList, Text, TouchableOpacity, View } from 'react-native';
+import { styles } from './NotificationList.styles';
 
-// 1. 알림 데이터 타입 정의
-interface NotificationItem {
-  id: string;
-  title: string;
-  time: string;
-  isRead: boolean;
-}
+const getTimeText = (receivedAt: string) => {
+  const receivedTime = new Date(receivedAt).getTime();
+  const diffMinutes = Math.max(0, Math.floor((Date.now() - receivedTime) / 60000));
+
+  if (diffMinutes < 1) return '방금 전';
+  if (diffMinutes < 60) return `${diffMinutes}분 전`;
+
+  const diffHours = Math.floor(diffMinutes / 60);
+  if (diffHours < 24) return `${diffHours}시간 전`;
+
+  return `${Math.floor(diffHours / 24)}일 전`;
+};
 
 export default function NotificationList() {
-  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [notifications, setNotifications] = useState<StoredNotification[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // 2. 백엔드에서 데이터 가져오기 (시뮬레이션)
   useEffect(() => {
     fetchNotifications();
+    const subscription = DeviceEventEmitter.addListener('notifications-updated', fetchNotifications);
+
+    return () => subscription.remove();
   }, []);
 
   const fetchNotifications = async () => {
     try {
-      // 여기에 실제 백엔드 API 주소를 넣으세요 (예: fetch('http://api.../notifications'))
-      // 지금은 1초 뒤에 더미 데이터를 가져오는 척 합니다.
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      const dummyData: NotificationItem[] = [
-        { id: '1', title: '환율이 목표가에 도달했습니다!', time: '1시간 전', isRead: false },
-        { id: '2', title: '미국(USD) 급등 주의 알림', time: '3시간 전', isRead: true },
-        { id: '3', title: '새로운 환율 뉴스가 도착했습니다.', time: '1일 전', isRead: true },
-        { id: '4', title: '일본(JPY) 최저가 갱신', time: '2일 전', isRead: true },
-      ];
-      setNotifications(dummyData);
+      const saved = await AsyncStorage.getItem(NOTIFICATION_STORAGE_KEY);
+      const parsed = saved ? JSON.parse(saved) : [];
+      setNotifications(Array.isArray(parsed) ? parsed : []);
     } catch (error) {
-      console.error("알림 로딩 실패", error);
+      console.error('알림 로딩 실패', error);
+      setNotifications([]);
     } finally {
       setLoading(false);
     }
   };
 
-  // 3. 알림 삭제 기능
-  const handleDelete = (id: string) => {
-    // 실제 앱에서는 백엔드에 삭제 요청(API call)을 먼저 보내야 합니다.
-    // 화면에서 지우기:
-    setNotifications(prev => prev.filter(item => item.id !== id));
+  const handleDelete = async (id: string) => {
+    const nextNotifications = notifications.filter((item) => item.id !== id);
+    setNotifications(nextNotifications);
+    await AsyncStorage.setItem(NOTIFICATION_STORAGE_KEY, JSON.stringify(nextNotifications));
   };
 
-  // 4. 로딩 중일 때
   if (loading) {
     return (
       <View style={styles.centerContainer}>
@@ -57,7 +57,6 @@ export default function NotificationList() {
     );
   }
 
-  // 5. 알림이 없을 때
   if (notifications.length === 0) {
     return (
       <View style={styles.centerContainer}>
@@ -73,27 +72,30 @@ export default function NotificationList() {
       contentContainerStyle={styles.listContainer}
       renderItem={({ item }) => (
         <View style={styles.itemContainer}>
-          {/* 왼쪽: 원형 아이콘 (회색) */}
-          <View style={styles.iconCircle} />
-
-          {/* 중간: 제목과 시간 */}
-          <View style={styles.textContainer}>
-            <Text style={[styles.title, Typography.Pretendard_M_14]} numberOfLines={1} ellipsizeMode="tail">
-              {item.title}
-            </Text>
-            <Text style={[styles.time, Typography.Pretendard_M_12]}>{item.time}</Text>
+          <View style={styles.iconCircle}>
+            <Ionicons name="notifications" size={20} color="#FF8FA3" />
           </View>
 
-          {/* 오른쪽: 삭제 버튼 (X) */}
-          <TouchableOpacity 
+          <View style={styles.textContainer}>
+            <Text style={[styles.title, Typography.Pretendard_M_14]} numberOfLines={1}>
+              {item.title}
+            </Text>
+            {!!item.body && (
+              <Text style={[styles.body, Typography.Pretendard_M_12]} numberOfLines={2}>
+                {item.body}
+              </Text>
+            )}
+            <Text style={[styles.time, Typography.Pretendard_M_12]}>{getTimeText(item.receivedAt)}</Text>
+          </View>
+
+          <TouchableOpacity
             onPress={() => handleDelete(item.id)}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} // 터치 영역 넓힘
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
             <Ionicons name="close" size={20} color="#bbb" />
           </TouchableOpacity>
         </View>
       )}
-      // 아이템 사이 구분선
       ItemSeparatorComponent={() => <View style={styles.separator} />}
     />
   );

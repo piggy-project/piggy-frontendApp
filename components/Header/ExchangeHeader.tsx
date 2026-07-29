@@ -3,9 +3,9 @@ import { Typography } from '@/constants/Typography';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import BaseHeader from './BaseHeader';
+import { styles as baseStyles } from './BaseHeader.styles';
 import BackButton from './component/BackButton';
 import WonSign from './component/WonSign';
-import { styles as baseStyles } from './BaseHeader.styles';
 
 interface Props {
     title?: string;

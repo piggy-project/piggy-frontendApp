@@ -498,9 +498,7 @@ export const communityApi = {
 };
 
 export const notificationApi = {
-  // 1. 알림 설정 저장 및 수정
-  // { currencyCode: "JPY", targetPercent: 3.0, period: "DAILY", isActive: true }
-  updateSetting: (data: {
+  updatePercentSetting: (data: {
     currencyCode: string;
     targetPercent: number;
     period: 'DAILY' | 'WEEKLY' | 'MONTHLY';
@@ -511,27 +509,65 @@ export const notificationApi = {
       body: JSON.stringify(data),
     });
   },
-
-  // 2. 내 알림 설정 목록 조회
-  getMySettings: () => {
+  updateSetting: (data: {
+    currencyCode: string;
+    targetPercent: number;
+    period: 'DAILY' | 'WEEKLY' | 'MONTHLY';
+    isActive: boolean;
+  }) => {
+    return notificationApi.updatePercentSetting(data);
+  },
+  getPercentSettings: () => {
     return request('/api/notifications/settings', {
       method: 'GET',
     });
   },
-
-  // 3. 알림 설정 삭제
-  deleteSetting: (settingId: number) => {
+  getMySettings: () => {
+    return notificationApi.getPercentSettings();
+  },
+  deletePercentSetting: (settingId: number) => {
     return request(`/api/notifications/settings/${settingId}`, {
       method: 'DELETE',
     });
   },
-
-  // 4. FCM 토큰 업데이트 (알림 컨트롤러 전용 경로)
-  // 백엔드 Map<String, String> tokenRequest 구조에 맞춰서 전송
+  deleteSetting: (settingId: number) => {
+    return notificationApi.deletePercentSetting(settingId);
+  },
+  updateTargetPrice: (data: {
+    currencyCode: string;
+    targetPrice: number;
+    direction: 'ABOVE' | 'BELOW';
+    isActive: boolean;
+  }) => {
+    return request('/api/notifications/target-price', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+  getTargetPrices: () => {
+    return request('/api/notifications/target-price', {
+      method: 'GET',
+    });
+  },
+  deleteTargetPrice: (settingId: number) => {
+    return request(`/api/notifications/target-price/${settingId}`, {
+      method: 'DELETE',
+    });
+  },
+  toggleLowestPrice: (currencyCode: string) => {
+    return request(`/api/notifications/lowest-price/${currencyCode}`, {
+      method: 'POST',
+    });
+  },
+  toggleVolatility: (currencyCode: string) => {
+    return request(`/api/notifications/volatility/${currencyCode}`, {
+      method: 'POST',
+    });
+  },
   updateFcmToken: (token: string) => {
     return request('/api/notifications/token', {
       method: 'POST',
-      body: JSON.stringify({ fcmToken: token }), // 백엔드 key인 'fcmToken'과 일치시킴
+      body: JSON.stringify({ fcmToken: token }),
     });
   },
 };

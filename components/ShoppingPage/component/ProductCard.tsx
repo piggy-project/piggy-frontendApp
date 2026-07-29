@@ -27,6 +27,7 @@ interface ProductCardProps {
   favorited?: boolean;
   favorite?: boolean;
   isFavorite?: boolean;
+  cardWidth?: number;
 }
 
 export default function ProductCard({ 
@@ -49,6 +50,7 @@ export default function ProductCard({
   favorited,
   favorite,
   isFavorite,
+  cardWidth,
 }: ProductCardProps) {
   const [isFavorited, setIsFavorited] = useState(Boolean(favorited ?? favorite ?? isFavorite));
   const productLink = productUrl || url || link || id;
@@ -152,15 +154,15 @@ export default function ProductCard({
 
   return (
     <TouchableOpacity 
-      style={styles.container} 
+      style={[styles.container, cardWidth ? { width: cardWidth, marginRight: 0 } : null]} 
       onPress={handlePress} 
       activeOpacity={0.8}
     >
-      <View style={styles.imageWrapper}>
+      <View style={[styles.imageWrapper, cardWidth ? { width: cardWidth, height: cardWidth } : null]}>
         {image ? (
-          <Image source={{ uri: image }} style={styles.image} resizeMode="cover" />
+          <Image source={{ uri: image }} style={[styles.image, cardWidth ? { width: cardWidth, height: cardWidth } : null]} resizeMode="cover" />
         ) : (
-          <View style={styles.imagePlaceholder} />
+          <View style={[styles.imagePlaceholder, cardWidth ? { width: cardWidth, height: cardWidth } : null]} />
         )}
         <Pressable
           style={styles.favoriteButton}

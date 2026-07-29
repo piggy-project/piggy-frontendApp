@@ -181,17 +181,14 @@ export default function ExchangePage() {
 
   return (
     <View style={styles.container}>
-      <ExchangeHeader
-        //title="환율 목록"
-        time={updateTime}
-      />
+      <ExchangeHeader />
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.sectionGap}>
-          <TodayTravelDestination />
+          <TodayTravelDestination updateTime={updateTime} />
           {isLoading ? (
             <View style={styles.loadingContainer}>
               <ActivityIndicator size="large" color="#4A90E2" />

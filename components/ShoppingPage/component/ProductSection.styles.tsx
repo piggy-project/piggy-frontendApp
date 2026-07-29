@@ -9,4 +9,9 @@ export const styles = StyleSheet.create({
     marginBottom: 12,
     color: '#000',
   },
+  gridList: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    rowGap: 26,
+  },
 });

@@ -6,6 +6,7 @@ import React, { useEffect } from 'react';
 import { ActivityIndicator, StatusBar, Text, TextInput, View } from 'react-native';
 import { SafeAreaProvider, initialWindowMetrics } from 'react-native-safe-area-context';
 import { AuthProvider, useAuth } from '../components/utils/AuthContext';
+import { registerNotificationListeners } from '../components/utils/NotificationHelper';
 
 // 앱이 로드될 때까지 스플래시 화면 유지
 SplashScreen.preventAutoHideAsync();
@@ -27,6 +28,7 @@ export default function RootLayout() {
   useEffect(() => {
     if (loaded) {
       setDefaultFont();
+      registerNotificationListeners();
       SplashScreen.hideAsync();
     }
   }, [loaded]);

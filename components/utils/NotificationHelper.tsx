@@ -1,8 +1,72 @@
 import Constants from 'expo-constants';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
-import { Platform } from 'react-native';
-import { authApi } from './api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { DeviceEventEmitter, Platform } from 'react-native';
+import { notificationApi } from './api';
+
+export type StoredNotification = {
+  id: string;
+  title: string;
+  body?: string;
+  receivedAt: string;
+  data?: Record<string, any>;
+  isRead: boolean;
+};
+
+export const NOTIFICATION_STORAGE_KEY = 'piggy-notifications';
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+    shouldShowBanner: true,
+    shouldShowList: true,
+  }),
+});
+
+export async function saveNotification(notification: Notifications.Notification) {
+  const content = notification.request.content;
+  const nextItem: StoredNotification = {
+    id: notification.request.identifier || `${Date.now()}`,
+    title: content.title || '알림',
+    body: content.body || '',
+    receivedAt: new Date().toISOString(),
+    data: content.data as Record<string, any>,
+    isRead: false,
+  };
+
+  try {
+    const saved = await AsyncStorage.getItem(NOTIFICATION_STORAGE_KEY);
+    const parsed = saved ? JSON.parse(saved) : [];
+    const previous = Array.isArray(parsed) ? parsed : [];
+    const next = [
+      nextItem,
+      ...previous.filter((item: StoredNotification) => item.id !== nextItem.id),
+    ].slice(0, 50);
+
+    await AsyncStorage.setItem(NOTIFICATION_STORAGE_KEY, JSON.stringify(next));
+    DeviceEventEmitter.emit('notifications-updated');
+  } catch (error) {
+    console.error('알림 저장 실패:', error);
+  }
+}
+
+let listenersRegistered = false;
+
+export function registerNotificationListeners() {
+  if (listenersRegistered) return;
+  listenersRegistered = true;
+
+  Notifications.addNotificationReceivedListener((notification) => {
+    saveNotification(notification);
+  });
+
+  Notifications.addNotificationResponseReceivedListener((response) => {
+    saveNotification(response.notification);
+  });
+}
 
 export async function registerForPushNotificationsAsync() {
   let token;
@@ -39,7 +103,7 @@ export async function registerForPushNotificationsAsync() {
       console.log('FCM Token 획득:', token);
 
       // 6. 서버로 토큰 전송
-      await authApi.updateFcmToken(token);
+      await notificationApi.updateFcmToken(token);
       console.log('서버에 FCM 토큰 등록 완료');
       
     } catch (e) {

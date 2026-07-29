@@ -20,8 +20,10 @@ export const styles = StyleSheet.create({
     width: 46,
     height: 46,
     borderRadius: 23, // 반지름 (지름의 절반)
-    backgroundColor: '#D9D9D9', // 회색 배경
+    backgroundColor: '#FFE8EE',
     marginRight: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   textContainer: {
     flex: 1, // 남은 공간 모두 차지
@@ -33,6 +35,10 @@ export const styles = StyleSheet.create({
   },
   time: {
     color: '#888', // 연한 회색
+  },
+  body: {
+    color: '#666',
+    marginBottom: 4,
   },
   emptyText: {
     color: '#999',

@@ -16,7 +16,6 @@ interface BottomInfoContainerProps {
 }
 
 export default function BottomInfoContainer({ data, isLoading, displayCode }: BottomInfoContainerProps) {
-
   if (isLoading) {
     return (
       <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
@@ -30,19 +29,18 @@ export default function BottomInfoContainer({ data, isLoading, displayCode }: Bo
   const visualCode = displayCode || data.displayCode || data.code;
   const apiCode = getCurrencyApiCode(visualCode);
   const currentCurrency = CURRENCY_INFO_MAP[visualCode];
-  const FlagIcon = currentCurrency?.FlagIcon;
   const countryName = currentCurrency?.label || '알 수 없음';
+  const change = Number(data.change || 0);
+  const changeColor = change >= 0 ? '#FF3B57' : '#1E88E5';
 
   const handleGoToDetail = () => {
-    const target = {
-      name: countryName,
-      code: apiCode,
-      displayCode: visualCode,
-    };
-
     router.push({
       pathname: '/exchange_detail',
-      params: { ...target }
+      params: {
+        name: countryName,
+        code: apiCode,
+        displayCode: visualCode,
+      },
     });
   };
 
@@ -52,30 +50,27 @@ export default function BottomInfoContainer({ data, isLoading, displayCode }: Bo
 
   return (
     <View style={styles.container}>
-
-      {/* 1. 실시간 환율 정보 바 */}
-      <View style={styles.rateInfoBar}>
-        <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
-          <Text style={[styles.rateText, Typography.Pretendard_B_24]}>{data.currentRate}</Text>
-          <Text style={[Typography.Pretendard_M_16, { marginLeft: 4, color: '#333' }]}>₩</Text>
-        </View>
-
-        <View style={styles.countryInfo}>
-          <Text style={[styles.countryName, Typography.Pretendard_M_14]}>{countryName}</Text>
-          <View style={styles.flagIcon}>
-            {FlagIcon && <FlagIcon width={30} height={30} />}
+      <View style={styles.rateInfoCard}>
+        <View style={styles.rateInfoLeft}>
+          <View style={styles.rateIconCircle}>
+            <Text style={[styles.rateIconText, Typography.Pretendard_B_16]}>₩</Text>
+          </View>
+          <View>
+            <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
+              <Text style={[styles.rateText, Typography.Pretendard_B_16]}>{data.currentRate}</Text>
+              <Text style={[Typography.Pretendard_M_12, { marginLeft: 2, color: '#333' }]}></Text>
+            </View>
+            <Text style={[styles.changeText, Typography.Pretendard_M_11, { color: changeColor }]}>
+              {`${change >= 0 ? '+' : '-'}${Math.abs(change)}원 (${data.percentChange || 0}%)`}
+            </Text>
           </View>
         </View>
+
+        <TouchableOpacity style={styles.exchangeRecordButton} activeOpacity={0.8}>
+          <Text style={[styles.exchangeRecordText, Typography.Pretendard_M_12]}>내 환전 기록</Text>
+        </TouchableOpacity>
       </View>
 
-      {/* 변동률 표시 */}
-      <View style={{ paddingHorizontal: 10, marginTop: -10, marginBottom: 10 }}>
-        <Text style={[Typography.Pretendard_M_12, { color: (data.change || 0) >= 0 ? '#E53935' : '#1E88E5' }]}>
-          어제보다 {Math.abs(data.change || 0)}원 ({data.percentChange || 0}%) {(data.change || 0) >= 0 ? '▲' : '▼'}
-        </Text>
-      </View>
-
-      {/* 2. 환율 그래프 영역 */}
       <View style={styles.graphArea}>
         <ExchangeGraph
           code={apiCode}
@@ -84,7 +79,6 @@ export default function BottomInfoContainer({ data, isLoading, displayCode }: Bo
         />
       </View>
 
-      {/* 3. 하단 상세 보기 버튼 */}
       <TouchableOpacity
         style={{ alignSelf: 'center', marginVertical: 10 }}
         onPress={handleGoToDetail}
@@ -110,7 +104,6 @@ export default function BottomInfoContainer({ data, isLoading, displayCode }: Bo
         </View>
         <Ionicons name="chevron-forward" size={24} color="#111" />
       </TouchableOpacity>
-
     </View>
   );
 }

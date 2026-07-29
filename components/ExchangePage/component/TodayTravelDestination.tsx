@@ -17,7 +17,11 @@ interface TravelRecommendation {
   imageUrl: string;         // 이미지 URL
 }
 
-const TodayTravelDestination: React.FC = () => {
+interface TodayTravelDestinationProps {
+  updateTime?: string;
+}
+
+const TodayTravelDestination: React.FC<TodayTravelDestinationProps> = ({ updateTime }) => {
   // API를 통해 추천 여행지 데이터 가져오기
   const { data: recommendations, isLoading, isError } = useQuery<TravelRecommendation[]>({
     queryKey: ['travelRecommendations'],
@@ -39,7 +43,14 @@ const TodayTravelDestination: React.FC = () => {
   return (
     <View style={styles.container}>
       {/* 섹션 타이틀 */}
-      <Text style={[styles.title, Typography.Pretendard_M_16]}>오늘의 가성비 여행지</Text>
+      <View style={styles.titleRow}>
+        <Text style={[styles.title, Typography.Pretendard_M_16]}>오늘의 가성비 여행지</Text>
+        {!!updateTime && (
+          <Text style={[styles.timeText, Typography.Pretendard_M_12]}>
+            {updateTime} 기준
+          </Text>
+        )}
+      </View>
       
       {/* 가로 스크롤 카드 리스트 */}
       <ScrollView 

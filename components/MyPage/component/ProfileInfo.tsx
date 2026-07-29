@@ -36,7 +36,7 @@ export default function ProfileInfo() {
       </View>
 
       {/* 3. 우측 화살표 아이콘 */}
-      <Ionicons name="chevron-forward" size={20} color="#CCC" />
+      <Ionicons name="chevron-forward" size={22} color="#777" />
     </TouchableOpacity>
   );
 }

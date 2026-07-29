@@ -6,34 +6,56 @@ export const styles = StyleSheet.create({
     padding: 20,
   },
   
-  // 1. 환율 정보 바 스타일
-  rateInfoBar: {
-    backgroundColor: '#E0E0E0', // 연한 회색 배경
+  rateInfoCard: {
+    minHeight: 68,
+    backgroundColor: '#F3F3F3',
     borderRadius: 10,
     paddingVertical: 12,
-    paddingHorizontal: 15,
+    paddingHorizontal: 14,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 15,
+    marginBottom: 14,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 2,
   },
-  rateText: {
-    color: '#333',
-  },
-  countryInfo: {
+  rateInfoLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    flexShrink: 1,
   },
-  countryName: {
-    color: '#333',
-  },
-  flagIcon: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+  rateIconCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#FF8FA3',
     justifyContent: 'center',
     alignItems: 'center',
+    marginRight: 10,
+  },
+  rateIconText: {
+    color: '#fff',
+  },
+  rateText: {
+    color: '#111',
+  },
+  changeText: {
+    color: '#FF3B57',
+    marginTop: 2,
+  },
+  exchangeRecordButton: {
+    minWidth: 92,
+    height: 36,
+    borderRadius: 8,
+    backgroundColor: '#E5E5E5',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  exchangeRecordText: {
+    color: '#555',
   },
 
   // 2. 그래프 영역 스타일

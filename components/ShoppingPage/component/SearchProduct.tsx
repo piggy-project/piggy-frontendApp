@@ -8,7 +8,7 @@ interface SearchProductProps {
   onClear?: () => void;
   onFocus?: () => void;
   onBack?: () => void;
-  variant?: 'compact' | 'search';
+  variant?: 'compact' | 'search' | 'header';
   autoFocus?: boolean;
 }
 
@@ -27,6 +27,7 @@ export default function SearchProduct({
   const [searchText, setSearchText] = useState('');
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const isSearchVariant = variant === 'search';
+  const isHeaderVariant = variant === 'header';
 
   useEffect(() => {
     const loadRecentSearches = async () => {
@@ -89,7 +90,7 @@ export default function SearchProduct({
   };
 
   return (
-    <View style={[styles.container, isSearchVariant && styles.searchModeContainer]}>
+    <View style={[styles.container, isSearchVariant && styles.searchModeContainer, isHeaderVariant && styles.headerContainer]}>
       <View style={isSearchVariant ? styles.searchModeHeader : undefined}>
         {isSearchVariant && (
           <TouchableOpacity style={styles.backButton} onPress={onBack} activeOpacity={0.7}>
@@ -97,8 +98,8 @@ export default function SearchProduct({
           </TouchableOpacity>
         )}
 
-        <View style={[styles.searchBar, isSearchVariant && styles.searchModeBar]}>
-          <Ionicons name="search-outline" size={20} color="#777" style={styles.icon} />
+        <View style={[styles.searchBar, isSearchVariant && styles.searchModeBar, isHeaderVariant && styles.headerSearchBar]}>
+          <Ionicons name="search-outline" size={isHeaderVariant ? 16 : 20} color="#777" style={styles.icon} />
           <TextInput
             ref={inputRef}
             style={styles.input}
@@ -155,6 +156,11 @@ const styles = StyleSheet.create({
     paddingTop: 8,
     paddingBottom: 0,
   },
+  headerContainer: {
+    flex: 1,
+    paddingHorizontal: 0,
+    paddingVertical: 0,
+  },
   searchModeHeader: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -178,6 +184,11 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 42,
     borderRadius: 22,
+  },
+  headerSearchBar: {
+    height: 32,
+    borderRadius: 16,
+    paddingHorizontal: 12,
   },
   icon: {
     marginRight: 10,

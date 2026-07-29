@@ -57,7 +57,11 @@ export default function MainDashBoardPage() {
       >
         <View style={styles.sectionGap}>
           <ChoiceCountry onSelect={handleCountrySelect} />
-          <MainImageContainer timing={exchangeData?.timing} />
+          <MainImageContainer
+            timing={exchangeData?.timing}
+            currentRate={exchangeData?.currentRate}
+            currencyCode={selectedCurrencyCode}
+          />
           <BottomInfoContainer data={exchangeData} displayCode={selectedCurrencyCode} />
         </View>
       </ScrollView>
