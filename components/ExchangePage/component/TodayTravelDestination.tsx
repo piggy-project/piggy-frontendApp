@@ -77,7 +77,7 @@ const TodayTravelDestination: React.FC<TodayTravelDestinationProps> = ({ updateT
     <View style={styles.container}>
       {/* 섹션 타이틀 */}
       <View style={styles.titleRow}>
-        <Text style={[styles.title, Typography.Pretendard_M_16]}>오늘의 가성비 여행지</Text>
+        <Text style={[styles.title, Typography.Pretendard_M_16, { marginTop: 8 }]}>오늘의 가성비 여행지</Text>
         {!!updateTime && (
           <Text style={[styles.timeText, Typography.Pretendard_M_12]}>
             {updateTime} 기준

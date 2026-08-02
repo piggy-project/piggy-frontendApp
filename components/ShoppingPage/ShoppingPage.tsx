@@ -3,7 +3,6 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, RefreshControl, ScrollView, View } from 'react-native';
 import BaseHeader from '../Header/BaseHeader';
 import { styles as baseHeaderStyles } from '../Header/BaseHeader.styles';
-import Piggylogo from '../Header/component/piggylogo';
 import ChoiceCountry from '../MainDashBoardPage/component/ChoiceCountry';
 import ComparisonResultList from './component/ComparisonResultList';
 import ProductSection from './component/ProductSection';
@@ -206,7 +205,7 @@ export default function ShoppingPage() {
                 onClear={handleReset}
               />
             }
-            right={<Piggylogo />}
+            right={null}
             leftStyle={baseHeaderStyles.shrinkSideArea}
             centerStyle={baseHeaderStyles.wideCenterArea}
             rightStyle={baseHeaderStyles.shrinkSideArea}

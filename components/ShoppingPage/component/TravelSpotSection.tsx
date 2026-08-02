@@ -1,8 +1,7 @@
-import { exchangeApi } from '@/components/utils/api';
 import { Typography } from '@/constants/Typography';
 import { useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React from 'react';
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface TravelRecommendation {
   destination?: string;
@@ -24,33 +23,7 @@ const DEFAULT_SPOTS: TravelRecommendation[] = [
 
 export default function TravelSpotSection() {
   const router = useRouter();
-  const [spots, setSpots] = useState<TravelRecommendation[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchSpots = async () => {
-      try {
-        setIsLoading(true);
-        // 백엔드 API (/api/exchange/travel-recommendations) 직접 호출
-        const response = await exchangeApi.getTravelRecommendations();
-        const rawData = response?.data || response;
-
-        console.log('[TravelSpotSection] 백엔드 추천 관광지 API 실제 응답:', rawData);
-
-        if (Array.isArray(rawData) && rawData.length > 0) {
-          setSpots(rawData);
-        }
-      } catch (error: any) {
-        console.error('[TravelSpotSection] 백엔드 API 호출 실패:', error?.response?.data || error?.message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchSpots();
-  }, []);
-
-  const displaySpots = (spots && spots.length > 0) ? spots : DEFAULT_SPOTS;
+  const displaySpots = DEFAULT_SPOTS;
 
   const handleSpotPress = (item: TravelRecommendation) => {
     const code = item.currencyCode || item.name || 'JPY';
@@ -64,14 +37,6 @@ export default function TravelSpotSection() {
       },
     });
   };
-
-  if (isLoading) {
-    return (
-      <View style={[styles.container, { height: 140, justifyContent: 'center', alignItems: 'center' }]}>
-        <ActivityIndicator size="small" color="#FFD700" />
-      </View>
-    );
-  }
 
   return (
     <View style={styles.container}>

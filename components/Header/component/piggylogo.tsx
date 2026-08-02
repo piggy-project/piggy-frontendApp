@@ -1,10 +1,7 @@
-import { useRouter } from 'expo-router';
 import React from 'react';
 import { Image, StyleSheet } from 'react-native';
 
-export default function piggylogo() {
-  const router = useRouter();
-
+export default function Piggylogo() {
   return (
     <Image 
           source={require('@/assets/images/signupPiggy.png')} 

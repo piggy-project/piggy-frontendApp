@@ -1,7 +1,6 @@
-import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { Image, StyleSheet, TouchableOpacity } from 'react-native';
 
 type Props = {
   onPress?: () => void;
@@ -24,15 +23,19 @@ export default function BackButton({ onPress }: Props) {
 
   return (
     <TouchableOpacity style={styles.button} onPress={handlePress}>
-      <Ionicons name="arrow-back" size={26} color="gray" />
+      <Image 
+                source={require('@/assets/images/backbutton.png')} 
+                style={styles.button} 
+                resizeMode="contain"
+              />
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
   button: {
-    width: 36,
-    height: 36,
+    width: 15,
+    height: 15,
     justifyContent: 'center',
     alignItems: 'center',
   },
