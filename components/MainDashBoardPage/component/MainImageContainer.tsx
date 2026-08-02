@@ -1,4 +1,5 @@
 import { exchangeApi, notificationApi } from '@/components/utils/api';
+import { getAccessToken } from '@/components/utils/authStore';
 import { getCurrencyApiCode } from '@/constants/Currency';
 import { Typography } from '@/constants/Typography';
 import { Ionicons } from '@expo/vector-icons';
@@ -154,15 +155,6 @@ export default function MainImageContainer({ timing, currentRate, currencyCode =
     onPanResponderTerminate: persistRecordedRate,
   });
 
-  const saveTargetPrice = () => {
-    return notificationApi.updateTargetPrice({
-      currencyCode: apiCurrencyCode,
-      targetPrice: Number(recordedRate.toFixed(4)),
-      direction: recordedRate <= rate ? 'BELOW' : 'ABOVE',
-      isActive: true,
-    });
-  };
-
   const showLoginRequiredAlert = () => {
     Alert.alert(
       '알림',
@@ -177,54 +169,54 @@ export default function MainImageContainer({ timing, currentRate, currencyCode =
   const handleSaveTargetPrice = async () => {
     if (!recordedRate || !rate) return;
 
+    const token = await getAccessToken();
+    if (!token) {
+      showLoginRequiredAlert();
+      return;
+    }
+
+    const formattedTargetPrice = Number(recordedRate.toFixed(4));
+    const targetDirection = recordedRate <= rate ? 'BELOW' : 'ABOVE';
+
     try {
-      await saveTargetPrice();
+      await notificationApi.updateTargetPrice({
+        currencyCode: apiCurrencyCode,
+        targetPrice: formattedTargetPrice,
+        direction: targetDirection,
+        isActive: true,
+      });
       Alert.alert('알림', `₩${formatRate(recordedRate)} 목표 환율 알림을 설정했어요.`);
     } catch (error: any) {
-      console.error('목표 환율 알림 설정 실패:', error.response?.data || error.message);
+      const status = error.response?.status;
+      const responseMessage = error.response?.data?.message || error.response?.data || error.message;
+      console.error('목표 환율 알림 설정 실패 (상태코드:', status, '):', responseMessage);
 
-      if (error.response?.status === 401 || error.response?.status === 403) {
+      // 1. 미인증 (401/403) 처리
+      if (status === 401 || status === 403) {
         showLoginRequiredAlert();
         return;
       }
 
-      if (
-        error.response?.status === 400 &&
-        String(error.response?.data?.message || '').includes('즐겨찾기')
-      ) {
-        Alert.alert(
-          '알림',
-          '목표 환율 알림은 즐겨찾기에 등록된 통화만 설정할 수 있어요. 이 통화를 즐겨찾기에 추가하고 알림을 설정할까요?',
-          [
-            { text: '취소', style: 'cancel' },
-            {
-              text: '설정하기',
-              onPress: async () => {
-                try {
-                  const favoriteResult = await exchangeApi.toggleFavorite(apiCurrencyCode);
+      // 2. 즐겨찾기 미등록으로 인한 500/400 에러 처리 (자동 즐겨찾기 추가 후 재시도)
+      try {
+        console.log('[알림 설정] 즐겨찾기 자동 등록 시도 후 재설정 진행:', apiCurrencyCode);
+        await exchangeApi.toggleFavorite(apiCurrencyCode);
 
-                  if (!favoriteResult?.favorited) {
-                    Alert.alert('알림', '즐겨찾기 등록 후 다시 시도해주세요.');
-                    return;
-                  }
+        await notificationApi.updateTargetPrice({
+          currencyCode: apiCurrencyCode,
+          targetPrice: formattedTargetPrice,
+          direction: targetDirection,
+          isActive: true,
+        });
 
-                  await saveTargetPrice();
-                  Alert.alert('알림', `₩${formatRate(recordedRate)} 목표 환율 알림을 설정했어요.`);
-                } catch (favoriteError: any) {
-                  console.error('즐겨찾기 등록 후 목표가 알림 설정 실패:', favoriteError.response?.data || favoriteError.message);
-
-                  if (favoriteError.response?.status === 401 || favoriteError.response?.status === 403) {
-                    showLoginRequiredAlert();
-                    return;
-                  }
-
-                  Alert.alert('오류', '즐겨찾기 등록 또는 알림 설정 중 문제가 발생했습니다.');
-                }
-              },
-            },
-          ]
-        );
+        Alert.alert('알림', `₩${formatRate(recordedRate)} 목표 환율 알림을 설정했어요.`);
         return;
+      } catch (retryError: any) {
+        console.error('재시도 목표 환율 알림 설정 실패:', retryError.response?.data || retryError.message);
+        if (retryError.response?.status === 401 || retryError.response?.status === 403) {
+          showLoginRequiredAlert();
+          return;
+        }
       }
 
       Alert.alert('오류', '목표 환율 알림 설정 중 문제가 발생했습니다.');

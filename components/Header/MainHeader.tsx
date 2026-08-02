@@ -1,7 +1,7 @@
 import React from 'react';
 import BaseHeader from './BaseHeader';
 import Notice from './component/Notice';
-import WonSign from './component/WonSign';
+import Piggylogo from './component/piggylogo';
 
 interface Props {
   showCurrencySelector?: boolean;
@@ -21,7 +21,7 @@ export default function MainHeader({
     <BaseHeader
       left={
         showCurrencySelector && (
-          <WonSign onSelect={handleCurrencySelect} />
+          <Piggylogo />
         )
       }
       center={

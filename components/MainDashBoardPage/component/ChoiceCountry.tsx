@@ -13,19 +13,28 @@ import {
 import { styles } from './ChoiceCountry.style';
 
 // 모든 지원 국가 및 프론트 표시용 코드 매핑
-const COUNTRY_MAP = Object.fromEntries(
-    AVAILABLE_CURRENCIES.map((currency) => [currency.label, currency.code])
-);
+const COUNTRY_MAP: Record<string, string> = {
+    '전체': 'ALL',
+    ...Object.fromEntries(
+        AVAILABLE_CURRENCIES.map((currency) => [currency.label, currency.code])
+    ),
+};
 
 interface Props {
     // 이제 부모에게 'JPY', 'USD' 같은 코드를 넘겨줍니다.
-    onSelect?: (currencyCode: string) => void; 
+    onSelect?: (currencyCode: string) => void;
+    initialLabels?: string[];
+    initialSelectedLabel?: string;
 }
 
-export default function ChoiceCountry({ onSelect }: Props) {
+export default function ChoiceCountry({
+    onSelect,
+    initialLabels = ['일본', '미국', '중국', '베트남', '태국', '+'],
+    initialSelectedLabel = '일본',
+}: Props) {
     // 탭 리스트 관리 (화면 표시용 이름)
-    const [tabList, setTabList] = useState(['일본', '미국', '중국', '베트남', '태국', '+']);
-    const [selectedLabel, setSelectedLabel] = useState('일본');
+    const [tabList, setTabList] = useState(initialLabels);
+    const [selectedLabel, setSelectedLabel] = useState(initialSelectedLabel);
     const [dropdownVisible, setDropdownVisible] = useState(false);
 
     // 탭 클릭 핸들러
@@ -34,8 +43,8 @@ export default function ChoiceCountry({ onSelect }: Props) {
             setDropdownVisible(true);
         } else {
             setSelectedLabel(label);
-            const code = COUNTRY_MAP[label];
-            if (onSelect && code) onSelect(code);
+            const code = COUNTRY_MAP[label] || 'JPY';
+            if (onSelect) onSelect(code);
         }
     };
 

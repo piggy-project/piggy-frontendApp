@@ -186,18 +186,19 @@ const styles = StyleSheet.create({
     borderRadius: 22,
   },
   headerSearchBar: {
-    height: 32,
-    borderRadius: 16,
+    height: 36,
+    borderRadius: 18,
     paddingHorizontal: 12,
+    backgroundColor: '#F5F5F5',
   },
   icon: {
-    marginRight: 10,
+    marginRight: 6,
   },
   input: {
     flex: 1,
-    fontSize: 15,
+    fontSize: 14,
     color: '#000',
-    paddingBottom: 5,
+    paddingVertical: 0,
   },
   recentContainer: {
     paddingTop: 26,

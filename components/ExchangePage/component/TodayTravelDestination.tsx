@@ -21,23 +21,56 @@ interface TodayTravelDestinationProps {
   updateTime?: string;
 }
 
+const DEFAULT_RECOMMENDATIONS: TravelRecommendation[] = [
+  {
+    destination: '일본',
+    location: '도쿄',
+    reason: '엔화 가치 안정화로 가성비 쇼핑과 먹거리를 함께 즐길 수 있는 추천 여행지!',
+    currencyCode: 'JPY',
+    currencyName: '엔',
+    exchangeRate: 950.5,
+    percentChange: -0.35,
+    imageUrl: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?w=400',
+  },
+  {
+    destination: '베트남',
+    location: '다낭',
+    reason: '저렴한 물가와 럭셔리 해변 리조트를 합리적인 가격에 이용할 수 있는 여행지',
+    currencyCode: 'VND',
+    currencyName: '동',
+    exchangeRate: 5.4,
+    percentChange: -0.12,
+    imageUrl: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=400',
+  },
+  {
+    destination: '태국',
+    location: '방콕',
+    reason: '다채로운 스트리트 푸드와 화려한 야시장이 반기는 최고의 가성비 식도락 여행',
+    currencyCode: 'THB',
+    currencyName: '바트',
+    exchangeRate: 38.2,
+    percentChange: 0.15,
+    imageUrl: 'https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=400',
+  },
+];
+
 const TodayTravelDestination: React.FC<TodayTravelDestinationProps> = ({ updateTime }) => {
   // API를 통해 추천 여행지 데이터 가져오기
-  const { data: recommendations, isLoading, isError } = useQuery<TravelRecommendation[]>({
+  const { data: recommendations, isLoading } = useQuery<TravelRecommendation[]>({
     queryKey: ['travelRecommendations'],
     queryFn: exchangeApi.getTravelRecommendations,
   });
 
+  const displayList = (Array.isArray(recommendations) && recommendations.length > 0)
+    ? recommendations
+    : DEFAULT_RECOMMENDATIONS;
+
   if (isLoading) {
     return (
       <View style={[styles.container, { paddingVertical: 20, alignItems: 'center' }]}>
-        <ActivityIndicator size="small" color="#000" />
+        <ActivityIndicator size="small" color="#4A90E2" />
       </View>
     );
-  }
-
-  if (isError || !recommendations) {
-    return null; // 에러 시 노출하지 않음
   }
 
   return (
@@ -58,7 +91,7 @@ const TodayTravelDestination: React.FC<TodayTravelDestinationProps> = ({ updateT
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.cardContainer}
       >
-        {recommendations.map((item, index) => (
+        {displayList.map((item, index) => (
           <View key={`${item.destination}-${index}`} style={styles.destinationCard}>
             {/* 이미지 영역 */}
             <View style={styles.imageWrapper}>

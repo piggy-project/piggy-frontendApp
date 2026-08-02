@@ -193,7 +193,6 @@ export default function ExchangePage() {
             <View style={styles.loadingContainer}>
               <ActivityIndicator size="large" color="#4A90E2" />
             </View>
-
           ) : (
             <ShowCountry
               data={exchangeData}

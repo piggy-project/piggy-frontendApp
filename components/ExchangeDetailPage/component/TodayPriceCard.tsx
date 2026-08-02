@@ -44,21 +44,25 @@ export default function TodayPriceCard({
     });
   };
 
+  const showLoginAlert = () => {
+    Alert.alert(
+      '알림',
+      '로그인이 필요한 서비스입니다.',
+      [
+        { text: '취소', style: 'cancel' },
+        {
+          text: '로그인하러 가기',
+          onPress: () => router.push('/login')
+        }
+      ]
+    );
+  };
+
   const handleFavoritePress = async () => {
     const token = await getAccessToken();
 
     if (!token) {
-      Alert.alert(
-        '알림',
-        '로그인이 필요한 서비스입니다.',
-        [
-          { text: '취소', style: 'cancel' },
-          {
-            text: '로그인하러 가기',
-            onPress: () => router.push('/(tabs)/mypage')
-          }
-        ]
-      );
+      showLoginAlert();
       return;
     }
 
@@ -67,6 +71,10 @@ export default function TodayPriceCard({
       const result = await exchangeApi.toggleFavorite(currencyCode);
       setFavorited(result.favorited);
     } catch (error: any) {
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        showLoginAlert();
+        return;
+      }
       Alert.alert('오류', error.response?.data?.message || '즐겨찾기 처리 중 오류가 발생했습니다.');
     } finally {
       setIsPending(false);

@@ -1,4 +1,4 @@
-import { notificationApi } from '@/components/utils/api';
+import { exchangeApi, notificationApi } from '@/components/utils/api';
 import { AVAILABLE_CURRENCIES, getCurrencyApiCode } from '@/constants/Currency';
 import { Typography } from '@/constants/Typography';
 import { Ionicons } from '@expo/vector-icons';
@@ -113,6 +113,24 @@ export default function NotificationSettings() {
       Alert.alert('알림', '목표가 알림이 설정되었습니다.');
     } catch (error: any) {
       console.error('목표가 알림 저장 실패:', error.response?.data || error.message);
+
+      // 즐겨찾기 미등록으로 인한 500/400 에러 처리 (자동 즐겨찾기 추가 후 재시도)
+      try {
+        await exchangeApi.toggleFavorite(apiCurrencyCode);
+        await notificationApi.updateTargetPrice({
+          currencyCode: apiCurrencyCode,
+          targetPrice: parsedPrice,
+          direction,
+          isActive: true,
+        });
+        setTargetPrice('');
+        await fetchSettings();
+        Alert.alert('알림', '목표가 알림이 설정되었습니다.');
+        return;
+      } catch (retryError: any) {
+        console.error('재시도 목표가 알림 저장 실패:', retryError.response?.data || retryError.message);
+      }
+
       Alert.alert('오류', '목표가 알림 저장 중 문제가 발생했습니다.');
     } finally {
       setIsSaving(false);

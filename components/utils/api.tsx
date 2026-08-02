@@ -211,7 +211,7 @@ export const authApi = {
   updateFcmToken: (token: string) => {
     return request('/users/fcm-token', {
       method: 'POST',
-      body: JSON.stringify({ token }),
+      body: JSON.stringify({ token, fcmToken: token }),
     });
   },
   // 토큰 재발급 (Refresh Token Rotation)
@@ -567,7 +567,7 @@ export const notificationApi = {
   updateFcmToken: (token: string) => {
     return request('/api/notifications/token', {
       method: 'POST',
-      body: JSON.stringify({ fcmToken: token }),
+      body: JSON.stringify({ fcmToken: token, token: token }),
     });
   },
 };

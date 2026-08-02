@@ -42,7 +42,7 @@ export default function TabLayout() {
             <Tabs.Screen
                 name="shopping"
                 options={{
-                    title: '쇼핑',
+                    title: '여행',
                     tabBarIcon: ({ color }) => <ShoppingIcon width={24} height={24} color={color} />,
                 }}
             />

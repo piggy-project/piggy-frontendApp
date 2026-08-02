@@ -1,5 +1,3 @@
-import type React from 'react';
-import { SvgProps } from 'react-native-svg';
 import AmericaFlag from '@/assets/icons/americaflag.svg';
 import AustraliaFlag from '@/assets/icons/australiaflag.svg';
 import ChinaFlag from '@/assets/icons/chinaflag.svg';
@@ -10,6 +8,8 @@ import PhilippinesFlag from '@/assets/icons/philippinesflag.svg';
 import ThailandFlag from '@/assets/icons/thailandflag.svg';
 import UkFlag from '@/assets/icons/ukflag.svg';
 import VietnamFlag from '@/assets/icons/vietnamflag.svg';
+import type React from 'react';
+import { SvgProps } from 'react-native-svg';
 
 export interface CurrencyInfo {
   code: string;

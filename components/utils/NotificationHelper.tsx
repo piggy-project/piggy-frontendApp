@@ -69,7 +69,7 @@ export function registerNotificationListeners() {
 }
 
 export async function registerForPushNotificationsAsync() {
-  let token;
+  let token: string | undefined;
 
   // 1. 실제 기기인지 확인
   if (Device.isDevice) {
@@ -89,25 +89,63 @@ export async function registerForPushNotificationsAsync() {
       return;
     }
 
-    // 5. Expo Push Token (FCM) 가져오기
+    // 5. FCM / Push Token 가져오기
     try {
-      // app.json의 projectId를 자동으로 참조합니다.
-      const projectId =
-        Constants.expoConfig?.extra?.eas?.projectId ?? Constants.easConfig?.projectId;
-      
-      if (!projectId) {
-        throw new Error('EAS Project ID를 찾을 수 없습니다. app.json 설정을 확인하세요.');
+      // 1차 시도: Device Push Token (순수 Native FCM 토큰)
+      try {
+        const deviceTokenObj = await Notifications.getDevicePushTokenAsync();
+        if (deviceTokenObj && deviceTokenObj.data) {
+          token = typeof deviceTokenObj.data === 'string' ? deviceTokenObj.data : (deviceTokenObj.data as any).token;
+          console.log('[FCM] Native Device Push Token 획득 성공:', token);
+        }
+      } catch (deviceErr) {
+        console.warn('[FCM] getDevicePushTokenAsync 실패, getExpoPushTokenAsync 시도:', deviceErr);
       }
 
-      token = (await Notifications.getExpoPushTokenAsync({ projectId })).data;
-      console.log('FCM Token 획득:', token);
+      // 2차 시도: Expo Push Token (DeviceToken 실패 시 또는 Expo Go 환경)
+      if (!token) {
+        const projectId =
+          Constants.expoConfig?.extra?.eas?.projectId ?? Constants.easConfig?.projectId;
+        
+        if (projectId) {
+          const expoTokenObj = await Notifications.getExpoPushTokenAsync({ projectId });
+          token = expoTokenObj.data;
+          console.log('[FCM] Expo Push Token 획득 성공:', token);
+        } else {
+          console.warn('[FCM] EAS Project ID를 찾을 수 없습니다.');
+        }
+      }
 
-      // 6. 서버로 토큰 전송
-      await notificationApi.updateFcmToken(token);
-      console.log('서버에 FCM 토큰 등록 완료');
+      if (!token) {
+        throw new Error('Push Token을 획득하지 못했습니다.');
+      }
+
+      // 6. 로그인 상태인지 확인 후 백엔드로 토큰 전송
+      const { getAccessToken } = require('./authStore');
+      const accessToken = await getAccessToken();
+
+      if (!accessToken) {
+        console.log('[FCM] 로그인 토큰(AccessToken)이 없어 서버 등록을 스킵합니다.');
+        return token;
+      }
+
+      // 백엔드로 토큰 등록 시도 (notificationApi 및 userApi 폴백 처리)
+      try {
+        await notificationApi.updateFcmToken(token);
+        console.log('[FCM] 서버에 FCM 토큰 등록 완료 (/api/notifications/token)');
+      } catch (apiErr: any) {
+        console.warn('[FCM] notificationApi.updateFcmToken 실패, userApi.updateFcmToken 시도:', apiErr?.response?.status || apiErr?.message);
+        try {
+          const { userApi } = require('./api');
+          await userApi.updateFcmToken(token);
+          console.log('[FCM] 서버에 FCM 토큰 등록 완료 (/users/fcm-token)');
+        } catch (userApiErr: any) {
+          console.error('[FCM] FCM 토큰 서버 등록 실패 (500/에러):', userApiErr?.response?.data || userApiErr?.message || userApiErr);
+        }
+      }
       
-    } catch (e) {
-      console.error('FCM 토큰 등록 중 에러 발생:', e);
+    } catch (e: any) {
+      console.error('FCM 토큰 획득/등록 과정 에러:', e?.response?.data || e?.message || e);
     }
   } else {
     console.log('물리적인 기기에서만 푸시 알림이 작동합니다.');

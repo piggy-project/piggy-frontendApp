@@ -5,7 +5,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import BaseHeader from './BaseHeader';
 import { styles as baseStyles } from './BaseHeader.styles';
 import BackButton from './component/BackButton';
-import WonSign from './component/WonSign';
+import Piggylogo from './component/piggylogo';
 
 interface Props {
     title?: string;
@@ -25,7 +25,7 @@ export default function ExchangeHeader({ title, country, code, displayCode, flag
         <BaseHeader
             left={
                 <>
-                    {showBackButton ? <BackButton /> : <WonSign />}
+                    {showBackButton ? <BackButton /> : <Piggylogo />}
                     {/* 1순위: title이 있으면 title 표시 */}
                     {title ? (
                         <Text style={baseStyles.title}>
@@ -54,7 +54,7 @@ export default function ExchangeHeader({ title, country, code, displayCode, flag
                     )}
                     {/* 국기가 있으면 국기 표시 */}
                     {FlagIcon ? (
-                        <FlagIcon width={26} height={26} />
+                        <FlagIcon/>
                     ) : flag ? (
                         <Text style={styles.flagText}>{flag}</Text>
                     ) : (

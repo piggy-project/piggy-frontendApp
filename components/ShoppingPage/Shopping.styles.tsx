@@ -11,6 +11,14 @@ export const styles = StyleSheet.create({
   sectionGap: {
     gap: 0, // 아이템들 사이에 20px씩 간격 자동 생성
   },
+  scrollView: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  scrollContent: {
+    paddingTop: 14,
+    paddingBottom: 24,
+  },
   searchModeScreen: {
     flex: 1,
     backgroundColor: '#fff',
