@@ -1,13 +1,14 @@
-import { communityApi } from '@/components/utils/api';
-import { getAccessToken } from '@/components/utils/authStore';
 import BaseHeader from '@/components/Header/BaseHeader';
 import BackButton from '@/components/Header/component/BackButton';
+import { communityApi } from '@/components/utils/api';
+import { getAccessToken } from '@/components/utils/authStore';
 import { Typography } from '@/constants/Typography';
 import { Ionicons } from '@expo/vector-icons';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { ActivityIndicator, Alert, Image, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Image, Modal, Platform, Pressable, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { styles } from './CommunityDetail.styles';
 
 export default function CommunityDetailPage() {
@@ -176,7 +177,7 @@ export default function CommunityDetailPage() {
   if (!post) return <View style={styles.errorContainer}><Text>게시글을 찾을 수 없습니다.</Text></View>;
 
   return (
-    <KeyboardAvoidingView
+    <KeyboardAvoidingView 
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}

@@ -8,21 +8,20 @@ export const styles = StyleSheet.create({
   searchSection: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#E5E5E5',
-    borderRadius: 25,
-    paddingHorizontal: 10,
-    height: 40,
-    marginRight: 10
+    backgroundColor: '#F5F5F5',
+    borderRadius: 18,
+    paddingHorizontal: 12,
+    height: 36,
+    marginBottom: 4,
   },
   input: {
     flex: 1,
     fontSize: 14,
+    lineHeight: 16,
     color: '#000',
+    paddingVertical: 0,
   },
   searchIcon: {
-    marginLeft: 10,
-    marginRight: 10
+    marginRight: 6,
   },
 });

@@ -1,7 +1,6 @@
 import { Typography } from '@/constants/Typography';
-import { AntDesign } from '@expo/vector-icons';
 import React, { useState } from 'react';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { styles } from './ShowCommunity.styles';
 
 interface ShowCommunityProps {
@@ -34,7 +33,7 @@ const ShowCommunity = ({ activeTab, setActiveTab, activeCode, setActiveCode }: S
       // 1. 이미 환율게시판인 상태에서 다시 누르면 드롭다운 토글
       if (activeTab === '환율게시판') {
         setIsDropdownOpen(!isDropdownOpen);
-      } 
+      }
       // 2. 다른 게시판에서 환율게시판으로 올 때는 탭만 이동하고 드롭다운은 닫아둠
       else {
         setActiveTab(tab);
@@ -75,11 +74,10 @@ const ShowCommunity = ({ activeTab, setActiveTab, activeCode, setActiveCode }: S
                 </Text>
 
                 {tab === '환율게시판' && (
-                  <AntDesign
-                    name="down"
-                    size={10}
-                    color={activeTab === tab ? '#000' : '#D1D1D1'}
-                    style={{ marginLeft: 4 }}
+                  <Image
+                    source={require('@/assets/images/dropdown.png')}
+                    style={{ width: 10, height: 10, marginLeft: 4, tintColor: '#C9C9C9' }}
+                    resizeMode="contain"
                   />
                 )}
               </View>

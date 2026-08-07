@@ -1,7 +1,7 @@
 import { shoppingApi } from '@/components/utils/api';
 import { Typography } from '@/constants/Typography';
 import { Ionicons } from '@expo/vector-icons';
-import { router, useFocusEffect } from 'expo-router';
+import { useFocusEffect } from 'expo-router';
 import React, { useCallback, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
@@ -17,6 +17,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import MyPageDetailHeader from '../Header/MyPageDetailHeader';
 
 type WishlistItem = {
   id?: number;
@@ -143,11 +144,7 @@ export default function ShoppingBookmarkPage() {
 
   return (
     <View style={styles.container}>
-      <View style={[styles.header, { paddingTop: Math.max(insets.top, 8) }]}>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()} activeOpacity={0.7}>
-          <Ionicons name="chevron-back" size={24} color="#555" />
-        </TouchableOpacity>
-      </View>
+      <MyPageDetailHeader />  
 
       {isLoading ? (
         <View style={styles.loadingBox}>

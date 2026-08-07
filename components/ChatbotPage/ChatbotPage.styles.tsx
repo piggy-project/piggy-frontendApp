@@ -38,23 +38,33 @@ export const styles = StyleSheet.create({
     marginBottom: 22,
   },
   botMessageRow: {
-    justifyContent: 'flex-start',
+    flexDirection: 'column', // 가로 배치가 아닌 세로 정렬로 변경
+    alignItems: 'flex-start',
   },
   userMessageRow: {
+    flexDirection: 'row',
     justifyContent: 'flex-end',
   },
+  botProfileHeader: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  marginBottom: 8, // 프로필/이름과 말풍선 사이 간격
+},
   avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 22,
-    marginRight: 10,
-  },
+  width: 36,
+  height: 36,
+  borderRadius: 18,
+  marginRight: 8,
+},
   messageBlock: {
     maxWidth: '82%',
   },
+  userMessageBlock: {
+  alignItems: 'flex-end',
+},
   botName: {
     color: '#111',
-    marginBottom: 10,
+    marginBottom: 0,
   },
   bubble: {
     borderRadius: 16,

@@ -1,8 +1,8 @@
 import SearchCommunity from '@/components/CommunityPage/component/SearchCommunity';
 import React from 'react';
 import BaseHeader from './BaseHeader';
-import Notice from './component/Notice';
 import { styles as baseStyles } from './BaseHeader.styles';
+import Notice from './component/Notice';
 
 interface Props {
   searchText: string;

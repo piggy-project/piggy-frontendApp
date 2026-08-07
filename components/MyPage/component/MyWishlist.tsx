@@ -105,7 +105,7 @@ export default function MyWishlist() {
         <Text style={[styles.title, Typography.Pretendard_B_16]}>내 관심 상품 목록</Text>
         <TouchableOpacity
           style={styles.moreButton}
-          onPress={() => router.push('/(tabs)/shopping-bookmarks' as any)}
+          onPress={() => router.push('/shopping-bookmarks' as any)}
           activeOpacity={0.7}
         >
           <Ionicons name="chevron-forward" size={22} color="#777" />

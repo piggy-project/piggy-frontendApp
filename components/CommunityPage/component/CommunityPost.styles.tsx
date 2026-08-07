@@ -44,7 +44,7 @@ export const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: '#888',
+    backgroundColor: '#C9C9C9',
     marginBottom: 10,
   },
   bodyContainer: {

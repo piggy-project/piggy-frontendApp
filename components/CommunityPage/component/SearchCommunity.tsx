@@ -11,11 +11,11 @@ interface SearchProps {
 const SearchCommunity = ({ searchText, setSearchText }: SearchProps) => {
   return (
     <View style={styles.searchSection}>
-      <Ionicons name="search" size={20} color="#C7C7CD" style={styles.searchIcon} />
+      <Ionicons name="search-outline" size={16} color="#777" style={styles.searchIcon} />
       <TextInput
         style={styles.input}
         placeholder="검색어를 입력하세요"
-        placeholderTextColor="#C7C7CD"
+        placeholderTextColor="#999"
         value={searchText}
         onChangeText={setSearchText}
       />

@@ -1,7 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect, useRef, useState } from 'react';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Platform, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface SearchProductProps {
   onSearch?: (text: string) => void;
@@ -28,6 +29,12 @@ export default function SearchProduct({
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const isSearchVariant = variant === 'search';
   const isHeaderVariant = variant === 'header';
+
+  const insets = useSafeAreaInsets();
+  const androidStatusBarHeight = Platform.OS === 'android' ? StatusBar.currentHeight ?? 0 : 0;
+  const topInset = Platform.OS === 'android'
+    ? Math.max(insets.top, androidStatusBarHeight)
+    : insets.top;
 
   useEffect(() => {
     const loadRecentSearches = async () => {
@@ -90,16 +97,25 @@ export default function SearchProduct({
   };
 
   return (
-    <View style={[styles.container, isSearchVariant && styles.searchModeContainer, isHeaderVariant && styles.headerContainer]}>
+    <View
+      style={[
+        styles.container,
+        isSearchVariant && styles.searchModeContainer,
+        isHeaderVariant && styles.headerContainer,
+        {
+          paddingTop: isHeaderVariant ? 0 : topInset + (isSearchVariant ? 0 : 10)
+        },
+      ]}
+    >
       <View style={isSearchVariant ? styles.searchModeHeader : undefined}>
         {isSearchVariant && (
           <TouchableOpacity style={styles.backButton} onPress={onBack} activeOpacity={0.7}>
-            <Ionicons name="chevron-back" size={28} color="#555" />
+            <Ionicons name="chevron-back" size={25} color="#555" />
           </TouchableOpacity>
         )}
 
         <View style={[styles.searchBar, isSearchVariant && styles.searchModeBar, isHeaderVariant && styles.headerSearchBar]}>
-          <Ionicons name="search-outline" size={isHeaderVariant ? 16 : 20} color="#777" style={styles.icon} />
+          <Ionicons name="search-outline" size={isHeaderVariant ? 16 : 16} color="#777" style={styles.icon} />
           <TextInput
             ref={inputRef}
             style={styles.input}
@@ -153,7 +169,6 @@ const styles = StyleSheet.create({
   },
   searchModeContainer: {
     flex: 1,
-    paddingTop: 8,
     paddingBottom: 0,
   },
   headerContainer: {
@@ -164,11 +179,11 @@ const styles = StyleSheet.create({
   searchModeHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 4,
   },
   backButton: {
     width: 34,
-    height: 44,
+    height: 36,
     justifyContent: 'center',
     alignItems: 'flex-start',
   },
@@ -182,7 +197,7 @@ const styles = StyleSheet.create({
   },
   searchModeBar: {
     flex: 1,
-    height: 42,
+    height: 36,
     borderRadius: 22,
   },
   headerSearchBar: {
@@ -201,7 +216,7 @@ const styles = StyleSheet.create({
     paddingVertical: 0,
   },
   recentContainer: {
-    paddingTop: 26,
+    paddingTop: 20,
     paddingBottom: 24,
     borderBottomWidth: 1,
     borderBottomColor: '#E0E0E0',

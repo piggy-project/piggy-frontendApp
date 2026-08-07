@@ -4,6 +4,7 @@ import { Stack, useRouter, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import React, { useEffect } from 'react';
 import { ActivityIndicator, StatusBar, Text, TextInput, View } from 'react-native';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { SafeAreaProvider, initialWindowMetrics } from 'react-native-safe-area-context';
 import { AuthProvider, useAuth } from '../components/utils/AuthContext';
 import { registerNotificationListeners } from '../components/utils/NotificationHelper';
@@ -39,13 +40,15 @@ export default function RootLayout() {
 
   return (
     // AuthProvider로 감싸고, 실제 로직은 AppLayout에서 처리
-    <QueryClientProvider client={queryClient}>
-      <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-        <AuthProvider>
-          <AppLayout />
-        </AuthProvider>
-      </SafeAreaProvider>
-    </QueryClientProvider>
+    <KeyboardProvider>
+      <QueryClientProvider client={queryClient}>
+        <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+          <AuthProvider>
+            <AppLayout />
+          </AuthProvider>
+        </SafeAreaProvider>
+      </QueryClientProvider>
+    </KeyboardProvider>
   );
 }
 

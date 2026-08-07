@@ -18,12 +18,11 @@ export const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 30, // 둥근 모양
     // 안드로이드 그림자
-    elevation: 8,
-    // iOS 그림자
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4.65,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 8,
     justifyContent: 'center',
     alignItems: 'center',
   },

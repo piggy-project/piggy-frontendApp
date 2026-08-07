@@ -7,6 +7,7 @@ import ChoiceCountry from '../MainDashBoardPage/component/ChoiceCountry';
 import ComparisonResultList from './component/ComparisonResultList';
 import ProductSection from './component/ProductSection';
 import SearchProduct from './component/SearchProduct';
+import ShoppingUtility from './component/ShoppingUtility';
 import TravelSpotSection from './component/TravelSpotSection';
 import { styles } from './Shopping.styles';
 
@@ -260,6 +261,7 @@ export default function ShoppingPage() {
           </ScrollView>
         </View>
       )}
+      {!isSearchMode && <ShoppingUtility />}
     </View>
   );
 }

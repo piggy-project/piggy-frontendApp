@@ -72,7 +72,7 @@ export default function ChatbotPage() {
   const [question, setQuestion] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
-  
+
   const { user } = useAuth();
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -270,24 +270,25 @@ export default function ChatbotPage() {
               message.role === 'user' ? styles.userMessageRow : styles.botMessageRow,
             ]}
           >
+            {/* 1. 챗봇일 때 프로필+이름을 위쪽 한 줄로 배치 */}
             {message.role === 'bot' && (
-              <Image source={require('@/assets/images/piggychatbot.png')} style={styles.avatar} />
+              <View style={styles.botProfileHeader}>
+                <Image source={require('@/assets/images/piggychatbot.png')} style={styles.avatar} />
+                <Text style={[styles.botName, Typography.Pretendard_B_16]}>피기</Text>
+              </View>
             )}
 
-            <View style={styles.messageBlock}>
-              {message.role === 'bot' && (
-                <Text style={[styles.botName, Typography.Pretendard_B_16]}>피기</Text>
-              )}
-              <View
-                style={[
-                  styles.bubble,
-                  message.role === 'user' ? styles.userBubble : styles.botBubble,
-                ]}
-              >
-                <Text style={[styles.messageText, Typography.Pretendard_M_14]}>
-                  {message.text}
-                </Text>
-              </View>
+            <View style={[styles.messageBlock, message.role === 'user' && styles.userMessageBlock]}>
+      <View
+        style={[
+          styles.bubble,
+          message.role === 'user' ? styles.userBubble : styles.botBubble,
+        ]}
+      >
+        <Text style={[styles.messageText, Typography.Pretendard_M_14]}>
+          {message.text}
+        </Text>
+      </View>
 
               {!!message.navigationLinks?.length && (
                 <View style={styles.quickActionList}>
@@ -336,16 +337,18 @@ export default function ChatbotPage() {
         ))}
 
         {isLoading && (
-          <View style={[styles.messageRow, styles.botMessageRow]}>
-            <Image source={require('@/assets/images/piggychatbot.png')} style={styles.avatar} />
-            <View style={styles.messageBlock}>
-              <Text style={[styles.botName, Typography.Pretendard_B_16]}>피기</Text>
-              <View style={[styles.bubble, styles.botBubble, styles.loadingBubble]}>
-                <ActivityIndicator size="small" color="#FF8FAA" />
-              </View>
-            </View>
-          </View>
-        )}
+  <View style={[styles.messageRow, styles.botMessageRow]}>
+    <View style={styles.botProfileHeader}>
+      <Image source={require('@/assets/images/piggychatbot.png')} style={styles.avatar} />
+      <Text style={[styles.botName, Typography.Pretendard_B_16]}>피기</Text>
+    </View>
+    <View style={styles.messageBlock}>
+      <View style={[styles.bubble, styles.botBubble, styles.loadingBubble]}>
+        <ActivityIndicator size="small" color="#FF8FAA" />
+      </View>
+    </View>
+  </View>
+)}
       </ScrollView>
 
       <View
