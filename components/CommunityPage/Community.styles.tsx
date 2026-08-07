@@ -31,4 +31,29 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  searchModeScreen: {
+  flex: 1,
+  backgroundColor: '#fff',
+},
+searchResultBar: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  paddingHorizontal: 20,
+  paddingVertical: 12,
+  backgroundColor: '#F5F5F5',
+  marginBottom: 8,
+},
+searchResultText: {
+  flex: 1,
+  fontSize: 14,
+  fontWeight: '600',
+  color: '#222',
+  marginRight: 8,
+},
+searchResultClear: {
+  fontSize: 13,
+  color: '#FFB7C5',
+  fontWeight: '600',
+},
 });

@@ -6,78 +6,95 @@ import CommunityHeader from '../Header/CommunityHeader';
 import { styles } from './Community.styles';
 import CommunityContainer from './component/CommunityContainer';
 import HotPost from './component/HotPost';
+import SearchCommunity from './component/SearchCommunity';
 import ShowCommunity from './component/ShowCommunity';
 
 export default function CommunityPage() {
   const router = useRouter();
-  
-  // 1. 탭 이름 일치 (ShowCommunity의 tabs 배열과 맞춤)
-  const [activeTab, setActiveTab] = useState('환율게시판'); 
-  
-  // 2. 선택된 통화 코드 상태 추가 (USD, JPY 등)
+
+  const [activeTab, setActiveTab] = useState('환율게시판');
   const [activeCode, setActiveCode] = useState<string | null>(null);
-  
   const [searchText, setSearchText] = useState('');
+  const [isSearchMode, setIsSearchMode] = useState(false);
 
   const handleWritePress = async () => {
     const token = await getAccessToken();
-
     if (!token) {
       Alert.alert(
         '알림',
         '로그인이 필요한 서비스입니다.',
         [
           { text: '취소', style: 'cancel' },
-          {
-            text: '로그인하러 가기',
-            onPress: () => router.push('/(tabs)/mypage')
-          }
+          { text: '로그인하러 가기', onPress: () => router.push('/(tabs)/mypage') }
         ]
       );
       return;
     }
     router.push({
       pathname: '/community_write',
-      params: { 
+      params: {
         initialCategory: activeTab,
-        initialCode: activeCode || '' 
+        initialCode: activeCode || ''
       }
     });
   };
 
+  const handleSearch = (query: string) => {
+    setSearchText(query);
+    setIsSearchMode(false);
+  };
+
+  const handleExitSearchMode = () => {
+    setIsSearchMode(false);
+  };
+
+  const handleClearSearch = () => {
+    setSearchText('');
+  };
+
   return (
     <View style={styles.container}>
-      <CommunityHeader 
-        searchText={searchText} 
-        setSearchText={setSearchText} 
-      />
-      <View style={[styles.sectionGap, { flex: 1 }]}>
+      {isSearchMode ? (
+        <View style={styles.searchModeScreen}>
+          <SearchCommunity
+            variant="search"
+            autoFocus
+            onBack={handleExitSearchMode}
+            onSearch={handleSearch}
+            onClear={handleClearSearch}
+          />
+        </View>
+      ) : (
+        <>
+          <CommunityHeader onFocus={() => setIsSearchMode(true)} />
 
-        {/* 3. ShowCommunity에 필요한 4개의 Props 모두 전달 */}
-        <ShowCommunity 
-          activeTab={activeTab} 
-          setActiveTab={setActiveTab} 
-          activeCode={activeCode}
-          setActiveCode={setActiveCode}
-        />
+          <View style={[styles.sectionGap, { flex: 1 }]}>
+            <ShowCommunity
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              activeCode={activeCode}
+              setActiveCode={setActiveCode}
+              onInteract={handleClearSearch}
+            />
 
-        <HotPost />
+            <HotPost />
 
-        {/* 4. 필터링된 리스트에도 activeCode를 넘겨야 백엔드에서 해당 국가 글만 가져옵니다. */}
-        <CommunityContainer 
-          activeTab={activeTab}
-          activeCode={activeCode}
-          searchText={searchText}
-        />
-      </View>
+            <CommunityContainer
+              activeTab={activeTab}
+              activeCode={activeCode}
+              searchText={searchText}
+            />
+          </View>
 
-      <TouchableOpacity
-        style={styles.fab}
-        onPress={handleWritePress}
-        activeOpacity={0.8}
-      >
-        <Text style={styles.fabText}>+ 글쓰기</Text>
-      </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.fab}
+            onPress={handleWritePress}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.fabText}>+ 글쓰기</Text>
+          </TouchableOpacity>
+        </>
+      )}
     </View>
   );
 }

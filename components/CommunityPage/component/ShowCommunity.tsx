@@ -8,13 +8,13 @@ interface ShowCommunityProps {
   setActiveTab: (tab: string) => void;
   activeCode: string | null;
   setActiveCode: (code: string | null) => void;
+  onInteract?: () => void; // 추가: 탭/드롭다운 조작 시 호출
 }
 
-const ShowCommunity = ({ activeTab, setActiveTab, activeCode, setActiveCode }: ShowCommunityProps) => {
+const ShowCommunity = ({ activeTab, setActiveTab, activeCode, setActiveCode, onInteract }: ShowCommunityProps) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const tabs = ['자유게시판', '환율게시판', '여행게시판'];
 
-  // 백엔드 currencyMap에 맞춘 리스트 구성
   const currencyList = [
     { code: 'ALL', name: '전체보기' },
     { code: 'USD', name: '미국 달러' },
@@ -30,26 +30,24 @@ const ShowCommunity = ({ activeTab, setActiveTab, activeCode, setActiveCode }: S
 
   const handleTabPress = (tab: string) => {
     if (tab === '환율게시판') {
-      // 1. 이미 환율게시판인 상태에서 다시 누르면 드롭다운 토글
       if (activeTab === '환율게시판') {
         setIsDropdownOpen(!isDropdownOpen);
-      }
-      // 2. 다른 게시판에서 환율게시판으로 올 때는 탭만 이동하고 드롭다운은 닫아둠
-      else {
+      } else {
         setActiveTab(tab);
         setIsDropdownOpen(false);
       }
     } else {
-      // 자유/여행 게시판 클릭 시 드롭다운 닫고 탭 이동
       setActiveTab(tab);
       setIsDropdownOpen(false);
-      setActiveCode(null); // 다른 게시판으로 갈 때는 필터링 초기화
+      setActiveCode(null);
     }
+    onInteract?.(); // 탭 클릭 시 검색 초기화
   };
 
   const handleSelectCode = (code: string) => {
     setActiveCode(code);
     setIsDropdownOpen(false);
+    onInteract?.(); // 통화 선택 시(전체보기 포함) 검색 초기화
   };
 
   return (
@@ -83,7 +81,6 @@ const ShowCommunity = ({ activeTab, setActiveTab, activeCode, setActiveCode }: S
               </View>
             </TouchableOpacity>
 
-            {/* 드롭다운 영역 */}
             {tab === '환율게시판' && isDropdownOpen && (
               <View style={[styles.dropdownContainer, { height: 250 }]}>
                 <ScrollView showsVerticalScrollIndicator={false}>
