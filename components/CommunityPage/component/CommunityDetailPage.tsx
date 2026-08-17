@@ -177,7 +177,7 @@ export default function CommunityDetailPage() {
   if (!post) return <View style={styles.errorContainer}><Text>게시글을 찾을 수 없습니다.</Text></View>;
 
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
@@ -205,9 +205,9 @@ export default function CommunityDetailPage() {
             <TouchableOpacity style={styles.menuOption} onPress={handleEdit}>
               <Text style={styles.menuOptionText}>수정</Text>
             </TouchableOpacity>
-            
+
             <View style={styles.menuSeparator} />
-            
+
             <TouchableOpacity style={styles.menuOption} onPress={confirmDelete}>
               <Text style={styles.menuOptionText}>삭제</Text>
             </TouchableOpacity>
@@ -271,11 +271,23 @@ export default function CommunityDetailPage() {
           </Text>
           <View style={styles.interactionRow}>
             <TouchableOpacity onPress={handleLike} style={styles.statItem}>
-              <Ionicons name="thumbs-up-outline" size={16} color={post.isLiked ? "#FFB7C5" : "#888"} />
-              <Text style={[styles.statText, post.isLiked && { color: '#FFB7C5' }]}>{post.likeCount}</Text>
+              <Image
+                source={
+                  post.isLiked
+                    ? require('@/assets/images/yeslike.png')
+                    : require('@/assets/images/nolike.png')
+                }
+                style={{ width: 16, height: 16 }}
+                resizeMode="contain"
+              />
+            <Text style={[styles.statText, post.isLiked && { color: '#FFB7C5' }]}>{post.likeCount}</Text>
             </TouchableOpacity>
             <View style={styles.statItem}>
-              <Ionicons name="chatbubble-outline" size={16} color="#888" />
+              <Image
+                source={require('@/assets/images/chaticon.png')}
+                style={{ width: 16, height: 16, tintColor: '#888' }}
+                resizeMode="contain"
+              />
               <Text style={styles.statText}>{comments.length}</Text>
             </View>
           </View>
@@ -306,16 +318,24 @@ export default function CommunityDetailPage() {
 
               <Text style={styles.commentBody}>{comment.content}</Text>
 
-              <View style={styles.commentStats}>
+              {/* <View style={styles.commentStats}>
                 <View style={styles.statItemSmall}>
-                  <Ionicons name="thumbs-up-outline" size={12} color="#888" />
-                  <Text style={styles.statTextSmall}>0</Text>
+                  <Image
+                    source={require('@/assets/images/chaticon.png')}
+                    style={{ width: 16, height: 16, tintColor: '#888' }}
+                    resizeMode="contain"
+                  />
+                <Text style={styles.statTextSmall}>0</Text>
                 </View>
                 <View style={styles.statItemSmall}>
-                  <Ionicons name="chatbubble-outline" size={12} color="#888" />
-                  <Text style={styles.statTextSmall}>0</Text>
+                  <Image
+                    source={require('@/assets/images/chaticon.png')}
+                    style={{ width: 16, height: 16, tintColor: '#888' }}
+                    resizeMode="contain"
+                  />
+                <Text style={styles.statTextSmall}>0</Text>
                 </View>
-              </View>
+              </View> */}
             </View>
           ))}
         </View>

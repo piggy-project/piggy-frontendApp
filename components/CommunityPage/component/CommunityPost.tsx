@@ -88,9 +88,9 @@ const CommunityPost: React.FC<PostProps> = ({ id, user, category, time, code, ti
     >
       <View style={styles.header}>
         {userProfileUrl ? (
-          <Image 
-            source={{ uri: userProfileUrl }} 
-            style={styles.profileCircle} 
+          <Image
+            source={{ uri: userProfileUrl }}
+            style={styles.profileCircle}
           />
         ) : (
           <View style={[styles.profileCircle, styles.defaultProfile]}>
@@ -118,7 +118,7 @@ const CommunityPost: React.FC<PostProps> = ({ id, user, category, time, code, ti
               {title}
             </Text>
           </View>
-          
+
           {/* 본문 미리보기 */}
           <Text
             style={[styles.contentPreview, Typography.Pretendard_M_14, { marginBottom: 0 }]}
@@ -131,9 +131,9 @@ const CommunityPost: React.FC<PostProps> = ({ id, user, category, time, code, ti
 
         {/* 오른쪽 썸네일 이미지 영역 (이미지가 있을 때만 노출) */}
         {imageUrl && (
-          <Image 
-            source={{ uri: imageUrl }} 
-            style={styles.thumbnail} 
+          <Image
+            source={{ uri: imageUrl }}
+            style={styles.thumbnail}
             resizeMode="cover"
           />
         )}
@@ -147,10 +147,14 @@ const CommunityPost: React.FC<PostProps> = ({ id, user, category, time, code, ti
             activeOpacity={0.6}
             disabled={mutation.isPending}
           >
-            <Ionicons
-              name={isLiked ? "thumbs-up" : "thumbs-up-outline"}
-              size={16}
-              color={isLiked ? "#FFB7C5" : "#888"}
+            <Image
+              source={
+                isLiked
+                  ? require('@/assets/images/yeslike.png')
+                  : require('@/assets/images/nolike.png')
+              }
+              style={{ width: 16, height: 16 }}
+              resizeMode="contain"
             />
             <Text style={[
               styles.interactionText,
@@ -162,7 +166,11 @@ const CommunityPost: React.FC<PostProps> = ({ id, user, category, time, code, ti
           </TouchableOpacity>
 
           <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 10 }}>
-            <Ionicons name="chatbubble-outline" size={16} color="#888" style={{ marginLeft: 10 }} />
+            <Image
+              source={require('@/assets/images/chaticon.png')}
+              style={{ width: 16, height: 16, tintColor: '#888' }}
+              resizeMode="contain"
+            />
             <Text style={[styles.interactionText, Typography.Pretendard_M_12]}>{comments}</Text>
           </View>
         </View>

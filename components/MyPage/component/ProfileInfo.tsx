@@ -7,7 +7,7 @@ import { useAuth } from '../../utils/AuthContext';
 import { styles } from './ProfileInfo.styles';
 
 export default function ProfileInfo() {
-  const { user } = useAuth(); // 김유빈 님의 정보를 가져옵니다.
+  const { user } = useAuth();
   const router = useRouter();
 
   return (

@@ -7,7 +7,6 @@ import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { ActivityIndicator, Alert, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import NotificationSettings from './NotificationSettings';
 import { styles } from './ProfileDetail.styles';
 
 export default function ProfileDetail() {
@@ -108,21 +107,21 @@ export default function ProfileDetail() {
       `${user.email}로 재설정 이메일을 보낼까요?`,
       [
         { text: "취소", style: "cancel" },
-        { 
-          text: "보내기", 
+        {
+          text: "보내기",
           onPress: async () => {
             try {
               setIsUploading(true);
               await authApi.requestPasswordReset(user.email, 'app');
               Alert.alert("발송 완료", "이메일함에서 재설정 링크(또는 토큰)를 확인해주세요.");
-              
+
               // 여기서 토큰을 입력받는 모달을 띄우거나 페이지를 이동할 수 있습니다.
             } catch (error) {
               Alert.alert("오류", "이메일 발송에 실패했습니다.");
             } finally {
               setIsUploading(false);
             }
-          } 
+          }
         },
       ]
     );
@@ -185,7 +184,11 @@ export default function ProfileDetail() {
 
       </View>
 
-      <NotificationSettings />
+      <TouchableOpacity onPress={() => router.push('/notification_settings')}>
+        <View style={styles.infoSection}>
+          <Text style={[styles.sectionTitle, Typography.Pretendard_B_16]}>알림 설정</Text>
+        </View>
+      </TouchableOpacity>
 
       <TouchableOpacity style={styles.logoutContainer} onPress={handleLogout}>
         <Text style={styles.logoutText}>로그아웃</Text>

@@ -169,8 +169,6 @@ export default function NotificationSettings() {
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.sectionTitle, Typography.Pretendard_B_16]}>알림 설정</Text>
-
       <View style={styles.currencyList}>
         {currencyOptions.map((currency) => (
           <TouchableOpacity
@@ -294,10 +292,6 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     marginBottom: 8,
   },
-  sectionTitle: {
-    color: '#495057',
-    marginBottom: 14,
-  },
   currencyList: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -312,14 +306,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   activeChip: {
-    backgroundColor: '#FFD3DD',
+    backgroundColor: '#868686',
   },
   chipText: {
     color: '#777',
     fontSize: 12,
   },
   activeChipText: {
-    color: '#111',
+    color: '#FFFFFF',
     fontWeight: '700',
   },
   settingBox: {
@@ -361,7 +355,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   activeOptionButton: {
-    backgroundColor: '#333',
+    backgroundColor: '#868686',
   },
   optionText: {
     color: '#777',
@@ -374,12 +368,12 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 8,
     marginTop: 12,
-    backgroundColor: '#FFD3DD',
+    backgroundColor: '#3D3D3D',
     justifyContent: 'center',
     alignItems: 'center',
   },
   saveButtonText: {
-    color: '#111',
+    color: '#FFFFFF',
   },
   toggleRow: {
     minHeight: 52,

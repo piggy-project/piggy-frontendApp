@@ -8,7 +8,7 @@ interface ShowCommunityProps {
   setActiveTab: (tab: string) => void;
   activeCode: string | null;
   setActiveCode: (code: string | null) => void;
-  onInteract?: () => void; // 추가: 탭/드롭다운 조작 시 호출
+  onInteract?: () => void;
 }
 
 const ShowCommunity = ({ activeTab, setActiveTab, activeCode, setActiveCode, onInteract }: ShowCommunityProps) => {

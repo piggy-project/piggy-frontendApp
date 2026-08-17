@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { styles } from './HotPost.styles';
 
 const HotPost = () => {
@@ -21,20 +21,20 @@ const HotPost = () => {
   if (isLoading || !hotPost) return null;
 
   const handlePress = () => {
-  if (!hotPost?.id || isNaN(Number(hotPost.id))) {
-    console.warn("유효하지 않은 게시글 ID입니다.");
-    return;
-  }
+    if (!hotPost?.id || isNaN(Number(hotPost.id))) {
+      console.warn("유효하지 않은 게시글 ID입니다.");
+      return;
+    }
 
-  router.push({
-    pathname: '/community_detail',
-    params: { id: String(hotPost.id) }
-  });
-};
+    router.push({
+      pathname: '/community_detail',
+      params: { id: String(hotPost.id) }
+    });
+  };
 
   return (
-    <TouchableOpacity 
-      style={styles.container} 
+    <TouchableOpacity
+      style={styles.container}
       onPress={handlePress}
       activeOpacity={0.9}
     >
@@ -42,9 +42,9 @@ const HotPost = () => {
         {/* 왼쪽: 불 아이콘 + 제목 */}
         <View style={styles.leftSection}>
           <Ionicons name="flame" size={16} color="#FF7088" style={styles.fireIcon} />
-          <Text 
-            style={[styles.title, Typography.Pretendard_M_14]} 
-            numberOfLines={1} 
+          <Text
+            style={[styles.title, Typography.Pretendard_M_14]}
+            numberOfLines={1}
             ellipsizeMode="tail"
           >
             {hotPost.title}
@@ -58,7 +58,11 @@ const HotPost = () => {
             <Text style={[styles.statText, Typography.Pretendard_M_11]}>{hotPost.likeCount}</Text>
           </View>
           <View style={[styles.statItem, { marginLeft: 8 }]}>
-            <Ionicons name="chatbubble-outline" size={12} color="#888" />
+            <Image
+              source={require('@/assets/images/chaticon.png')}
+              style={{ width: 16, height: 16, tintColor: '#888' }}
+              resizeMode="contain"
+            />
             <Text style={[styles.statText, Typography.Pretendard_M_11]}>{hotPost.commentCount}</Text>
           </View>
         </View>

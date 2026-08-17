@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useQuery } from '@tanstack/react-query';
 import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 type ActivityTab = '게시물' | '댓글' | '좋아요';
 
@@ -233,11 +233,13 @@ function ActivityList<T>({
                 )}
                 {commentCount !== undefined && (
                   <>
-                    <Ionicons
-                      name="chatbubble-outline"
-                      size={12}
-                      color="#6E6E73"
-                      style={likeCount !== undefined ? styles.commentIcon : undefined}
+                    <Image
+                      source={require('@/assets/images/chaticon.png')}
+                      style={[
+                        { width: 12, height: 12, tintColor: '#6E6E73' },
+                        likeCount !== undefined ? styles.commentIcon : undefined,
+                      ]}
+                      resizeMode="contain"
                     />
                     <Text style={styles.statText}>{commentCount}</Text>
                   </>
