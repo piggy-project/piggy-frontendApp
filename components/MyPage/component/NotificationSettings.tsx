@@ -68,6 +68,49 @@ export default function NotificationSettings() {
     fetchSettings();
   }, []);
 
+  const isFavoriteRequiredError = (error: any) => {
+    const status = error.response?.status;
+    const message = String(error.response?.data?.message || error.response?.data || error.message || '');
+    return (status === 400 || status === 500) && message.includes('즐겨찾기');
+  };
+
+  const retryAfterFavoriteConfirm = (
+    retryAction: () => Promise<void>,
+    successMessage: string,
+  ) => {
+    Alert.alert(
+      '알림',
+      '즐겨찾기에 등록된 통화만 알림 설정이 가능합니다. 이 통화를 즐겨찾기에 등록하고 알림을 설정할까요?',
+      [
+        { text: '취소', style: 'cancel' },
+        {
+          text: '등록하기',
+          onPress: async () => {
+            try {
+              setIsSaving(true);
+              const favoriteResult = await exchangeApi.toggleFavorite(apiCurrencyCode);
+              const isFavorited = Boolean(favoriteResult?.favorited ?? favoriteResult?.data?.favorited);
+
+              if (!isFavorited) {
+                Alert.alert('알림', '즐겨찾기 등록 후 다시 시도해주세요.');
+                return;
+              }
+
+              await retryAction();
+              await fetchSettings();
+              Alert.alert('알림', successMessage);
+            } catch (retryError: any) {
+              console.error('즐겨찾기 등록 후 알림 설정 실패:', retryError.response?.data || retryError.message);
+              Alert.alert('오류', '즐겨찾기 등록 또는 알림 설정 중 문제가 발생했습니다.');
+            } finally {
+              setIsSaving(false);
+            }
+          },
+        },
+      ]
+    );
+  };
+
   const handleSavePercent = async () => {
     const parsedPercent = Number(targetPercent);
     if (!parsedPercent) {
@@ -75,19 +118,25 @@ export default function NotificationSettings() {
       return;
     }
 
+    const savePercentSetting = () => notificationApi.updatePercentSetting({
+      currencyCode: apiCurrencyCode,
+      targetPercent: parsedPercent,
+      period,
+      isActive: true,
+    });
+
     try {
       setIsSaving(true);
-      await notificationApi.updatePercentSetting({
-        currencyCode: apiCurrencyCode,
-        targetPercent: parsedPercent,
-        period,
-        isActive: true,
-      });
+      await savePercentSetting();
       await fetchSettings();
       Alert.alert('알림', '퍼센트 알림 설정이 저장되었습니다.');
     } catch (error: any) {
-      console.error('퍼센트 알림 저장 실패:', error.response?.data || error.message);
-      Alert.alert('오류', '퍼센트 알림 저장 중 문제가 발생했습니다.');
+      console.error('퍼센트 알림 설정 실패:', error.response?.data || error.message);
+      if (isFavoriteRequiredError(error)) {
+        retryAfterFavoriteConfirm(savePercentSetting, '퍼센트 알림 설정이 저장되었습니다.');
+        return;
+      }
+      Alert.alert('오류', '퍼센트 알림 설정 중 문제가 발생했습니다.');
     } finally {
       setIsSaving(false);
     }
@@ -100,8 +149,7 @@ export default function NotificationSettings() {
       return;
     }
 
-    try {
-      setIsSaving(true);
+    const saveTargetPriceSetting = async () => {
       await notificationApi.updateTargetPrice({
         currencyCode: apiCurrencyCode,
         targetPrice: parsedPrice,
@@ -109,29 +157,20 @@ export default function NotificationSettings() {
         isActive: true,
       });
       setTargetPrice('');
+    };
+
+    try {
+      setIsSaving(true);
+      await saveTargetPriceSetting();
       await fetchSettings();
       Alert.alert('알림', '목표가 알림이 설정되었습니다.');
     } catch (error: any) {
-      console.error('목표가 알림 저장 실패:', error.response?.data || error.message);
-
-      // 즐겨찾기 미등록으로 인한 500/400 에러 처리 (자동 즐겨찾기 추가 후 재시도)
-      try {
-        await exchangeApi.toggleFavorite(apiCurrencyCode);
-        await notificationApi.updateTargetPrice({
-          currencyCode: apiCurrencyCode,
-          targetPrice: parsedPrice,
-          direction,
-          isActive: true,
-        });
-        setTargetPrice('');
-        await fetchSettings();
-        Alert.alert('알림', '목표가 알림이 설정되었습니다.');
+      console.error('목표가 알림 설정 실패:', error.response?.data || error.message);
+      if (isFavoriteRequiredError(error)) {
+        retryAfterFavoriteConfirm(saveTargetPriceSetting, '목표가 알림이 설정되었습니다.');
         return;
-      } catch (retryError: any) {
-        console.error('재시도 목표가 알림 저장 실패:', retryError.response?.data || retryError.message);
       }
-
-      Alert.alert('오류', '목표가 알림 저장 중 문제가 발생했습니다.');
+      Alert.alert('오류', '목표가 알림 설정 중 문제가 발생했습니다.');
     } finally {
       setIsSaving(false);
     }
@@ -148,22 +187,38 @@ export default function NotificationSettings() {
   };
 
   const handleToggleLowest = async () => {
-    try {
+    const saveLowestAlert = async () => {
       const response = await notificationApi.toggleLowestPrice(apiCurrencyCode);
       setLowestAlertOn(Boolean(response?.isLowestAlertOn ?? response?.data?.isLowestAlertOn));
+    };
+
+    try {
+      await saveLowestAlert();
     } catch (error: any) {
       console.error('최저가 알림 토글 실패:', error.response?.data || error.message);
-      Alert.alert('오류', '최저가 알림 변경 중 문제가 발생했습니다.');
+      if (isFavoriteRequiredError(error)) {
+        retryAfterFavoriteConfirm(saveLowestAlert, '최저가 알림 설정이 저장되었습니다.');
+        return;
+      }
+      Alert.alert('오류', '최저가 알림 설정 중 문제가 발생했습니다.');
     }
   };
 
   const handleToggleVolatility = async () => {
-    try {
+    const saveVolatilityAlert = async () => {
       const response = await notificationApi.toggleVolatility(apiCurrencyCode);
       setVolatilityAlertOn(Boolean(response?.isVolatilityAlertOn ?? response?.data?.isVolatilityAlertOn));
+    };
+
+    try {
+      await saveVolatilityAlert();
     } catch (error: any) {
       console.error('급등락 알림 토글 실패:', error.response?.data || error.message);
-      Alert.alert('오류', '급등락 알림 변경 중 문제가 발생했습니다.');
+      if (isFavoriteRequiredError(error)) {
+        retryAfterFavoriteConfirm(saveVolatilityAlert, '급등락 변동성 알림 설정이 저장되었습니다.');
+        return;
+      }
+      Alert.alert('오류', '급등락 알림 설정 중 문제가 발생했습니다.');
     }
   };
 
