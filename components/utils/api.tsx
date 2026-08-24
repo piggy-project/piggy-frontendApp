@@ -245,8 +245,13 @@ export const exchangeApi = {
   },
   // 4. 일일 시간별(09:00 ~ 22:00) 히스토리 조회
   getDailyHourlyHistory: (code: string) => {
-    return request(`/api/exchange/history/daily/${code}`, { 
+    return request(`/api/exchange/history/daily/${encodeURIComponent(code)}`, { 
       method: 'GET' 
+    });
+  },
+  getDailyHourlyHistoryByQuery: (code: string) => {
+    return request(`/api/exchange/history/daily?code=${encodeURIComponent(code)}`, {
+      method: 'GET',
     });
   },
   // 5. 가성비 여행지 추천 조회
@@ -498,6 +503,21 @@ export const communityApi = {
 };
 
 export const notificationApi = {
+  getNotifications: () => {
+    return request('/api/notifications', {
+      method: 'GET',
+    });
+  },
+  markNotificationAsRead: (notificationId: number | string) => {
+    return request(`/api/notifications/${notificationId}/read`, {
+      method: 'PATCH',
+    });
+  },
+  deleteNotification: (notificationId: number | string) => {
+    return request(`/api/notifications/${notificationId}`, {
+      method: 'DELETE',
+    });
+  },
   updatePercentSetting: (data: {
     currencyCode: string;
     targetPercent: number;

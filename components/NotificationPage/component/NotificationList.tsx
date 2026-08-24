@@ -1,10 +1,38 @@
+import { notificationApi } from '@/components/utils/api';
 import { NOTIFICATION_STORAGE_KEY, StoredNotification } from '@/components/utils/NotificationHelper';
 import { Typography } from '@/constants/Typography';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { useEffect, useState } from 'react';
+import { useFocusEffect } from 'expo-router';
+import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, DeviceEventEmitter, FlatList, Text, TouchableOpacity, View } from 'react-native';
 import { styles } from './NotificationList.styles';
+
+type NotificationItem = {
+  id: string;
+  title: string;
+  body?: string;
+  receivedAt: string;
+  type?: string;
+  isRead: boolean;
+  isLocal?: boolean;
+};
+
+type ServerNotification = {
+  id?: number | string;
+  notificationId?: number | string;
+  title?: string;
+  body?: string;
+  message?: string;
+  content?: string;
+  type?: string;
+  notificationType?: string;
+  createdAt?: string;
+  sentAt?: string;
+  receivedAt?: string;
+  isRead?: boolean;
+  read?: boolean;
+};
 
 const getTimeText = (receivedAt: string) => {
   const receivedTime = new Date(receivedAt).getTime();
@@ -19,34 +47,147 @@ const getTimeText = (receivedAt: string) => {
   return `${Math.floor(diffHours / 24)}일 전`;
 };
 
+const getTypeTitle = (type?: string) => {
+  switch (type) {
+    case 'EXCHANGE_PERCENT':
+      return '환율 변동 알림';
+    case 'TARGET_PRICE':
+      return '목표 환율 알림';
+    case 'LOWEST_PRICE':
+      return '최저가 알림';
+    case 'VOLATILITY':
+      return '급등락 알림';
+    default:
+      return '알림';
+  }
+};
+
+const mapServerNotification = (item: ServerNotification): NotificationItem => {
+  const id = String(item.id ?? item.notificationId ?? `${Date.now()}`);
+  const type = item.type ?? item.notificationType;
+  const body = item.body ?? item.message ?? item.content ?? '';
+
+  return {
+    id,
+    type,
+    title: item.title || getTypeTitle(type),
+    body,
+    receivedAt: item.createdAt || item.sentAt || item.receivedAt || new Date().toISOString(),
+    isRead: Boolean(item.isRead ?? item.read),
+  };
+};
+
+const mapLocalNotification = (item: StoredNotification): NotificationItem => ({
+  id: item.id,
+  title: item.title,
+  body: item.body,
+  receivedAt: item.receivedAt,
+  isRead: item.isRead,
+  isLocal: true,
+});
+
+const extractNotificationArray = (response: any): ServerNotification[] => {
+  const candidates = [
+    response,
+    response?.data,
+    response?.content,
+    response?.notifications,
+    response?.items,
+    response?.data?.content,
+    response?.data?.notifications,
+    response?.data?.items,
+  ];
+
+  const list = candidates.find((candidate) => Array.isArray(candidate));
+  return list || [];
+};
+
 export default function NotificationList() {
-  const [notifications, setNotifications] = useState<StoredNotification[]>([]);
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    fetchNotifications();
-    const subscription = DeviceEventEmitter.addListener('notifications-updated', fetchNotifications);
+  const fetchLocalNotifications = async () => {
+    const saved = await AsyncStorage.getItem(NOTIFICATION_STORAGE_KEY);
+    const parsed = saved ? JSON.parse(saved) : [];
+    return Array.isArray(parsed) ? parsed.map(mapLocalNotification) : [];
+  };
 
-    return () => subscription.remove();
-  }, []);
-
-  const fetchNotifications = async () => {
+  const fetchNotifications = useCallback(async (showLoading = true) => {
     try {
-      const saved = await AsyncStorage.getItem(NOTIFICATION_STORAGE_KEY);
-      const parsed = saved ? JSON.parse(saved) : [];
-      setNotifications(Array.isArray(parsed) ? parsed : []);
-    } catch (error) {
-      console.error('알림 로딩 실패', error);
-      setNotifications([]);
+      if (showLoading) setLoading(true);
+
+      const response = await notificationApi.getNotifications();
+      const rawItems = extractNotificationArray(response);
+      const serverItems = rawItems.map(mapServerNotification);
+      setNotifications(serverItems);
+    } catch (error: any) {
+      console.error('서버 알림함 조회 실패:', error.response?.data || error.message);
+
+      try {
+        const localItems = await fetchLocalNotifications();
+        setNotifications(localItems);
+      } catch (localError) {
+        console.error('로컬 알림 로딩 실패:', localError);
+        setNotifications([]);
+      }
     } finally {
       setLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    const subscription = DeviceEventEmitter.addListener('notifications-updated', () => {
+      fetchNotifications(false);
+    });
+
+    return () => subscription.remove();
+  }, [fetchNotifications]);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchNotifications();
+    }, [fetchNotifications])
+  );
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    fetchNotifications(false);
+  };
+
+  const handlePress = async (item: NotificationItem) => {
+    if (item.isRead || item.isLocal) return;
+
+    setNotifications((prev) => (
+      prev.map((notification) => (
+        notification.id === item.id ? { ...notification, isRead: true } : notification
+      ))
+    ));
+
+    try {
+      await notificationApi.markNotificationAsRead(item.id);
+    } catch (error: any) {
+      console.error('알림 읽음 처리 실패:', error.response?.data || error.message);
+      fetchNotifications(false);
     }
   };
 
-  const handleDelete = async (id: string) => {
-    const nextNotifications = notifications.filter((item) => item.id !== id);
+  const handleDelete = async (item: NotificationItem) => {
+    const previous = notifications;
+    const nextNotifications = notifications.filter((notification) => notification.id !== item.id);
     setNotifications(nextNotifications);
-    await AsyncStorage.setItem(NOTIFICATION_STORAGE_KEY, JSON.stringify(nextNotifications));
+
+    try {
+      if (item.isLocal) {
+        await AsyncStorage.setItem(NOTIFICATION_STORAGE_KEY, JSON.stringify(nextNotifications));
+      } else {
+        await notificationApi.deleteNotification(item.id);
+      }
+    } catch (error: any) {
+      console.error('알림 삭제 실패:', error.response?.data || error.message);
+      setNotifications(previous);
+    }
   };
 
   if (loading) {
@@ -70,9 +211,15 @@ export default function NotificationList() {
       data={notifications}
       keyExtractor={(item) => item.id}
       contentContainerStyle={styles.listContainer}
+      refreshing={refreshing}
+      onRefresh={handleRefresh}
       renderItem={({ item }) => (
-        <View style={styles.itemContainer}>
-          <View style={styles.iconCircle}>
+        <TouchableOpacity
+          style={[styles.itemContainer, !item.isRead && styles.unreadItemContainer]}
+          activeOpacity={0.75}
+          onPress={() => handlePress(item)}
+        >
+          <View style={[styles.iconCircle, !item.isRead && styles.unreadIconCircle]}>
             <Ionicons name="notifications" size={20} color="#FF8FA3" />
           </View>
 
@@ -88,13 +235,15 @@ export default function NotificationList() {
             <Text style={[styles.time, Typography.Pretendard_M_12]}>{getTimeText(item.receivedAt)}</Text>
           </View>
 
+          {!item.isRead && <View style={styles.unreadDot} />}
+
           <TouchableOpacity
-            onPress={() => handleDelete(item.id)}
+            onPress={() => handleDelete(item)}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
             <Ionicons name="close" size={20} color="#bbb" />
           </TouchableOpacity>
-        </View>
+        </TouchableOpacity>
       )}
       ItemSeparatorComponent={() => <View style={styles.separator} />}
     />

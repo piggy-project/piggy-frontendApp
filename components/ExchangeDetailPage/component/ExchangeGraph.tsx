@@ -116,6 +116,13 @@ export default function ExchangeGraph({
     return { newRates, newLabels };
   };
 
+  const processFallbackDailyData = (result: HistoryData[]) => {
+    const latestData = result.slice(-8);
+    const newRates = latestData.map(item => item.rate);
+    const newLabels = latestData.map(item => item.date.replace('-', '.'));
+    return { newRates, newLabels };
+  };
+
   const processPeriodData = (result: HistoryData[], selectedPeriod: Period) => {
     let filteredData: HistoryData[] = [];
 
@@ -165,15 +172,27 @@ export default function ExchangeGraph({
 
       let result: HistoryData[];
       if (period === '1D') {
-        result = await exchangeApi.getDailyHourlyHistory(code);
+        try {
+          result = await exchangeApi.getDailyHourlyHistory(code);
+        } catch (dailyError: any) {
+          console.warn('1D 그래프 path API 실패, query API로 재시도:', dailyError?.response?.data || dailyError?.message);
+
+          try {
+            result = await exchangeApi.getDailyHourlyHistoryByQuery(code);
+          } catch (queryError: any) {
+            console.warn('1D 그래프 query API 실패, 기간별 히스토리로 대체:', queryError?.response?.data || queryError?.message);
+            result = await exchangeApi.getExchangeHistory(code);
+          }
+        }
       } else {
         result = await exchangeApi.getExchangeHistory(code);
       }
 
       if (result && result.length > 0) {
         await AsyncStorage.setItem(cacheKey, JSON.stringify(result));
+        const isDailyHourlyData = period === '1D' && result.some(item => item.date.includes(':'));
         const { newRates, newLabels } = period === '1D'
-          ? processDailyData(result)
+          ? (isDailyHourlyData ? processDailyData(result) : processFallbackDailyData(result))
           : processPeriodData(result.slice(-(period === '1M' ? 30 : period === '3M' ? 90 : 365)), period);
         setLabels(newLabels);
         setGraphData(newRates);
@@ -189,6 +208,14 @@ export default function ExchangeGraph({
     return (
       <View style={[styles.graphContainer, styles.center]}>
         <ActivityIndicator size="large" color="#FF3B30" />
+      </View>
+    );
+  }
+
+  if (graphData.length === 0) {
+    return (
+      <View style={[styles.graphContainer, styles.center]}>
+        <Text style={styles.emptyText}>그래프 데이터를 불러오지 못했습니다.</Text>
       </View>
     );
   }

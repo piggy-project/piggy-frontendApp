@@ -3,7 +3,8 @@ import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { DeviceEventEmitter, Platform } from 'react-native';
-import { notificationApi } from './api';
+import { authApi, notificationApi } from './api';
+import { getAccessToken } from './authStore';
 
 export type StoredNotification = {
   id: string;
@@ -50,6 +51,56 @@ export async function saveNotification(notification: Notifications.Notification)
     DeviceEventEmitter.emit('notifications-updated');
   } catch (error) {
     console.error('알림 저장 실패:', error);
+  }
+}
+
+const extractServerNotifications = (response: any) => {
+  const candidates = [
+    response,
+    response?.data,
+    response?.content,
+    response?.notifications,
+    response?.items,
+    response?.data?.content,
+    response?.data?.notifications,
+    response?.data?.items,
+  ];
+
+  return candidates.find((candidate) => Array.isArray(candidate)) || [];
+};
+
+export async function syncServerNotificationsToLocal() {
+  try {
+    const response = await notificationApi.getNotifications();
+    const serverItems = extractServerNotifications(response);
+    const nextItems: StoredNotification[] = serverItems.map((item: any) => {
+      const type = item.type || item.notificationType;
+      const title = item.title || (
+        type === 'TARGET_PRICE'
+          ? '목표 환율 알림'
+          : type === 'EXCHANGE_PERCENT'
+            ? '환율 변동 알림'
+            : type === 'LOWEST_PRICE'
+              ? '최저가 알림'
+              : type === 'VOLATILITY'
+                ? '급등락 알림'
+                : '알림'
+      );
+
+      return {
+        id: String(item.id ?? item.notificationId ?? `${Date.now()}`),
+        title,
+        body: item.body || item.message || item.content || '',
+        receivedAt: item.createdAt || item.sentAt || item.receivedAt || new Date().toISOString(),
+        data: item,
+        isRead: Boolean(item.isRead ?? item.read),
+      };
+    });
+
+    await AsyncStorage.setItem(NOTIFICATION_STORAGE_KEY, JSON.stringify(nextItems));
+    DeviceEventEmitter.emit('notifications-updated');
+  } catch (error: any) {
+    console.error('서버 알림 동기화 실패:', error.response?.data || error.message);
   }
 }
 
@@ -121,7 +172,6 @@ export async function registerForPushNotificationsAsync() {
       }
 
       // 6. 로그인 상태인지 확인 후 백엔드로 토큰 전송
-      const { getAccessToken } = require('./authStore');
       const accessToken = await getAccessToken();
 
       if (!accessToken) {
@@ -136,8 +186,7 @@ export async function registerForPushNotificationsAsync() {
       } catch (apiErr: any) {
         console.warn('[FCM] notificationApi.updateFcmToken 실패, userApi.updateFcmToken 시도:', apiErr?.response?.status || apiErr?.message);
         try {
-          const { userApi } = require('./api');
-          await userApi.updateFcmToken(token);
+          await authApi.updateFcmToken(token);
           console.log('[FCM] 서버에 FCM 토큰 등록 완료 (/users/fcm-token)');
         } catch (userApiErr: any) {
           console.error('[FCM] FCM 토큰 서버 등록 실패 (500/에러):', userApiErr?.response?.data || userApiErr?.message || userApiErr);

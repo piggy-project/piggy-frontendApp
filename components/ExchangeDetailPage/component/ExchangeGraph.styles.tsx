@@ -97,4 +97,8 @@ export const styles = StyleSheet.create({
     color: '#999',
     fontSize: 14,
   },
+  emptyText: {
+    color: '#999',
+    fontSize: 13,
+  },
 });

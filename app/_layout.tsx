@@ -7,7 +7,7 @@ import { ActivityIndicator, StatusBar, Text, TextInput, View } from 'react-nativ
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { SafeAreaProvider, initialWindowMetrics } from 'react-native-safe-area-context';
 import { AuthProvider, useAuth } from '../components/utils/AuthContext';
-import { registerNotificationListeners } from '../components/utils/NotificationHelper';
+import { registerNotificationListeners, syncServerNotificationsToLocal } from '../components/utils/NotificationHelper';
 
 // 앱이 로드될 때까지 스플래시 화면 유지
 SplashScreen.preventAutoHideAsync();
@@ -70,6 +70,12 @@ function AppLayout() {
       router.replace('/(tabs)');
     }
   }, [user, isLoading, segments]);
+
+  useEffect(() => {
+    if (!user || isLoading) return;
+
+    syncServerNotificationsToLocal();
+  }, [user, isLoading]);
 
   if (isLoading) {
     return (

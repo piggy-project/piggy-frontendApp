@@ -12,21 +12,26 @@ export const styles = StyleSheet.create({
   },
   itemContainer: {
     flexDirection: 'row',
-    alignItems: 'center', // 수직 중앙 정렬
+    alignItems: 'center',
     paddingVertical: 15,
   },
-  // 왼쪽 원형 아이콘 스타일
+  unreadItemContainer: {
+    backgroundColor: '#FFF8FA',
+  },
   iconCircle: {
     width: 46,
     height: 46,
-    borderRadius: 23, // 반지름 (지름의 절반)
+    borderRadius: 23,
     backgroundColor: '#FFE8EE',
     marginRight: 15,
     justifyContent: 'center',
     alignItems: 'center',
   },
+  unreadIconCircle: {
+    backgroundColor: '#FFDDE7',
+  },
   textContainer: {
-    flex: 1, // 남은 공간 모두 차지
+    flex: 1,
     marginRight: 10,
   },
   title: {
@@ -34,7 +39,7 @@ export const styles = StyleSheet.create({
     marginBottom: 4,
   },
   time: {
-    color: '#888', // 연한 회색
+    color: '#888',
   },
   body: {
     color: '#666',
@@ -43,9 +48,16 @@ export const styles = StyleSheet.create({
   emptyText: {
     color: '#999',
   },
+  unreadDot: {
+    width: 7,
+    height: 7,
+    borderRadius: 3.5,
+    backgroundColor: '#FF6B8A',
+    marginRight: 10,
+  },
   separator: {
     height: 1,
-    backgroundColor: '#F0F0F0', // 아주 연한 구분선
+    backgroundColor: '#F0F0F0',
     width: '100%',
   },
 });
