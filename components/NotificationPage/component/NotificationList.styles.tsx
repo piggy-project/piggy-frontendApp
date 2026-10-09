@@ -2,7 +2,7 @@ import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
   listContainer: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 0,
   },
   centerContainer: {
     flex: 1,
@@ -13,7 +13,8 @@ export const styles = StyleSheet.create({
   itemContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 15,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
   },
   unreadItemContainer: {
     backgroundColor: '#FFF8FA',

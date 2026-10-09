@@ -1,6 +1,6 @@
 import { Typography } from '@/constants/Typography';
 import { useQuery } from '@tanstack/react-query';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ActivityIndicator, Image, ScrollView, Text, View } from 'react-native';
 import { exchangeApi } from '../../utils/api';
 import { styles } from './TodayTravelDestination.styles';
@@ -56,10 +56,19 @@ const DEFAULT_RECOMMENDATIONS: TravelRecommendation[] = [
 
 const TodayTravelDestination: React.FC<TodayTravelDestinationProps> = ({ updateTime }) => {
   // API를 통해 추천 여행지 데이터 가져오기
-  const { data: recommendations, isLoading } = useQuery<TravelRecommendation[]>({
+  const { data: recommendations, isLoading, isError, error } = useQuery<TravelRecommendation[]>({
     queryKey: ['travelRecommendations'],
     queryFn: exchangeApi.getTravelRecommendations,
   });
+
+  useEffect(() => {
+    if (recommendations) {
+      console.log('가성비 여행지 API 수신 성공:', JSON.stringify(recommendations, null, 2));
+    }
+    if (isError) {
+      console.error('가성비 여행지 API 수신 실패:', error);
+    }
+  }, [recommendations, isError, error]);
 
   const displayList = (Array.isArray(recommendations) && recommendations.length > 0)
     ? recommendations
@@ -69,6 +78,9 @@ const TodayTravelDestination: React.FC<TodayTravelDestinationProps> = ({ updateT
     return (
       <View style={[styles.container, { paddingVertical: 20, alignItems: 'center' }]}>
         <ActivityIndicator size="small" color="#4A90E2" />
+        <Text style={[Typography.Pretendard_M_12, { color: '#666666', marginTop: 10, textAlign: 'center' }]}>
+          오늘의 가성비 여행지를 분석하는 중...
+        </Text>
       </View>
     );
   }
