@@ -1,5 +1,4 @@
 import { Typography } from '@/constants/Typography';
-import React from 'react';
 import { FlatList, Text, useWindowDimensions, View } from 'react-native';
 import FoodCard from './FoodCard';
 import ProductCard from './ProductCard';

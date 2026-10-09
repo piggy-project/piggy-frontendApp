@@ -1,6 +1,5 @@
 import { Typography } from '@/constants/Typography';
 import { useRouter } from 'expo-router';
-import React from 'react';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface TravelRecommendation {

@@ -1,53 +1,52 @@
 import { Typography } from '@/constants/Typography';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ActivityIndicator, Image, StyleSheet, Text, View } from 'react-native';
 
+// 이미지가 없을 때나 로드 실패 시 보여줄 기본 폴백 이미지
+const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400';
+
 interface FoodCardProps {
-    rank: number;
+    rank?: number;
     name: string;
     category: string;
-    rating: number;
+    rating?: number;
     desc: string;
-    image?: string; // S3나 기본 이미지 URL
+    image?: string;
 }
 
-export default function FoodCard({ rank, name, category, rating, desc, image }: FoodCardProps) {
-    const [hasError, setHasError] = useState(false);
+export default function FoodCard({ rank, name, category, rating = 0, desc, image }: FoodCardProps) {
+    const [imgUri, setImgUri] = useState<string>(image || FALLBACK_IMAGE);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        setHasError(false);
+        setImgUri(image || FALLBACK_IMAGE);
         setIsLoading(true);
     }, [image]);
+
+    const handleError = () => {
+        // 이미지 로드 실패 시 디폴트 푸드 이미지로 교체
+        if (imgUri !== FALLBACK_IMAGE) {
+            setImgUri(FALLBACK_IMAGE);
+        }
+        setIsLoading(false);
+    };
 
     return (
         <View style={styles.container}>
             {/* 이미지 섹션 */}
             <View style={styles.imageWrapper}>
-                {image && !hasError ? (
-                    <>
-                        <Image
-                            source={{ uri: image }}
-                            style={styles.image}
-                            resizeMode="cover"
-                            onLoadEnd={() => setIsLoading(false)} // 로딩 완료 시 indicator 숨김
-                            onError={() => {
-                                setHasError(true);
-                                setIsLoading(false);
-                            }}
-                        />
-                        {/* 로딩 중일 때 보여줄 로딩 바 */}
-                        {isLoading && (
-                            <View style={styles.loaderContainer}>
-                                <ActivityIndicator color="#FFD700" />
-                            </View>
-                        )}
-                    </>
-                ) : (
-                    <View style={styles.placeholder}>
-                        <Text style={[styles.placeholderText, Typography.Pretendard_M_11]}>
-                            사진 준비중입니다
-                        </Text>
+                <Image
+                    source={{ uri: imgUri }}
+                    style={styles.image}
+                    resizeMode="cover"
+                    onLoadEnd={() => setIsLoading(false)}
+                    onError={handleError}
+                />
+                
+                {/* 이미지 로딩 바 */}
+                {isLoading && (
+                    <View style={styles.loaderContainer}>
+                        <ActivityIndicator color="#FFD700" />
                     </View>
                 )}
             </View>
@@ -59,7 +58,9 @@ export default function FoodCard({ rank, name, category, rating, desc, image }: 
 
                 <View style={styles.ratingRow}>
                     <Text style={styles.star}>⭐</Text>
-                    <Text style={[styles.ratingText, Typography.Pretendard_B_16]}>{rating.toFixed(1)}</Text>
+                    <Text style={[styles.ratingText, Typography.Pretendard_B_16]}>
+                        {(rating ?? 0).toFixed(1)}
+                    </Text>
                 </View>
 
                 <Text style={[styles.desc, Typography.Pretendard_M_11]} numberOfLines={2}>
@@ -87,18 +88,6 @@ const styles = StyleSheet.create({
     image: {
         width: '100%',
         height: '100%',
-    },
-    placeholder: {
-        width: '100%',
-        height: '100%',
-        backgroundColor: '#eee',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    placeholderText: {
-        color: '#aaa',
-        textAlign: 'center', // 여러 줄일 때 가운데 정렬
-        lineHeight: 16,
     },
     infoContainer: {
         marginTop: 8,

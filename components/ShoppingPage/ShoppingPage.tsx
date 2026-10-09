@@ -1,5 +1,5 @@
 import { shoppingApi } from '@/components/utils/api';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, RefreshControl, ScrollView, View } from 'react-native';
 import BaseHeader from '../Header/BaseHeader';
 import { styles as baseHeaderStyles } from '../Header/BaseHeader.styles';
@@ -8,10 +8,9 @@ import ComparisonResultList from './component/ComparisonResultList';
 import ProductSection from './component/ProductSection';
 import SearchProduct from './component/SearchProduct';
 import ShoppingUtility from './component/ShoppingUtility';
-import TravelSpotSection from './component/TravelSpotSection';
 import { styles } from './Shopping.styles';
 
-const TRAVEL_TABS = ['전체', '미국', '일본', '+'];
+const TRAVEL_TABS = ['일본','미국', '+'];
 
 const getCountryCode = (currencyCode: string): string => {
   switch (currencyCode.toUpperCase()) {
@@ -52,8 +51,8 @@ const DEFAULT_DIRECT_PURCHASE_ITEMS = [
 export default function ShoppingPage() {
   const [searchResult, setSearchResult] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [recommendItems, setRecommendItems] = useState<any[]>(DEFAULT_POPULAR_ITEMS);
-  const [foodItems, setFoodItems] = useState<any[]>(DEFAULT_FOOD_ITEMS);
+  const [recommendItems, setRecommendItems] = useState<any[]>([]);
+  const [foodItems, setFoodItems] = useState<any[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [isSearchMode, setIsSearchMode] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState('ALL');
@@ -68,7 +67,7 @@ export default function ShoppingPage() {
       const rawData = await shoppingApi.getPopularItems(requestCurrency);
 
       if (!Array.isArray(rawData) || rawData.length === 0) {
-        setRecommendItems(DEFAULT_POPULAR_ITEMS);
+        setRecommendItems([]);
         return;
       }
 
@@ -111,23 +110,37 @@ export default function ShoppingPage() {
       const data = await shoppingApi.getRegionalFoods(countryCode);
 
       if (!Array.isArray(data) || data.length === 0) {
-        setFoodItems(DEFAULT_FOOD_ITEMS);
+        setFoodItems([]);
         return;
       }
 
-      const formattedFood = data.map((food: any) => ({
-        ...food,
-        id: food.id || food.name,
-        image: food.image || 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300',
-        discount: food.discount || '74%',
-        priceKrw: food.priceKrw || '4,800원',
-        localPrice: food.rating ? `평점 ${food.rating}` : food.category || '',
-      }));
+      const formattedFood = data.map((food: any, index: number) => {
+        let validImage = food.image || food.imageUrl;
+
+        // loremflickr 주소나 잘못된 URL이 올 경우 렌더링 가능한 대체 고화질 이미지 주소로 교체
+        if (!validImage || validImage.includes('loremflickr.com')) {
+          validImage = `https://picsum.photos/seed/${encodeURIComponent(food.name || index)}/300/300`;
+        }
+
+        return {
+          ...food,
+          id: food.id || food.rank || `food-${index}`,
+          name: food.name,
+          category: food.category,
+          rating: food.rating ?? 0,
+          desc: food.desc,
+          image: validImage,
+          imageUrl: validImage,
+          discount: food.discount || '',
+          priceKrw: food.priceKrw || '',
+          localPrice: food.rating ? `평점 ${food.rating}` : food.category || '',
+        };
+      });
 
       setFoodItems(formattedFood);
     } catch (error) {
       console.error(`${currency} 음식 로드 실패:`, error);
-      setFoodItems(DEFAULT_FOOD_ITEMS);
+      setFoodItems([]);
     }
   }, []);
 
@@ -237,25 +250,26 @@ export default function ShoppingPage() {
               <ComparisonResultList data={searchResult} />
             ) : (
               <>
+              <ProductSection
+                  title="추천 먹거리"
+                  data={foodItems}
+                  type="food"
+                  layout="horizontal"
+                />
                 <ProductSection
                   title="실시간 인기 아이템"
                   data={recommendItems}
                   type="product"
-                  layout="horizontal"
+                  layout="grid"
                 />
-                <ProductSection
-                  title="추천 먹거리"
-                  data={foodItems}
-                  type="product"
-                  layout="horizontal"
-                />
-                <TravelSpotSection />
-                <ProductSection
+                
+                {/* <TravelSpotSection /> */}
+                {/* <ProductSection
                   title="직구 추천템"
                   data={directItems}
                   type="product"
                   layout="grid"
-                />
+                /> */}
               </>
             )}
           </ScrollView>

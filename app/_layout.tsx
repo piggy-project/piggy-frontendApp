@@ -3,7 +3,7 @@ import { useFonts } from 'expo-font';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import React, { useEffect } from 'react';
-import { ActivityIndicator, StatusBar, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, AppState, StatusBar, Text, TextInput, View } from 'react-native';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { SafeAreaProvider, initialWindowMetrics } from 'react-native-safe-area-context';
 import { AuthProvider, useAuth } from '../components/utils/AuthContext';
@@ -75,6 +75,18 @@ function AppLayout() {
     if (!user || isLoading) return;
 
     syncServerNotificationsToLocal();
+  }, [user, isLoading]);
+
+  useEffect(() => {
+    if (!user || isLoading) return;
+
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state === 'active') {
+        syncServerNotificationsToLocal();
+      }
+    });
+
+    return () => subscription.remove();
   }, [user, isLoading]);
 
   if (isLoading) {

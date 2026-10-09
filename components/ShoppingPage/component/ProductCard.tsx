@@ -3,7 +3,7 @@ import { getAccessToken } from '@/components/utils/authStore';
 import { Typography } from '@/constants/Typography';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Alert, DeviceEventEmitter, Image, Linking, Pressable, Text, TouchableOpacity, View } from 'react-native';
 import { styles } from './ProductCard.styles';
 

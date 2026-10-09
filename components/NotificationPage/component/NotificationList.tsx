@@ -27,17 +27,22 @@ type ServerNotification = {
   content?: string;
   type?: string;
   notificationType?: string;
+  typeLabel?: string;
+  currencyCode?: string;
   createdAt?: string;
+  createdDate?: string;
   sentAt?: string;
   receivedAt?: string;
+  readAt?: string | null;
   isRead?: boolean;
   read?: boolean;
 };
 
 const getTimeText = (receivedAt: string) => {
   const receivedTime = new Date(receivedAt).getTime();
-  const diffMinutes = Math.max(0, Math.floor((Date.now() - receivedTime) / 60000));
+  if (!Number.isFinite(receivedTime)) return '';
 
+  const diffMinutes = Math.max(0, Math.floor((Date.now() - receivedTime) / 60000));
   if (diffMinutes < 1) return '방금 전';
   if (diffMinutes < 60) return `${diffMinutes}분 전`;
 
@@ -65,15 +70,19 @@ const getTypeTitle = (type?: string) => {
 const mapServerNotification = (item: ServerNotification): NotificationItem => {
   const id = String(item.id ?? item.notificationId ?? `${Date.now()}`);
   const type = item.type ?? item.notificationType;
+  const title = item.title || item.typeLabel || getTypeTitle(type);
   const body = item.body ?? item.message ?? item.content ?? '';
+  const currencyPrefix = item.currencyCode && !title.includes(item.currencyCode)
+    ? `[${item.currencyCode}] `
+    : '';
 
   return {
     id,
     type,
-    title: item.title || getTypeTitle(type),
+    title: `${currencyPrefix}${title}`,
     body,
-    receivedAt: item.createdAt || item.sentAt || item.receivedAt || new Date().toISOString(),
-    isRead: Boolean(item.isRead ?? item.read),
+    receivedAt: item.createdAt || item.createdDate || item.sentAt || item.receivedAt || new Date().toISOString(),
+    isRead: Boolean(item.isRead ?? item.read ?? item.readAt),
   };
 };
 
@@ -98,8 +107,7 @@ const extractNotificationArray = (response: any): ServerNotification[] => {
     response?.data?.items,
   ];
 
-  const list = candidates.find((candidate) => Array.isArray(candidate));
-  return list || [];
+  return candidates.find((candidate) => Array.isArray(candidate)) || [];
 };
 
 export default function NotificationList() {
@@ -118,8 +126,7 @@ export default function NotificationList() {
       if (showLoading) setLoading(true);
 
       const response = await notificationApi.getNotifications();
-      const rawItems = extractNotificationArray(response);
-      const serverItems = rawItems.map(mapServerNotification);
+      const serverItems = extractNotificationArray(response).map(mapServerNotification);
       setNotifications(serverItems);
     } catch (error: any) {
       console.error('서버 알림함 조회 실패:', error.response?.data || error.message);
