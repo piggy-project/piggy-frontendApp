@@ -2,7 +2,7 @@ import { shoppingApi } from '@/components/utils/api';
 import { Typography } from '@/constants/Typography';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from 'expo-router';
-import React, { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -174,7 +174,7 @@ export default function ShoppingBookmarkPage() {
                   <View style={styles.imagePlaceholder} />
                 )}
                 <TouchableOpacity style={styles.bookmark} onPress={() => handleDelete(item)}>
-                  <Ionicons name="bookmark" size={18} color="#C9C9C9" />
+                  <Ionicons name="bookmark" size={18} color="#FF6B8A" />
                 </TouchableOpacity>
               </View>
               <Text style={[styles.name, Typography.Pretendard_M_12]} numberOfLines={2}>
