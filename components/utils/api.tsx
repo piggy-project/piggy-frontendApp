@@ -1,5 +1,6 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import { DeviceEventEmitter } from 'react-native';
+import * as Linking from 'expo-linking';
 import { getAccessToken, getRefreshToken, removeTokens, saveTokens } from './authStore';
 
 const BASE_URL = 'https://piggys.mooo.com';
@@ -199,7 +200,9 @@ export const authApi = {
   },
   // 비밀번호 재설정 이메일 요청
   requestPasswordReset: (email: string, source: 'web' | 'app') => {
-    return request(`/users/password/reset-request?email=${email}&source=${source}`, {
+    // 현재 연결된 환경(와이파이/배포 앱)에 맞는 딥링크 주소를 서버에 전달
+    const redirectUrl = Linking.createURL('password-reset');
+    return request(`/users/password/reset-request?email=${email}&source=${source}&redirectUrl=${encodeURIComponent(redirectUrl)}`, {
       method: 'POST',
       skipAuth: true
     });
