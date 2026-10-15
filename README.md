@@ -89,7 +89,6 @@ flowchart TB
   </thead>
   <tbody>
     <tr><td>실시간 환율</td><td>주요 9개 통화의 현재가 · 전일 대비 · 당일 고저가 · 시간대별 추이 · 기간별 이력 제공. 최근 90일 환율 대비 현재 환율의 백분위로 환전 적기 안내</td><td>React Query, react-native-chart-kit, AsyncStorage 캐시</td></tr>
-    <tr><td>환전 수수료 시뮬레이터</td><td>은행별(국민 · 신한 · 기업 · 토스 · 직접 입력) 수수료율과 우대율을 적용해 최종 수령 외화와 절약 금액 계산</td><td>상태 관리, 실시간 환율 연동</td></tr>
     <tr><td>AI 여행지 추천 · 챗봇</td><td>해시태그별 여행지를 매시간 추천하고, 앱 사용법 · 여행 · 환율 질문에 답변하며 후속 질문 추천</td><td>React Query, AsyncStorage 대화 캐시</td></tr>
     <tr><td>가격 OCR 스캔</td><td>가격표 사진에서 통화 기호와 금액을 인식해 실시간 환율로 원화 환산</td><td>expo-camera, expo-image-manipulator, expo-image-picker</td></tr>
     <tr><td>해외 쇼핑 가격 비교</td><td>네이버(국내)와 통화별 해외 쇼핑 API(Rakuten · eBay · SerpAPI) 가격을 환율 환산해 비교, 검색어 랭킹 기반 인기 상품 제공</td><td>Axios, AsyncStorage 최근 검색어</td></tr>
@@ -119,7 +118,7 @@ piggy
 │   ├── ShoppingPage · CommunityPage · ChatbotPage
 │   ├── MyPage · NotificationPage · LoginPage · Header
 │   └── utils            # api, AuthContext, authStore, NotificationHelper, OCRScanner
-├── constants            # 통화 정보, 테마, 타이포그래피
+├── constants            # 통화 정보, 테마
 └── assets               # 폰트(Pretendard), 이미지, 아이콘
 ```
 
@@ -185,15 +184,3 @@ flowchart LR
 
 - 통화 종류에 따라 가이드 박스 크기를 다르게 보여 가격표 영역만 정확히 잘라서 보냅니다.
 - 엔화 · 동화처럼 100단위로 고시되는 통화는 `금액 ÷ 100 × 환율`로 다시 계산해 표시합니다.
-
-### 빌드 · 배포
-
-| 프로필 | 용도 |
-| --- | --- |
-| `development` | Expo Dev Client로 개발 · 디버깅 (내부 배포) |
-| `preview` | 테스트용 내부 배포 빌드 |
-| `production` | 배포용 빌드 (버전 자동 증가) |
-
-- 로컬 실행: `npm install` → `npx expo start` (Android는 `npx expo run:android`)
-- Android 네이티브 프로젝트(`android/`)와 Firebase 설정(`google-services.json`)을 포함하며, iOS 네이티브 폴더는 필요할 때 생성합니다.
-- 서버는 별도 저장소에서 GitHub Actions → Docker Hub → AWS EC2 순서로 배포되며, 앱은 배포된 서버 주소로 REST 요청을 보냅니다.
