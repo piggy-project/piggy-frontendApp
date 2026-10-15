@@ -74,6 +74,12 @@ api.interceptors.response.use(
           throw new Error('Invalid token response from server');
         }
       } catch (refreshError: any) {
+        // 저장된 리프레시 토큰이 원래 없는 경우(로그인 전)는 세션 만료가 아니므로 알림 없이 에러만 반환
+        if (refreshError.message === 'No refresh token available') {
+          processQueue(refreshError, null);
+          return Promise.reject(refreshError);
+        }
+
         console.error('[API] 리프레시 실패:', refreshError.response?.data || refreshError.message);
         processQueue(refreshError, null);
 
@@ -81,7 +87,6 @@ api.interceptors.response.use(
         const shouldExpireSession =
           status === 401 ||
           status === 403 ||
-          refreshError.message === 'No refresh token available' ||
           refreshError.message === 'Invalid token response from server';
 
         if (shouldExpireSession) {

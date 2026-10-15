@@ -25,7 +25,7 @@ export default function SocialLoginButtons() {
 
       if (result.type === 'success' && result.url) {
         const url = result.url;
-        const params = new URLSearchParams(url.split('?')[1]);
+        const params = new URLSearchParams((url.split('?')[1] || '').split('#')[0]); // iOS가 붙이는 '#' 제거
 
         if (url.includes('/oauth/error')) {
           const rawErrorMessage = params.get('message');
