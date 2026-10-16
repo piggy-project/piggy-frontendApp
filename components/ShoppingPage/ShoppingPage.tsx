@@ -1,6 +1,6 @@
 import { shoppingApi } from '@/components/utils/api';
 import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, RefreshControl, ScrollView, View } from 'react-native';
+import { ActivityIndicator, RefreshControl, ScrollView, Text, View } from 'react-native';
 import BaseHeader from '../Header/BaseHeader';
 import { styles as baseHeaderStyles } from '../Header/BaseHeader.styles';
 import ChoiceCountry from '../MainDashBoardPage/component/ChoiceCountry';
@@ -57,6 +57,8 @@ export default function ShoppingPage() {
   const [isSearchMode, setIsSearchMode] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState('ALL');
   const [lastQuery, setLastQuery] = useState('');
+  const [searchError, setSearchError] = useState(false);
+  const [searchBarKey, setSearchBarKey] = useState(0);
 
   const directItems = DEFAULT_DIRECT_PURCHASE_ITEMS;
 
@@ -152,9 +154,9 @@ export default function ShoppingPage() {
   const handleCountrySelect = (currencyCode: string) => {
     setSelectedCurrency(currencyCode);
 
-    if (lastQuery) {
-      handleSearch(lastQuery, currencyCode);
-    }
+    // 국가 탭을 누르면 검색 결과를 풀고 기본 여행탭 화면으로 돌아간다.
+    handleReset();
+    setSearchBarKey((prev) => prev + 1); // 검색창 입력값도 비우기 위해 재생성
   };
 
   const handleSearch = async (query: string, currency: string = selectedCurrency) => {
@@ -165,6 +167,7 @@ export default function ShoppingPage() {
 
     setLastQuery(query);
     setIsSearchMode(false);
+    setSearchError(false);
 
     try {
       setIsLoading(true);
@@ -173,6 +176,8 @@ export default function ShoppingPage() {
       setSearchResult(data);
     } catch (error) {
       console.error('검색 실패:', error);
+      setSearchResult(null);
+      setSearchError(true);
     } finally {
       setIsLoading(false);
     }
@@ -180,6 +185,7 @@ export default function ShoppingPage() {
 
   const handleReset = () => {
     setSearchResult(null);
+    setSearchError(false);
     setLastQuery('');
   };
 
@@ -213,6 +219,7 @@ export default function ShoppingPage() {
             left={null}
             center={
               <SearchProduct
+                key={searchBarKey}
                 variant="header"
                 onFocus={() => setIsSearchMode(true)}
                 onSearch={(q) => handleSearch(q)}
@@ -246,6 +253,15 @@ export default function ShoppingPage() {
           >
             {isLoading ? (
               <ActivityIndicator size="large" color="#FFD700" style={{ marginTop: 50 }} />
+            ) : searchError ? (
+              <View style={{ alignItems: 'center', marginTop: 80, paddingHorizontal: 20 }}>
+                <Text style={{ fontSize: 15, color: '#222', textAlign: 'center' }}>
+                  검색 중 문제가 발생했습니다.
+                </Text>
+                <Text style={{ fontSize: 13, color: '#777', textAlign: 'center', marginTop: 8 }}>
+                  잠시 후 다시 시도해주세요.
+                </Text>
+              </View>
             ) : searchResult ? (
               <ComparisonResultList data={searchResult} />
             ) : (

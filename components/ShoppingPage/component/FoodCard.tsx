@@ -114,7 +114,11 @@ const styles = StyleSheet.create({
         lineHeight: 15,
     },
     loaderContainer: {
-        ...StyleSheet.absoluteFillObject,
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#F5F5F5',

@@ -2,7 +2,7 @@ import { exchangeApi } from '@/components/utils/api';
 import { CURRENCY_INFO_MAP, getCurrencyApiCode } from '@/constants/Currency';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, ScrollView, View } from 'react-native';
 import ExchangeHeader from '../Header/ExchangeHeader';
 import ShowCountry from './component/ShowCountry';

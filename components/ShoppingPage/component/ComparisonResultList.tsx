@@ -4,10 +4,9 @@ import { Typography } from '@/constants/Typography';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
-import { Alert, DeviceEventEmitter, Image, Linking, Pressable, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import { Alert, DeviceEventEmitter, Image, Linking, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function ComparisonResultList({ data }: { data: any }) {
-  const { width } = useWindowDimensions();
   const [favoriteMap, setFavoriteMap] = React.useState<Record<string, boolean>>({});
   const hasRakutenData = data?.rakutenResults?.Items?.length > 0;
   const hasSerpData = data?.serpResults?.length > 0;
@@ -42,10 +41,6 @@ export default function ComparisonResultList({ data }: { data: any }) {
   }
 
   const { naverResults, rakutenResults, serpResults, exchangeRate, currencyCode } = data;
-  const gridGap = 16;
-  const horizontalPadding = 20;
-  const cardWidth = Math.floor((width - horizontalPadding * 2 - gridGap) / 2);
-
   const parsePrice = (value: any) => {
     if (typeof value === 'number') {
       return value;
@@ -55,7 +50,11 @@ export default function ComparisonResultList({ data }: { data: any }) {
     return Number.isFinite(parsed) ? parsed : 0;
   };
 
-  const naverBestPrice = parsePrice(naverResults?.items?.[0]?.lprice);
+  // 국내 최저가: 백엔드는 SerpAPI 한국 결과를 { data: [{ salePrice }] } 형태로 내려준다.
+  const koreanPrices: number[] = (naverResults?.data ?? [])
+    .map((product: any) => parsePrice(product?.salePrice))
+    .filter((price: number) => price > 0);
+  const koreaBestPrice = koreanPrices.length > 0 ? Math.min(...koreanPrices) : 0;
 
   const showLoginRequiredAlert = () => {
     Alert.alert(
@@ -130,48 +129,29 @@ export default function ComparisonResultList({ data }: { data: any }) {
   };
 
   const renderPriceComparison = (priceInKrw: number) => {
-    if (!naverBestPrice || !priceInKrw) {
+    if (!koreaBestPrice || !priceInKrw) return null;
+
+    const diff = priceInKrw - koreaBestPrice;
+
+    if (diff === 0) {
       return (
-        <Text style={[styles.convertedPrice, Typography.Pretendard_M_14]}>
-          {priceInKrw.toLocaleString()}원
-        </Text>
+        <View style={styles.compareBox}>
+          <Text style={[styles.compareLabel, Typography.Pretendard_M_12]}>국내 최저가와 동일</Text>
+        </View>
       );
     }
 
-    const cheaperAmount = naverBestPrice - priceInKrw;
-
-    if (cheaperAmount > 0) {
-      const cheaperPercent = Math.max(1, Math.round((cheaperAmount / naverBestPrice) * 100));
-
-      return (
-        <>
-          <Text style={styles.benefitLine} numberOfLines={1}>
-            <Text style={[styles.benefitPercent, Typography.Pretendard_B_16]}>
-              {cheaperPercent}%
-            </Text>
-            <Text style={[styles.convertedPrice, Typography.Pretendard_B_16]}>
-              {' '}{priceInKrw.toLocaleString()}원
-            </Text>
-          </Text>
-          <Text style={[styles.naverPrice, Typography.Pretendard_M_11]}>
-            {naverBestPrice.toLocaleString()}원
-          </Text>
-        </>
-      );
-    }
+    const isExpensive = diff > 0;
 
     return (
-      <>
-        <Text style={[styles.convertedPrice, Typography.Pretendard_M_14]} numberOfLines={1}>
-          {priceInKrw.toLocaleString()}원
+      <View style={styles.compareBox}>
+        <Text style={[styles.compareLabel, Typography.Pretendard_M_12]}>
+          국내 최저가 대비{' '}
+          <Text style={[styles.compareAmount, Typography.Pretendard_B_16, { color: isExpensive ? '#22C55E' : '#FF3B30' }]}>
+            {Math.abs(diff).toLocaleString()}원 {isExpensive ? '비쌈' : '저렴'}
+          </Text>
         </Text>
-        <Text style={[styles.naverCheaperText, Typography.Pretendard_M_11]} numberOfLines={2}>
-          네이버 최저가가 더 저렴합니다!
-        </Text>
-        <Text style={[styles.naverPrice, Typography.Pretendard_M_11]}>
-          {naverBestPrice.toLocaleString()}원
-        </Text>
-      </>
+      </View>
     );
   };
 
@@ -182,17 +162,17 @@ export default function ComparisonResultList({ data }: { data: any }) {
     const favoriteKey = `${source}-${externalProductId}`;
 
     return (
-      <TouchableOpacity 
-        key={key} 
-        style={[styles.card, { width: cardWidth }]} 
+      <TouchableOpacity
+        key={key}
+        style={styles.card}
         onPress={() => openProductLink(link)}
         activeOpacity={0.8}
       >
-        <View style={[styles.imageWrapper, { width: cardWidth, height: cardWidth }]}>
+        <View style={styles.imageWrapper}>
           <Image
             source={{ uri: item.image || 'https://via.placeholder.com/160' }}
             style={styles.image}
-            resizeMode="cover"
+            resizeMode="contain"
           />
           <Pressable
             style={styles.favoriteButton}
@@ -208,10 +188,20 @@ export default function ComparisonResultList({ data }: { data: any }) {
             />
           </Pressable>
         </View>
-        <Text numberOfLines={2} style={[styles.itemName, Typography.Pretendard_M_12]}>
-          {item.name}
-        </Text>
-        {renderPriceComparison(priceInKrw)}
+        <View style={styles.info}>
+          <Text numberOfLines={2} style={[styles.itemName, Typography.Pretendard_M_14]}>
+            {item.name}
+          </Text>
+          <Text style={styles.priceLine} numberOfLines={1}>
+            <Text style={[styles.localPrice, Typography.Pretendard_B_16]}>
+              {parsePrice(item.price).toLocaleString()} {currencyCode}
+            </Text>
+            <Text style={[styles.convertedPrice, Typography.Pretendard_M_12]}>
+              {'  '}(약 {priceInKrw.toLocaleString()}원)
+            </Text>
+          </Text>
+          {renderPriceComparison(priceInKrw)}
+        </View>
       </TouchableOpacity>
     );
   };
@@ -220,9 +210,8 @@ export default function ComparisonResultList({ data }: { data: any }) {
     <View style={styles.container}>
       <View style={styles.resultHeader}>
         <Text style={[styles.title, Typography.Pretendard_B_16]}>검색 결과</Text>
-        <Text style={[styles.sortText, Typography.Pretendard_M_11]}>추천순⌄</Text>
       </View>
-      <View style={[styles.grid, { columnGap: gridGap }]}>
+      <View style={styles.list}>
         {/* 4. 일본(라쿠텐) 리스트: item.itemUrl 사용 */}
         {currencyCode === 'JPY' && rakutenResults?.Items?.map((itemObj: any, index: number) => {
           const item = itemObj.Item;
@@ -259,28 +248,37 @@ const styles = StyleSheet.create({
   },
   title: { color: '#222' },
   sortText: { color: '#777' },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    rowGap: 26,
+  list: {
+    rowGap: 14,
   },
   card: {
-    backgroundColor: '#fff'
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 14,
+    padding: 14,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
   },
   imageWrapper: {
-    marginBottom: 8,
+    width: 104,
+    height: 104,
+    marginRight: 14,
     position: 'relative',
   },
   image: {
     width: '100%',
     height: '100%',
     borderRadius: 6,
-    backgroundColor: '#F0F0F0',
+    backgroundColor: '#fff',
   },
   favoriteButton: {
     position: 'absolute',
-    right: 8,
-    bottom: 8,
+    right: 0,
+    bottom: 0,
     width: 28,
     height: 28,
     borderRadius: 14,
@@ -288,29 +286,33 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  info: {
+    flex: 1,
+  },
   itemName: {
-    minHeight: 34,
     color: '#222',
-    lineHeight: 17,
-    marginBottom: 2,
+    lineHeight: 20,
+    marginBottom: 6,
   },
-  benefitLine: {
-    lineHeight: 19,
+  priceLine: {
+    marginBottom: 8,
   },
-  benefitPercent: {
-    color: '#FF3B57',
-  },
-  convertedPrice: {
+  localPrice: {
     color: '#111',
   },
-  naverCheaperText: {
-    color: '#FF3B57',
-    lineHeight: 15,
-    marginTop: 2,
+  convertedPrice: {
+    color: '#888',
   },
-  naverPrice: {
-    color: '#9A9A9A',
-    textDecorationLine: 'line-through',
-    marginTop: 1,
+  compareBox: {
+    backgroundColor: '#F5F5F5',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+  },
+  compareLabel: {
+    color: '#222',
+  },
+  compareAmount: {
+    fontWeight: '700',
   },
 });
