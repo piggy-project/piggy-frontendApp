@@ -2,7 +2,6 @@ import { CURRENCY_INFO_MAP, getCurrencyApiCode } from '@/constants/Currency';
 import { Typography } from '@/constants/Typography';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React from 'react';
 import { ActivityIndicator, Dimensions, Image, Text, TouchableOpacity, View } from 'react-native';
 import ExchangeGraph from '../../ExchangeDetailPage/component/ExchangeGraph';
 import { styles } from './BottomInfoContainer.styles';
@@ -66,9 +65,9 @@ export default function BottomInfoContainer({ data, isLoading, displayCode }: Bo
           </View>
         </View>
 
-        <TouchableOpacity style={styles.exchangeRecordButton} activeOpacity={0.8}>
+        {/* <TouchableOpacity style={styles.exchangeRecordButton} activeOpacity={0.8}>
           <Text style={[styles.exchangeRecordText, Typography.Pretendard_M_12]}>내 환전 기록</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
 
       <View style={styles.graphArea}>

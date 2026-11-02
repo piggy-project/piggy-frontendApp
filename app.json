@@ -7,7 +7,6 @@
     "icon": "./assets/images/icon.png",
     "scheme": "piggy",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": false,
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.piggy"
@@ -21,7 +20,6 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "permissions": [
         "android.permission.RECORD_AUDIO"
@@ -67,11 +65,6 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    },
-    "statusBar": {
-      "barStyle": "dark-content",
-      "translucent": true,
-      "backgroundColor": "transparent"
     },
     "extra": {
       "router": {},

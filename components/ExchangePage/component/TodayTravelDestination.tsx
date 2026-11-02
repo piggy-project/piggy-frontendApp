@@ -62,9 +62,6 @@ const TodayTravelDestination: React.FC<TodayTravelDestinationProps> = ({ updateT
   });
 
   useEffect(() => {
-    if (recommendations) {
-      console.log('가성비 여행지 API 수신 성공:', JSON.stringify(recommendations, null, 2));
-    }
     if (isError) {
       console.error('가성비 여행지 API 수신 실패:', error);
     }
